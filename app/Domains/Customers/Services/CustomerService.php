@@ -53,6 +53,9 @@ class CustomerService
 
     public function createCustomer(array $data)
     {
+        $sales            = auth()->user();
+        $data['sales_id'] = $sales->id;
+
         $customer = $this->customer_repository->create($data);
 
         if($customer) {

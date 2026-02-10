@@ -15,6 +15,7 @@ class CreateCustomersTable extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('sales_id');
             $table->string('name');
             $table->string('email')->unique();
             $table->string('commercial_name');
@@ -25,6 +26,7 @@ class CreateCustomersTable extends Migration
             $table->string('city');
             $table->float('latitude')->nullable();
             $table->float('longitude')->nullable();
+            $table->foreign('sales_id')->references('id')->on('sales');
             $table->timestamps();
             $table->softDeletes();
         });
