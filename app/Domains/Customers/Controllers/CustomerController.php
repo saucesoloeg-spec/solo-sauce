@@ -5,9 +5,16 @@ namespace App\Domains\Customers\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Domains\Customers\Requests\CreateCustomerRequest;
 
 class CustomerController extends Controller
 {
+    public $customer_service;
+
+    public function __construct(CustomerService $customer_service)
+    {
+        $this->customer_service = $customer_service;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +22,9 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        //
+        $response = $this->customer_service->getAssignedCustomers();
+
+        return response()->json($response, $response['response_code']);
     }
 
     /**
@@ -34,9 +43,11 @@ class CustomerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateCustomerRequest $request)
     {
-        //
+        $response = $this->customer_service->createCustomer($request->validated());
+
+        return response()->json($response, $response['response_code']);
     }
 
     /**
@@ -45,9 +56,11 @@ class CustomerController extends Controller
      * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function show(Customer $customer)
+    public function show($id)
     {
-        //
+        $response = $this->customer_service->getCustomer($id);
+
+        return response()->json($response, $response['response_code']);
     }
 
     /**
