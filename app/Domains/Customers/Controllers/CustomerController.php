@@ -5,6 +5,7 @@ namespace App\Domains\Customers\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Domains\Customers\Services\CustomerService;
 use App\Domains\Customers\Requests\CreateCustomerRequest;
 
 class CustomerController extends Controller
@@ -81,9 +82,11 @@ class CustomerController extends Controller
      * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Customer $customer)
+    public function update(CreateCustomerRequest $request, Customer $customer)
     {
-        //
+        $response = $this->customer_service->updateCustomer($customer->id, $request->validated());
+
+        return response()->json($response, $response['response_code']);
     }
 
     /**
@@ -94,6 +97,18 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+        if($customer->delete()) {
+            return response()->json([
+                    'response_code'    => 200,
+                    'response_message' => 'Customer deleted successfully',
+                    'response_data'    => null
+            ], 200);
+        }
+
+        return response()->json([
+            'response_code'    => 500,
+            'response_message' => 'Failed to delete customer',
+            'response_data'    => null
+        ], 500);
     }
 }

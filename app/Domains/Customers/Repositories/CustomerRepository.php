@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Customers\Controllers;
+namespace App\Domains\Customers\Repositories;
 
 use App\Models\Customer;
 
@@ -15,8 +15,9 @@ class CustomerRepository
 
     public function getAssignedCustomers($sales_id)
     {
-        return $this->customer_model->join('sales_customers', 'customers.id', '=', 'sales_customers.customer_id')
+        return $this->customer_model->leftJoin('sales_customers', 'customers.id', '=', 'sales_customers.customer_id')
             ->where('sales_customers.sales_id', $sales_id)
+            ->orWhere('customers.sales_id', $sales_id)
             ->select('customers.*')
             ->get();
     }
