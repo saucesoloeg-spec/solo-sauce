@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
 
         'users' => [
             'driver' => 'sanctum',
@@ -78,6 +82,11 @@ return [
             'model' => App\Models\User::class,
         ],
 
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+
         'sales' => [
             'driver' => 'eloquent',
             'model' => App\Models\Sales::class,
@@ -113,6 +122,13 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'admins' => [
+            'provider' => 'admins', // Referencing the admins provider
+            'table' => 'password_resets', // Same table can be used
             'expire' => 60,
             'throttle' => 60,
         ],
