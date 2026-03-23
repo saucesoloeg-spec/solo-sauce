@@ -18,7 +18,7 @@ class SurveyQuestionsSeeder extends Seeder
             [
                 'question_en' => 'How satisfied are you with the continuous availability of our products?',
                 'question_ar' => "ما مدى رضاك عن توافر منتجاتنا بشكل مستمر؟",
-                'type'        => 'dropdown',
+                'type'        => 'radio',
                 'options'    => json_encode([
                     "en" => [
                         "0" => "Very Satisfied",
@@ -41,7 +41,7 @@ class SurveyQuestionsSeeder extends Seeder
             [
                 'question_en' => 'How effective was the product usage guidance provided to your barista/team?',
                 'question_ar' => "ما مدى فعالية الإرشادات المقدمة للبارستا/فريق العمل بشأن طريقة استخدام المنتج؟",
-                'type'        => 'dropdown',
+                'type'        => 'radio',
                 'options'     => json_encode([
                     "en" => [
                         "0" => "Very Clear and Helpful",
@@ -64,7 +64,7 @@ class SurveyQuestionsSeeder extends Seeder
             [
                 'question_en' => 'How satisfied are you with the product packaging (design, durability, ease of use)?',
                 'question_ar' => "ما مدى رضاك عن عبوة المنتج (التصميم، المتانة، سهولة الاستخدام)؟",
-                'type'        => 'dropdown',
+                'type'        => 'radio',
                 'options'     => json_encode([
                     "en" => [
                         "0" => "Very Satisfied",
@@ -87,7 +87,7 @@ class SurveyQuestionsSeeder extends Seeder
             [
                 'question_en' => "Based on your customers’ feedback, how do they rate the quality of our sauces?",
                 'question_ar' => "بناءً على ملاحظات عملائك، كيف يقيمون جودة صلصاتنا؟",
-                'type'        => 'dropdown',
+                'type'        => 'radio',
                 'options'    => json_encode([
                     "en" => [
                         "0" => "Excellent Feedback",
@@ -118,7 +118,7 @@ class SurveyQuestionsSeeder extends Seeder
             [
                 'question_en' => "How satisfied are you with your current supplier in terms of product quality and availability?",
                 'question_ar' => "ما مدى رضاك عن المورد الحالي من حيث جودة المنتج وتوافره؟",
-                'type'        => 'dropdown',
+                'type'        => 'radio',
                 'options'     => json_encode([
                     "en" => [
                         "0" => "Very Satisfied",
