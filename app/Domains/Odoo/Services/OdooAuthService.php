@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Domains\Odoo\Services;
+
+use App\Domains\Odoo\Repositories\OdooAuthRepository;
+
+class OdooAuthService
+{
+    public $odoo_auth_repository;
+
+    public function __construct(OdooAuthRepository $odoo_auth_repository)
+    {
+        $this->odoo_auth_repository = $odoo_auth_repository;
+    }
+
+    protected function createOdooAccount()
+    {
+        $response = curl_init(env('ODOO_API_URL').'/auth/signup');
+        curl_setopt($response, CURLOPT_POST, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
+            'name'     => "Solo Sauce",
+            'email'    => env('ODOO_EMAIL'),
+            'password' => env('ODOO_PASSWORD'),
+            'phone'    => "01234567890",
+        ]));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to create Odoo account: ' . $result['error']['details']);
+            }            
+
+            $this->odoo_auth_repository->create([
+                'email'         => env('ODOO_EMAIL'),
+            ]);
+        } catch (\Throwable $th) {
+            dd($result, $th->getMessage());
+            throw new \Exception($result);
+        }
+
+        curl_close($response);
+        
+        return $result;
+    }
+
+    protected function getAccessToken()
+    {
+        $result = [];
+        $true = true;
+        while ($true) {
+            if($exists = $this->odoo_auth_repository->getLatestToken(env('ODOO_EMAIL'))) {
+                // add the number of minutes in expires_at to the created_at timestamp and compare it with the current time to check if the token is still valid
+                if(isset($exists->access_token) && isset($exists->expires_at) && strtotime($exists->updated_at) + $exists->expires_at > now()->timestamp){
+                    $true = false;
+                    return $exists->toArray();
+                } 
+                else {
+                    $response = curl_init(env('ODOO_API_URL').'/auth/signin');
+                    curl_setopt($response, CURLOPT_POST, true);
+                    curl_setopt($response, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+                    curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
+                        'email'    => env('ODOO_EMAIL'),
+                        'password' => env('ODOO_PASSWORD'),
+                    ]));
+                    curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+                    $data = curl_exec($response);
+                    $data = json_decode($data, true);
+                    curl_close($response);
+                    
+                    if(isset($data['data']['access_token'])) {
+                        $result = $this->odoo_auth_repository->create([
+                            'email'         => env('ODOO_EMAIL'),
+                            'access_token'  => $data['data']['access_token'],
+                            'refresh_token' => $data['data']['refresh_token'],
+                            'expires_at'    => $data['data']['expires_in'],
+                        ]);
+                    }
+                    $true = false;
+                }
+            }
+            else {
+                $this->createOdooAccount();
+            }
+        }
+
+        return [
+            'access_token'  => $result->access_token,
+            'refresh_token' => $result->refresh_token,
+            'expires_at'    => $result->expires_at,
+        ];
+    }
+
+    public function getProductsFromOdoo($filters = [])
+    {
+        $token = $this->getAccessToken()['access_token'];
+
+        $response = curl_init(env('ODOO_API_URL').'/products');
+        curl_setopt($response, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        // send the filters as query parameters if they exist
+        if(!empty($filters)) {
+            $query = http_build_query($filters);
+            curl_setopt($response, CURLOPT_URL, env('ODOO_API_URL').'/products?' . $query);
+        }
+
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch products from Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch products from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
+    public function getProductByIdFromOdoo($id)
+    {
+        $token = $this->getAccessToken()['access_token'];
+
+        $response = curl_init(env('ODOO_API_URL').'/products/' . $id);
+        curl_setopt($response, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch product from Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch product from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+}

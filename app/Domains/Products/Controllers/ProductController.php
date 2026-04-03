@@ -2,6 +2,7 @@
 
 namespace App\Domains\Products\Controllers;
 
+use App\Domains\Odoo\Requests\GetProductRequest;
 use App\Domains\Products\Services\ProductService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -20,9 +21,9 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(GetProductRequest $request)
     {
-        $response = $this->product_service->getAllProducts();
+        $response = $this->product_service->getAllProducts($request->validated());
         
         return response()->json($response);
     }
