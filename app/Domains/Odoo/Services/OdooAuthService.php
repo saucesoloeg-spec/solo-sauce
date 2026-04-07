@@ -95,19 +95,18 @@ class OdooAuthService
     public function getProductsFromOdoo($filters = [])
     {
         $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/products';
 
-        $response = curl_init(env('ODOO_API_URL').'/products');
-        curl_setopt($response, CURLOPT_CUSTOMREQUEST, "GET");
+        if (!empty($filters)) {
+            $url .= '?' . http_build_query($filters);
+        }
+
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
         curl_setopt($response, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json',
             'Authorization: Bearer ' . $token,
         ));
-        // send the filters as query parameters if they exist
-        if(!empty($filters)) {
-            $query = http_build_query($filters);
-            curl_setopt($response, CURLOPT_URL, env('ODOO_API_URL').'/products?' . $query);
-        }
-
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
         try {
@@ -143,6 +142,95 @@ class OdooAuthService
             }
         } catch (\Throwable $th) {
             throw new \Exception('Failed to fetch product from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
+    public function getCustomers($filters = [])
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/customers';
+
+        if (!empty($filters)) {
+            $url .= '?' . http_build_query($filters);
+        }
+        
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch customers from Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch customers from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
+    public function getCustomerById($id)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/customers/' . $id;
+
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch customer from Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch customer from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
+    public function getOrders($filters = [])
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/orders';
+
+        if (!empty($filters)) {
+            $url .= '?' . http_build_query($filters);
+        }
+        
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch orders from Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch orders from Odoo: ' . $th->getMessage());
         }
 
         curl_close($response);
