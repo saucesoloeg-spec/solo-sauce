@@ -22,6 +22,11 @@ class CustomerRepository
             ->get();
     }
 
+    public function getAll()
+    {
+        return $this->customer_model->all();
+    }
+
     public function find($id)
     {
         return $this->customer_model->find($id);

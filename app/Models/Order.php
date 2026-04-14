@@ -16,7 +16,7 @@ class Order extends Model
         'customer_id',
         'customer_name',
         'customer_phone',
-        'order_date',
+        'delivery_date',
         'amount_total',
         'amount_tax',
         'state',
@@ -39,5 +39,10 @@ class Order extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function products()
+    {
+        return $this->hasMany(OrderProduct::class);
     }
 }

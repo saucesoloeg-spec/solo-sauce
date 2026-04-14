@@ -20,7 +20,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->string('customer_name');
             $table->string('customer_phone');
-            $table->timestamp('order_date');
+            $table->timestamp('delivery_date');
             $table->decimal('amount_total', 10, 2);
             $table->decimal('amount_tax', 10, 2);
             $table->string('state');

@@ -23,7 +23,7 @@ class OrderRepository
                 'customer_id'      => $data['customer_id'],
                 'customer_name'    => $data['customer_name'] ?? 'Unknown Customer',
                 'customer_phone'   => $data['customer_phone'] ?? 'Unknown Phone',
-                'order_date'       => $data['order_date'] ?? now(),
+                'delivery_date'    => $data['delivery_date'] ?? now(),
                 'amount_total'     => $data['amount_total'],
                 'amount_tax'       => $data['amount_tax'],
                 'state'            => $data['state'] ?? 'pending',
@@ -33,7 +33,18 @@ class OrderRepository
                 'notes'            => $data['notes'] ?? null,
             ];
 
-            return $this->model->create($orderData);
+            $order = $this->model->create($orderData);
+            
+            if($order && isset($data['products']) && is_array($data['products'])) {
+                foreach ($data['products'] as $product) {
+                    $order->products()->create([
+                        'product_id' => $product['product_id'],
+                        'quantity'   => $product['quantity'],
+                    ]);
+                }
+            }
+
+            return $order;
         } catch (\Exception $exception) {
             return false;
         }
