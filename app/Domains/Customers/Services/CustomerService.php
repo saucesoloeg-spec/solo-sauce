@@ -34,6 +34,27 @@ class CustomerService
         ];
     }
 
+    public function getCustomersFromDB()
+    {
+        $sales = auth()->user();
+
+        $customers = $this->customer_repository->getAll();
+
+        if(!$customers->isEmpty()) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Customers retrieved successfully',
+                'response_data'    => $customers
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'No customers found',
+            'response_data'    => null
+        ];
+    }
+
     public function getCustomer($id)
     {
         $customer = $this->customer_repository->find($id);
@@ -49,6 +70,25 @@ class CustomerService
         return [
             'response_code'    => 404,
             'response_message' => 'Customer not found',
+            'response_data'    => null
+        ];
+    }
+
+    public function createCustomers(array $data)
+    {
+        $customer = $this->customer_repository->create($data);
+
+        if($customer) {
+            return [
+                'response_code'    => 201,
+                'response_message' => 'Customer created successfully',
+                'response_data'    => $customer
+            ];
+        }
+
+        return [
+            'response_code'    => 400,
+            'response_message' => 'Failed to create customer',
             'response_data'    => null
         ];
     }

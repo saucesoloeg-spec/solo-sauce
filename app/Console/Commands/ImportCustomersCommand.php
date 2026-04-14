@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Domains\Customers\Services\CustomerService;
 use App\Domains\Odoo\Services\OdooAuthService;
 use Illuminate\Console\Command;
 
@@ -22,16 +23,18 @@ class ImportCustomersCommand extends Command
     protected $description = 'Import customer data from odoo to the database';
 
     protected $odoo_service;
+    protected $customer_service;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(OdooAuthService $odoo_service)
+    public function __construct(OdooAuthService $odoo_service, CustomerService $customer_service)
     {
         parent::__construct();
-        $this->odoo_service = $odoo_service;
+        $this->odoo_service     = $odoo_service;
+        $this->customer_service = $customer_service;
     }
 
     /**
@@ -41,19 +44,47 @@ class ImportCustomersCommand extends Command
      */
     public function handle()
     {
+        $db_customers = $this->customer_service->getCustomersFromDB();
+        $cusomters_ids = $db_customers['response_data']->pluck('id')->toArray();
+
         $filters = [
             'limit' => 100,
             'page'  => 1
         ];
-        $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
         
-        for ($i = 1; $i <= ceil($odoo_customers['total']/$odoo_customers['limit']); $i++) {
-            $filters['page'] = $i;
-            $customer = $this->odoo_service->getCustomerById($odoo_customers['items'][$i - 1]['id']);
-            dd($customer);
-            $odoo_customers = $this->odoo_service->getCustomers($filters);
-        }
+        $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
 
-        dd($odoo_customers);
+        while($filters['page'] <= $odoo_customers['pagination']['total_pages']) {
+            $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
+            
+            if(!empty($odoo_customers)) {
+                foreach($odoo_customers['customers'] as $key => $odoo_customer) {
+                    if(!in_array($odoo_customer['id'], $cusomters_ids)) {
+                        // filter email, phone and name from odoo response should not be null or empty string
+                        if(!empty($odoo_customer['email']) && !empty($odoo_customer['phone']) && !empty($odoo_customer['name'])) {
+                            // create customer
+                            $customer_data = [
+                                'id'       => $odoo_customer['id'],
+                                'sales_id' => null, // assign to sales later
+                                'name'     => $odoo_customer['name'],
+                                'phone'    => $odoo_customer['phone'],
+                                'email'    => $odoo_customer['email'],
+                                'address'  => $odoo_customer['address'],
+                                'zone'     => $odoo_customer['city'],
+                                'city'     => $odoo_customer['state'],
+                            ];
+                            $customer = $this->customer_service->createCustomers($customer_data);
+                            
+                            echo "Customer ID: {$odoo_customer['id']} - {$odoo_customer['name']} imported successfully.\n";
+                        }
+                        else {
+                            echo "Customer ID: {$odoo_customer['id']} - {$odoo_customer['name']} skipped due to missing email, phone or name.\n";
+                        }
+                    }
+                }
+            }
+            
+            $filters['page']++;
+        }
     }
 }

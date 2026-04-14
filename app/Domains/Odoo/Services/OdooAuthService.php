@@ -69,12 +69,12 @@ class OdooAuthService
                     $data = json_decode($data, true);
                     curl_close($response);
                     
-                    if(isset($data['data']['access_token'])) {
+                    if(isset($data['data']['tokens'])) {
                         $result = $this->odoo_auth_repository->create([
                             'email'         => env('ODOO_EMAIL'),
-                            'access_token'  => $data['data']['access_token'],
-                            'refresh_token' => $data['data']['refresh_token'],
-                            'expires_at'    => $data['data']['expires_in'],
+                            'access_token'  => $data['data']['tokens']['access_token'],
+                            'refresh_token' => $data['data']['tokens']['refresh_token'],
+                            'expires_at'    => $data['data']['tokens']['expires_in'],
                         ]);
                     }
                     $true = false;
@@ -84,7 +84,7 @@ class OdooAuthService
                 $this->createOdooAccount();
             }
         }
-
+        
         return [
             'access_token'  => $result->access_token,
             'refresh_token' => $result->refresh_token,
@@ -210,7 +210,13 @@ class OdooAuthService
     public function getOrders($filters = [])
     {
         $token = $this->getAccessToken()['access_token'];
-        $url = env('ODOO_API_URL').'/orders';
+        if(!empty($filters)) {
+            $filters = array_filter($filters, function($value) {
+                return !is_null($value) && $value !== '';
+            });
+            $url = env('ODOO_API_URL').'/sales-orders?'. http_build_query($filters);
+        }
+            $url = env('ODOO_API_URL').'/sales-orders';
 
         if (!empty($filters)) {
             $url .= '?' . http_build_query($filters);
@@ -218,10 +224,13 @@ class OdooAuthService
         
         $response = curl_init($url);
         curl_setopt($response, CURLOPT_HTTPGET, true);
+        // 
         curl_setopt($response, CURLOPT_HTTPHEADER, array(
             'Accept: application/json',
+            'content-type: application/json',
             'Authorization: Bearer ' . $token,
         ));
+
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
         try {
@@ -237,4 +246,62 @@ class OdooAuthService
 
         return $result;
     }
+
+    public function sendOrderToOdoo($order)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/sales-orders';
+        
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_POST, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'content-type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode($order));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to send order to Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to send order to Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
+    public function getOrderById($id)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/sales-orders/' . $id;
+
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'content-type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch order from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
 }
