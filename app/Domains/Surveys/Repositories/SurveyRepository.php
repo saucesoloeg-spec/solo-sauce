@@ -4,16 +4,19 @@ namespace App\Domains\Surveys\Repositories;
 
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
+use App\Models\SalesCustomer;
 
 class SurveyRepository
 {
     private $model;
     private $answers_model;
+    private $sales_customers_model;
 
-    public function __construct(Survey $model, SurveyAnswer $answers_model)
+    public function __construct(Survey $model, SurveyAnswer $answers_model, SalesCustomer $sales_customers_model)
     {
         $this->model = $model;
         $this->answers_model = $answers_model;
+        $this->sales_customers_model = $sales_customers_model;
     }
 
     public function all()
@@ -23,19 +26,44 @@ class SurveyRepository
 
     public function store($data)
     {
+        $customer_id = 0;
         // Assuming $data is an array of answers
         foreach ($data['answers'] as $answer) {
             $this->answers_model->create($answer);
+            $customer_id = $answer['customer_id']; // Assuming all answers have the same customer_id
         }
-
+        
+        $visit = $this->sales_customers_model->where('customer_id', $customer_id)
+            ->whereDate('visit_at', date('Y-m-d'))
+            ->where('status', 'pending')
+            ->first();
+        
+        if ($visit) {
+            $update_visit = $this->sales_customers_model->where('id', $visit->id)->update(['survey' => true, 'status' => 'completed']);
+        }
+        else {
+            $this->sales_customers_model->create([
+                'sales_id'    => auth('sales')->id(),
+                'customer_id' => $customer_id,
+                'visit_at'    => now(),
+                'survey'      => true,
+                'status'      => 'completed',
+            ]);
+        }
         return true;
     }
 
-    public function getAnswersByCustomerId($customer_id)
+    public function getAnswersByCustomerId($data)
     {
-       return $this->model->leftJoin('survey_answers', function ($join) use ($customer_id) {
+        $visit = $this->sales_customers_model->where('id', $data['visit_id'])->first();
+        if (!$visit) {
+            return null; // or throw an exception
+        }
+
+        return $this->model->leftJoin('survey_answers', function ($join) use ($data, $visit) {
                         $join->on('surveys.id', '=', 'survey_answers.survey_id')
-                            ->where('survey_answers.customer_id', '=', $customer_id);
+                            ->where('survey_answers.customer_id', '=', $data['customer_id'])
+                            ->whereDate('survey_answers.created_at', '=', date('Y-m-d', strtotime($visit['visit_at'])));
                     })
                     ->select('surveys.*', 'survey_answers.answer')
                     ->get();

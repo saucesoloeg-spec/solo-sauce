@@ -5,9 +5,17 @@ namespace App\Domains\Sales\Controllers;
 use App\Models\sales;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Domains\Sales\Services\SalesService;
 
 class SalesController extends Controller
 {
+    public $sales_service;
+
+    public function __construct(SalesService $sales_service) 
+    {
+        $this->sales_service = $sales_service;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +23,9 @@ class SalesController extends Controller
      */
     public function index()
     {
-        //
+        $response = $this->sales_service->dashboard();
+
+        return response()->json($response, $response['response_code']);
     }
 
     /**
@@ -40,14 +50,41 @@ class SalesController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display a listing of the schedule.
      *
-     * @param  \App\Models\sales  $sales
      * @return \Illuminate\Http\Response
      */
-    public function show(sales $sales)
+    public function schedule()
     {
-        //
+        $response = $this->sales_service->getSchedule();
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    /**
+     * Display a listing of the schedule.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function scheduleHistory()
+    {
+        $response = $this->sales_service->scheduleHistory();
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    /**
+     * Cancel a scheduled visit.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function cancelSchedule($id)
+    {
+        $sales = auth('sales')->user();
+        $response = $this->sales_service->cancelSchedule($id, $sales->id);
+
+        return response()->json($response, $response['response_code']);
     }
 
     /**

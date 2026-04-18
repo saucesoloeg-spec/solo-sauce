@@ -50,4 +50,23 @@ class SalesAuthService
             'response_data'    => null,
         ];
     }
+
+    public function logout($request)
+    {
+        $logout = auth('sales')->logout();
+
+        if($logout) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Sales logged out successfully',
+                'response_data'    => null,
+            ];
+        }
+
+        return [
+            'response_code'    => 400,
+            'response_message' => 'Sales logout failed !',
+            'response_data'    => null,
+        ];
+    }
 }
