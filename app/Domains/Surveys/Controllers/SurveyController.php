@@ -2,6 +2,7 @@
 
 namespace App\Domains\Surveys\Controllers;
 
+use App\Domains\Surveys\Requests\GetSurveyAnswersRequest;
 use App\Models\Survey;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -58,9 +59,9 @@ class SurveyController extends Controller
      * @param  \App\Models\Servey  $servey
      * @return \Illuminate\Http\Response
      */
-    public function show($customer_id)
+    public function show(GetSurveyAnswersRequest $request)
     {
-        $response = $this->survey_service->getSurveyAnswersByCustomerId($customer_id);
+        $response = $this->survey_service->getSurveyAnswersByCustomerId($request->validated());
 
         return response()->json($response, $response['response_code']);
     }

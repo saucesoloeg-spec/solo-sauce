@@ -4,14 +4,18 @@ namespace App\Domains\Orders\Repositories;
 
 use App\Models\Order;
 use Illuminate\Support\Str;
+use App\Models\SalesCustomer;
+use Illuminate\Support\Facades\Log;
 
 class OrderRepository
 {
     protected $model;
+    protected $sales_customer_model;
 
-    public function __construct(Order $model)
+    public function __construct(Order $model, SalesCustomer $sales_customer_model)
     {
         $this->model = $model;
+        $this->sales_customer_model = $sales_customer_model;
     }
 
     public function saveOrder(array $data)
@@ -19,7 +23,7 @@ class OrderRepository
         try {
             $orderData = [
                 'code'             => $data['code'] ?? $this->generateOrderCode(),
-                'sales_id'         => $data['sales_id'] ?? null,
+                'sales_id'         => $data['sales_id'] ?? auth('sales')->id(),
                 'customer_id'      => $data['customer_id'],
                 'customer_name'    => $data['customer_name'] ?? 'Unknown Customer',
                 'customer_phone'   => $data['customer_phone'] ?? 'Unknown Phone',
@@ -44,9 +48,27 @@ class OrderRepository
                 }
             }
 
+            $visit = $this->sales_customer_model->where('customer_id', $order->customer_id)
+                ->whereDate('visit_at', date('Y-m-d'))
+                ->where('status', 'pending')
+                ->first();
+            
+            if ($visit) {
+                $this->sales_customer_model->where('id', $visit->id)->update(['order_id' => $order->id, 'status' => 'completed']);
+            }
+            else {
+                $this->sales_customer_model->create([
+                    'sales_id'    => auth('sales')->id(),
+                    'customer_id' => $order->customer_id,
+                    'visit_at'    => now(),
+                    'order_id'    => $order->id,
+                    'status'      => 'completed',
+                ]);
+            }
+
             return $order;
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
+            Log::error('Error saving order: ' . $exception->getMessage());
             return false;
         }
     }

@@ -13,6 +13,8 @@ class SalesCustomer extends Model
         'sales_id',
         'customer_id',
         'visit_at',
+        'order_id',
+        'survey',
         'status',
         'notes',
     ];
@@ -26,4 +28,10 @@ class SalesCustomer extends Model
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+    
 }

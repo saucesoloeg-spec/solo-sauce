@@ -51,9 +51,9 @@ class SurveyService
         ];
     }
 
-    public function getSurveyAnswersByCustomerId($customer_id)
+    public function getSurveyAnswersByCustomerId($data)
     {
-        $answers = $this->survey_repository->getAnswersByCustomerId($customer_id);
+        $answers = $this->survey_repository->getAnswersByCustomerId($data);
 
         if ($answers) {
             return [

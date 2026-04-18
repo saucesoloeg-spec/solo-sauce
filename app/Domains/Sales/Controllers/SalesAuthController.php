@@ -77,4 +77,17 @@ class SalesAuthController extends Controller
     {
         //
     }
+
+    /**
+     * Logout the authenticated sales user.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request)
+    {
+        $result = $this->sales_auth_service->logout($request);
+
+        return response()->json($result, $result['response_code']);
+    }
+    
 }

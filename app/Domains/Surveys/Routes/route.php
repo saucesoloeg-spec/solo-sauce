@@ -19,5 +19,5 @@ use App\Domains\Surveys\Controllers\SurveyController;
 Route::middleware('auth:sales')->group(function () {
     Route::get('/', [SurveyController::class, 'index']);
     Route::post('/', [SurveyController::class, 'store']);
-    Route::get('/customer/{customer_id}', [SurveyController::class, 'show']);
+    Route::get('/customer', [SurveyController::class, 'show']);
 });
