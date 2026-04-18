@@ -52,4 +52,10 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::get('/sales', [SalesController::class, 'index'])->name('sales.get');
     Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
 
+    Route::get('/schedules', [SalesController::class, 'schedule'])->name('schedules.get');
+
+    // API routes for sales schedules
+    Route::post('/api/sales/update_visit_date', [SalesController::class, 'updateVisitDate']);
+    Route::post('/api/sales/delete_schedule', [SalesController::class, 'deleteSchedule']);
+
 });

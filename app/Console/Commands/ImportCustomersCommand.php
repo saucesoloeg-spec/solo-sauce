@@ -51,7 +51,7 @@ class ImportCustomersCommand extends Command
             'limit' => 100,
             'page'  => 1
         ];
-        
+        $emails = [];
         $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
 
         while($filters['page'] <= $odoo_customers['pagination']['total_pages']) {
@@ -61,7 +61,13 @@ class ImportCustomersCommand extends Command
                 foreach($odoo_customers['customers'] as $key => $odoo_customer) {
                     if(!in_array($odoo_customer['id'], $cusomters_ids)) {
                         // filter email, phone and name from odoo response should not be null or empty string
-                        if(!empty($odoo_customer['email']) && !empty($odoo_customer['phone']) && !empty($odoo_customer['name'])) {
+                        if(!empty($odoo_customer['email']) && !empty($odoo_customer['phone']) && !empty($odoo_customer['name'])) {    
+                            if(in_array($odoo_customer['email'], $emails)) {
+                                echo "Customer ID: {$odoo_customer['id']} - {$odoo_customer['name']} skipped due to duplicate email.\n";
+                                continue;
+                            }
+                            $emails[] = $odoo_customer['email'];
+
                             // create customer
                             $customer_data = [
                                 'id'       => $odoo_customer['id'],
@@ -74,7 +80,7 @@ class ImportCustomersCommand extends Command
                                 'city'     => $odoo_customer['state'],
                             ];
                             $customer = $this->customer_service->createCustomers($customer_data);
-                            
+
                             echo "Customer ID: {$odoo_customer['id']} - {$odoo_customer['name']} imported successfully.\n";
                         }
                         else {
