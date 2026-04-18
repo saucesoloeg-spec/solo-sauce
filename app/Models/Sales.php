@@ -51,4 +51,9 @@ class Sales extends Authenticatable
             ->withPivot('visit_at', 'status', 'notes')
             ->withTimestamps();
     }
+
+    public function appointments()
+    {
+        return $this->hasMany(SalesCustomer::class, 'sales_id', 'id');
+    }
 }

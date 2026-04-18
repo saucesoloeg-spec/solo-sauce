@@ -25,7 +25,7 @@ class OrderRepository
                 'customer_phone'   => $data['customer_phone'] ?? 'Unknown Phone',
                 'delivery_date'    => $data['delivery_date'] ?? now(),
                 'amount_total'     => $data['amount_total'],
-                'amount_tax'       => $data['amount_tax'],
+                'amount_tax'       => $data['amount_tax'] ?? 0,
                 'state'            => $data['state'] ?? 'pending',
                 'payment_status'   => $data['payment_status'],
                 'driver_id'        => $data['driver_id'] ?? null,
@@ -46,6 +46,7 @@ class OrderRepository
 
             return $order;
         } catch (\Exception $exception) {
+            dd($exception->getMessage());
             return false;
         }
     }

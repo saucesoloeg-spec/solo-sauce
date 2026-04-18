@@ -91,4 +91,51 @@ class SalesController extends Controller
     {
         //
     }
+
+    /*
+     * Display a listing of the schedule.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function schedule()
+    {
+        $response = $this->sales_service->getSchedule();
+
+        return view('sales.schedule', ['schedules' => $response['response_data']]);
+    }
+
+    /**
+     * Update visit date for a schedule.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateVisitDate(Request $request)
+    {
+        $request->validate([
+            'schedule_id' => 'required|exists:sales_customers,id',
+            'visit_date' => 'required|date'
+        ]);
+
+        $response = $this->sales_service->updateVisitDate($request->schedule_id, $request->visit_date);
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    /**
+     * Delete a schedule.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteSchedule(Request $request)
+    {
+        $request->validate([
+            'schedule_id' => 'required|exists:sales_customers,id'
+        ]);
+
+        $response = $this->sales_service->deleteSchedule($request->schedule_id);
+
+        return response()->json($response, $response['response_code']);
+    }
 }
