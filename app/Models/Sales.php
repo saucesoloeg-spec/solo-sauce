@@ -23,6 +23,10 @@ class Sales extends Authenticatable
         'name',
         'email',
         'phone',
+        'national_number',
+        'address',
+        'zone',
+        'city',
         'password',
     ];
 

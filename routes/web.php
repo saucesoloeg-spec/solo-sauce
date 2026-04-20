@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SalesController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\Sales;
@@ -50,7 +51,13 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::get('/customers/{id}', [CustomerController::class, 'show'])->name('customers.show');
 
     Route::get('/sales', [SalesController::class, 'index'])->name('sales.get');
+    Route::get('/sales/create', [SalesController::class, 'create'])->name('sales.create');
+    Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
     Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
+    Route::put('/sales/{id}', [SalesController::class, 'update'])->name('sales.update');
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.get');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 
     Route::get('/schedules', [SalesController::class, 'schedule'])->name('schedules.get');
 

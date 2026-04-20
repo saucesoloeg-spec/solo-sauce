@@ -35,4 +35,19 @@ class SalesRepository
     {
         return $this->sales_customers_model->where('id', $scheduleId)->delete();
     }
+
+    public function getById($id)
+    {
+        return $this->model->find($id);
+    }
+
+    public function update($id, $data)
+    {
+        return $this->model->where('id', $id)->update($data);
+    }
+
+    public function create($data)
+    {
+        return $this->model->create($data);
+    }
 }

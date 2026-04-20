@@ -2,15 +2,15 @@
 
 namespace App\Http\Repositories;
 
-use App\Models\Customer;
+use App\Models\Order;
 
-class CustomerRepository
+class OrderRepository
 {
     private $model;
 
-    public function __construct(Customer $customer) 
+    public function __construct(Order $order) 
     {
-        $this->model = $customer;
+        $this->model = $order;
     }
 
     public function getAll() 
