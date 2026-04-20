@@ -88,4 +88,72 @@ class SalesService
             'response_data'    => null
         ];
     }
+
+    public function getById($id)
+    {
+        $sales = $this->sales_repository->getById($id);
+
+        if($sales) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Sales retrieved successfully.',
+                'response_data'    => $sales
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Sales not found.',
+            'response_data'    => null
+        ];
+    }
+
+    public function updateSales($id, $data)
+    {
+        // Only update password if provided
+        if(!$data['password']) {
+            unset($data['password']);
+        } else {
+            $data['password'] = bcrypt($data['password']);
+        }
+
+        $updated = $this->sales_repository->update($id, $data);
+
+        if($updated) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Sales updated successfully.',
+                'response_data'    => null
+            ];
+        }
+
+        return [
+            'response_code'    => 400,
+            'response_message' => 'Failed to update sales.',
+            'response_data'    => null
+        ];
+    }
+
+    public function createSales($data)
+    {
+        // Generate UUID
+        $data['uuid']     = \Illuminate\Support\Str::uuid();
+        $data['password'] = bcrypt($data['password']);
+
+        $sales = $this->sales_repository->create($data);
+
+        if($sales) {
+            return [
+                'response_code'    => 201,
+                'response_message' => 'Sales created successfully.',
+                'response_data'    => $sales
+            ];
+        }
+
+        return [
+            'response_code'    => 400,
+            'response_message' => 'Failed to create sales.',
+            'response_data'    => null
+        ];
+    }
 }

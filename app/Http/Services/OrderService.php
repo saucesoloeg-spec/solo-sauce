@@ -2,26 +2,26 @@
 
 namespace App\Http\Services;
 
-use App\Http\Repositories\CustomerRepository;
+use App\Http\Repositories\OrderRepository;
 
-class CustomerService
+class OrderService
 {
-    private $customer_repository;
+    private $order_repository;
 
-    public function __construct(CustomerRepository $customer_repository) 
+    public function __construct(OrderRepository $order_repository) 
     {
-        $this->customer_repository = $customer_repository;
+        $this->order_repository = $order_repository;
     }
 
     public function getAll() 
     {
-        $customers = $this->customer_repository->getAll();  
+        $orders = $this->order_repository->getAll();  
         
-        if($customers->isNotEmpty()) {
+        if($orders->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Customers retrieved successfully.',
-                'response_data'    => $customers
+                'response_data'    => $orders
             ];
         }
 
@@ -34,15 +34,13 @@ class CustomerService
 
     public function getById($id) 
     {
-        $customer = $this->customer_repository->getById($id); 
-        $orders   = $customer->orders()
-                             ->paginate(3); 
+        $orders = $this->order_repository->getById($id);  
         
-        if($customer) {
+        if($orders) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Customer retrieved successfully.',
-                'response_data'    => ['customer' => $customer, 'orders' => $orders]
+                'response_data'    => $orders
             ];
         }
 

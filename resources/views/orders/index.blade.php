@@ -79,20 +79,6 @@
     .updateModal .modal-footer {
         border-top: 1px solid #dee2e6;
     }
-    .btn-outline-secondary {
-        border: 1px solid #dcdcdc;
-        background-color: #f8f9fa;
-        color: #333;
-        border-radius: 10px;
-        padding: 12px 24px;
-        font-weight: 500;
-        font-size: 14px;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #e9ecef;
-        color: #000;
-    }
 </style>
 @stop
 
@@ -103,16 +89,8 @@
             <div class="card-header border-bottom pb-0">
                 <div class="d-sm-flex align-items-center">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Sales list</h6>
-                        <p class="text-sm">See information about all Salesman</p>
-                    </div>
-                    <div class="ms-auto">
-                        <a href="{{ route('sales.create') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center" style="gap: 5px; white-space: nowrap;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                            </svg>
-                            Create
-                        </a>
+                        <h6 class="font-weight-semibold text-lg mb-0">Orders list</h6>
+                        <p class="text-sm">See information about all Orders</p>
                     </div>
                 </div>
             </div>
@@ -120,7 +98,7 @@
             <div id="delete-modal" class="modal">
                 <div class="modal-content">
                     <h3>Confirm Deletion</h3>
-                    <p>Are you sure you want to delete this Sale?</p>
+                    <p>Are you sure you want to delete this Order?</p>
                     <div class="modal-buttons">
                         <button id="confirm-delete" class="btn-confirm">Confirm</button>
                         <span id="loader" class="loader" style="display: none;"></span>
@@ -130,16 +108,24 @@
             </div>
             <!-- Confirmation Modal -->
             <div class="card-body px-0 py-0">
-                <div class="border-bottom py-3 px-3 d-sm-flex align-items-center">
+                <div class="py-3 px-3 d-sm-flex align-items-center">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                         <input id="filter-all" type="radio" class="btn-check" name="btnradiotable" autocomplete="off" checked>
                         <label class="btn btn-white px-3 mb-0" for="filter-all">All</label>
-                        <input id="filter-verified" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-verified">Verified</label>
                         <input id="filter-pending" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
                         <label class="btn btn-white px-3 mb-0" for="filter-pending">Pending</label>
+                        <input id="filter-confirmed" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="filter-confirmed">Confirmed</label>
+                        <input id="filter-shipped" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="filter-shipped">Shipped</label>
+                        <input id="filter-delivered" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="filter-delivered">Delivered</label>
+                        <input id="filter-canceled" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="filter-canceled">Canceled</label>
+                        <input id="filter-suspended" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="filter-suspended">Suspended</label>
                     </div>
-                    <div class="input-group w-sm-25 ms-auto" style="display: flex; gap: 10px;">
+                    <div class="input-group w-sm-25 ms-auto">
                         <span class="input-group-text text-body">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
@@ -148,49 +134,134 @@
                         <input type="text" class="form-control" id="searchInput" placeholder="Search">
                     </div>
                 </div>
+                <div class="border-bottom py-3 px-3 d-sm-flex align-items-center">
+                    <div class="py-3 px-3 d-sm-flex align-items-center">
+                        <!-- Date Filtration -->
+                        <select id="yearFilter" class="form-select" style="width: 150px;">
+                            <option value="" selected>Year</option>
+                            <!-- Populate with years dynamically -->
+                        </select>
+
+                        <select id="monthFilter" class="form-select" style="width: 150px;">
+                            <option value="" selected>Month</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+
+                        <button id="filterByDate" class="btn btn-primary mx-2 mb-0">Filter</button>
+                        <button id="resetFilters" class="btn btn-secondary mr-2 mb-0">Reset</button>
+                    </div>
+                </div>
                 <div class="table-responsive p-0">
-                    <table class="table align-items-center mb-0" id="salesTable">
+                    <table class="table align-items-center mb-0" id="companiesTable">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7">Salesman</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">E-mail</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Phone No.</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Registered At</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7">Order Code</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Customer Name</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Order Status</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Total Amount</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Address</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Zone</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">City</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Delivered At</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Rep. Name</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($sales as $key => $sales)
-                            <tr data-status="{{ $sales->email_verified_at ? 'verified' : 'pending' }}" data-sales-id="{{ $sales->id }}" id="row-{{$sales->id}}">
+                            @foreach($orders as $key => $order)
+                            <tr data-status="{{ $order->state }}" data-order-id="{{ $order->id }}" id="row-{{$order->id}}">
+                                <td class="text-center">
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->code }}</p>
+                                </td>
                                 <td>
                                     <div class="d-flex px-2 py-1">
                                         <div class="d-flex align-items-center">
                                             <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
                                         </div>
-                                        <div class="d-flex flex-column justify-content-center ms-1">
-                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $sales->name }}</h6>
-                                            <!-- <p class="text-sm text-secondary mb-0">{{ $sales->email }}</p>
-                                            <p class="text-sm text-secondary mb-0">{{ $sales->phone_number }}</p> -->
+                                        <div class="d-flex flex-column justify-content-left ms-1">
+                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $order->customer->name }}</h6>
+                                            <p class="text-sm text-secondary mb-0">{{ $order->customer->email }}</p>
+                                            <p class="text-sm text-secondary mb-0">{{ $order->customer->phone }}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $sales->email }}</p>
+                                <td class="align-middle text-center text-sm">
+                                    @if($order->state == 'pending')
+                                    <span class="badge badge-sm border border-secondary text-secondary bg-secondary reservation">
+                                        Pending
+                                    </span>
+                                    @elseif($order->state == 'confirmed')
+                                    <span class="badge badge-sm border border-info text-info bg-info reservation">
+                                        Confirmed
+                                    </span>
+                                    @elseif($order->state == 'shipped')
+                                    <span class="badge badge-sm border border-warning text-warning bg-warning reservation">
+                                        Shipped
+                                    </span>
+                                    @elseif($order->state == 'delivered')
+                                    <span class="badge badge-sm border border-success text-success bg-success reservation">
+                                        Delivered
+                                    </span>
+                                    @elseif($order->state == 'canceled')
+                                    <span class="badge badge-sm border border-danger text-danger bg-danger reservation">
+                                        Canceled
+                                    </span>
+                                    @elseif($order->state == 'suspended')
+                                    <span class="badge badge-sm border border-danger text-danger bg-danger reservation">
+                                        Suspended
+                                    </span>
+                                    @endif
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $sales->phone }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->address }}</p>
+                                </td>
+                                <td class="text-center">
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->address }}</p>
+                                </td>
+                                <td class="text-center">
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->zone }}</p>
+                                </td>
+                                <td class="text-center">
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->city }}</p>
+                                </td>
+                                <td class="align-middle text-center" data-date="{{ $order->delivery_date }}">
+                                    <span class="text-secondary text-sm font-weight-normal">{{ $order->delivery_date }}</span>
                                 </td>
                                 <td class="align-middle text-center">
-                                    <span class="text-secondary text-sm font-weight-normal">{{ $sales->created_at->toDateString() }}</span>
+                                    @if(!isset($order->sales))
+                                        <span class="text-secondary text-sm font-weight-normal">Delviered by the Factory</span>
+                                    @else
+                                        <div class="d-flex px-2 py-1">
+                                        <div class="d-flex align-items-center">
+                                            <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
+                                        </div>
+                                        <div class="d-flex flex-column justify-content-center ms-1">
+                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $order->sales->name }}</h6>
+                                            <p class="text-sm text-secondary mb-0">{{ $order->sales->email }}</p>
+                                            <p class="text-sm text-secondary mb-0">{{ $order->sales->phone }}</p>
+                                        </div>
+                                    </div>
+                                    @endif
                                 </td>
                                 <td class="align-middle">
-                                    <a href="{{ route('sales.show', ['id' => $sales->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="View Sale">
+                                    <a href="{{ route('orders.show', ['id' => $order->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="View Customer">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
                                         </svg>
                                     </a>
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Delete Sale">
+                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Delete Company">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -203,7 +274,31 @@
                         </tbody>
                     </table>
                 </div>
-                
+                <!-- Update Modal -->
+                <div class="modal fade updateModal" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="updateModalLabel">Update Percentage</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="updatePercentageForm">
+                                    <div class="mb-3">
+                                        <label for="percentageInput" class="form-label">Percentage</label>
+                                        <input type="number" class="form-control" id="percentageInput" placeholder="Enter percentage">
+                                        @csrf
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <span id="updateLoader" class="loader" style="display: none;"></span>
+                                <button type="button" class="btn btn-primary" id="updatePercentageButton">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Update Modal -->
                 <div class="border-top py-3 px-3 d-flex align-items-center">
                     <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
@@ -221,14 +316,22 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Select all filter buttons
-        const filterAll      = document.getElementById('filter-all');
-        const filterVerified = document.getElementById('filter-verified');
-        const filterPending  = document.getElementById('filter-pending');
+        const filterAll        = document.getElementById("filter-all");
+        const filterPending    = document.getElementById("filter-pending");
+        const filterConfirmed  = document.getElementById("filter-confirmed");
+        const filterShipped    = document.getElementById("filter-shipped");
+        const filterDelivered  = document.getElementById("filter-delivered");
+        const filterCanceled  = document.getElementById("filter-canceled");
+        const filterSuspended  = document.getElementById("filter-suspended");
 
         const searchInput    = document.getElementById('searchInput');
-        const table          = document.getElementById('salesTable');
+        const table          = document.getElementById('companiesTable');
         const tableRows      = Array.from(table.querySelectorAll('tbody tr')); // Get all rows from the table body
 
+        const yearFilter       = document.getElementById("yearFilter");
+        const monthFilter      = document.getElementById("monthFilter");
+        const filterButton     = document.getElementById("filterByDate");
+        
         let filteredRows     = [...tableRows]; // Rows currently visible (filtered or searched)
         let currentFilter    = 'all'; // Keep track of the active filter
         const rowsPerPage    = 10; // Maximum rows per page
@@ -237,6 +340,26 @@
         const pageInfo       = document.querySelector('.paging'); // Page info text
         const prevButton     = document.querySelector('.previous'); // Previous button
         const nextButton     = document.querySelector('.next'); // Next button
+
+        // Populate year dropdown based on available data
+        const populateYears = () => {
+            const years = new Set();
+            tableRows.forEach(row => {
+                const dateCell = row.querySelector("td[data-date]");
+                if (dateCell) {
+                    const year = dateCell.getAttribute("data-date").slice(0, 4); // Extract year from "YYYY-MM-DD"
+                    years.add(year);
+                }
+            });
+
+            // Sort years in descending order
+            Array.from(years).sort((a, b) => b - a).forEach(year => {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
+        };
 
         // Function to update the table based on the current page
         function updateTable() {
@@ -259,6 +382,7 @@
         // Function to filter rows based on the selected filter
         function filterTable(filterType) {
             currentFilter = filterType; // Update the current filter
+            console.log(filterType);
             filteredRows = tableRows.filter(row => {
                 const status = row.getAttribute('data-status');
                 return filterType === 'all' || status === filterType;
@@ -270,6 +394,34 @@
             currentPage = 1; // Reset to the first page after filtering
             updateTable(); // Update the table display
         }
+
+        // Filter table by date
+        const filterTableByDate = (year, month) => {
+            const formattedDate = `${year}-${month}`;
+            filteredRows = filteredRows.filter(row => {
+                const dateCell = row.querySelector("td[data-date]");
+                if (dateCell) {
+                    const cellDate = dateCell.getAttribute("data-date").slice(0, 7); // Get "YYYY-MM"
+                    return cellDate === formattedDate;
+                }
+                return false;
+            });
+
+            currentPage = 1;
+            updateTable();
+        };
+
+        // Reset filters to show the original table
+        const resetFilters = () => {
+            yearFilter.value = "";
+            monthFilter.value = "";
+            
+            // Reapply the current filter and search
+            filterTable(currentFilter);
+            searchTable();
+            currentPage = 1;
+            updateTable();
+        };
 
         // Function to search within the current filtered rows
         function searchTable() {
@@ -291,8 +443,14 @@
 
         // Add event listeners to the filter buttons
         filterAll.addEventListener('change', () => filterTable('all'));
-        filterVerified.addEventListener('change', () => filterTable('verified'));
         filterPending.addEventListener('change', () => filterTable('pending'));
+        filterConfirmed.addEventListener('change', () => filterTable('confirmed'));
+        filterShipped.addEventListener('change', () => filterTable('shipped'));
+        filterDelivered.addEventListener('change', () => filterTable('delivered'));
+        filterCanceled.addEventListener('change', () => filterTable('canceled'));
+        filterSuspended.addEventListener('change', () => filterTable('suspended'));
+
+        document.getElementById("resetFilters").addEventListener("click", resetFilters);
 
         // Add event listener to the search input
         searchInput.addEventListener('input', function () {
@@ -316,33 +474,48 @@
             }
         });
 
+        // Event listener for date filter
+        filterButton.addEventListener("click", () => {
+            const selectedYear = yearFilter.value;
+            const selectedMonth = monthFilter.value;
+
+            if (!selectedYear || !selectedMonth) {
+                alert("Please select both a year and a month!");
+                return;
+            }
+
+            filterTableByDate(selectedYear, selectedMonth);
+        });
+        
+        // Initialize table and populate year filter
+        populateYears();
         // Initialize the table display
         updateTable();
 
         const modal         = document.getElementById('imageModal');
         const carouselInner = document.querySelector('#imageCarousel .carousel-inner');
 
-        document.querySelectorAll('.view-images-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const companyId = this.dataset.companyId;
-                const imageContainer = document.getElementById(`company-images-${companyId}`);
-                const images = imageContainer.querySelectorAll('.company-image');
+        // document.querySelectorAll('.view-images-btn').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         const companyId = this.dataset.companyId;
+        //         const imageContainer = document.getElementById(`company-images-${companyId}`);
+        //         const images = imageContainer.querySelectorAll('.company-image');
 
-                // Populate carousel
-                carouselInner.innerHTML = Array.from(images).map((img, index) => `
-                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                        <img src="${img.src}" class="d-block w-100" alt="Company Image">
-                    </div>
-                `).join('');
+        //         // Populate carousel
+        //         carouselInner.innerHTML = Array.from(images).map((img, index) => `
+        //             <div class="carousel-item ${index === 0 ? 'active' : ''}">
+        //                 <img src="${img.src}" class="d-block w-100" alt="Company Image">
+        //             </div>
+        //         `).join('');
 
-                // Show modal
-                modal.style.display = 'block';
-            });
-        });
+        //         // Show modal
+        //         modal.style.display = 'block';
+        //     });
+        // });
 
-        modal.querySelector('.btn-close').addEventListener('click', function () {
-            modal.style.display = 'none';
-        });
+        // modal.querySelector('.btn-close').addEventListener('click', function () {
+        //     modal.style.display = 'none';
+        // });
 
         let currentCompanyId  = null;
         const updateModal     = new bootstrap.Modal(document.getElementById("updateModal"));

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Services\CustomerService;
+use App\Http\Services\OrderService;
 use Illuminate\Http\Request;
 
-class CustomerController extends Controller
+class OrderController extends Controller
 {
-    public $customer_service;
+    public $order_service;
 
-    public function __construct(CustomerService $customer_service) 
+    public function __construct(OrderService $order_service) 
     {
-        $this->customer_service = $customer_service;
+        $this->order_service = $order_service;
     }
 
     /**
@@ -21,9 +21,9 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $response = $this->customer_service->getAll();
+        $response = $this->order_service->getAll();
 
-        return view('customers.index', ['customers' => $response['response_data']]);
+        return view('orders.index', ['orders' => $response['response_data']]);
     }
 
     /**
@@ -55,13 +55,13 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        $response = $this->customer_service->getById($id);
+        $response = $this->order_service->getById($id);
 
         if($response['response_code'] == 200) {
-            return view('customers.show', ['customer' => $response['response_data']['customer'], 'orders' => $response['response_data']['orders']]);
+            return view('orders.show', ['orders' => $response['response_data']['orders']]);
         }
 
-        return redirect()->route('customers.get')->with('error', $response['response_message']);
+        return redirect()->route('orders.get')->with('error', $response['response_message']);
     }
 
     /**

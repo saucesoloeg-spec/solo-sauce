@@ -41,17 +41,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('sales.get') }}">
                     <div class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
-                        <!-- replace the icon with a salesman icon -->
-                        <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                            <title>Representatives</title>
-                            <g id="person" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                <g id="template" fill="#FFFFFF" fill-rule="nonzero">
-                                    <circle class="color-foreground" cx="12" cy="5" r="3.5" id="head"></circle>
-                                    <path class="color-background" d="M4,14 C4,12.9 4.9,12 6,12 L18,12 C19.1,12 20,12.9 20,14 L20,22 C20,23.1 19.1,24 18,24 L6,24 C4.9,24 4,23.1 4,22 L4,14 Z" id="body"></path>
-                                </g>
-                            </g>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 24 24">
+                            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
                         </svg>
-                        <!-- end of salesman icon -->
                     </div>
                     <span class="nav-link-text ms-1">{{ __('dashboard.representatives') }}</span>
                 </a>
@@ -68,6 +60,17 @@
                         </svg>
                     </div>
                     <span class="nav-link-text ms-1">{{ __('dashboard.schedule') }}</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('orders.get') }}">
+                    <div class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 16 16">
+                            <path d="M0 0h1v15h15v1H0V0zm10 10h2v4h-2v-4zm-4-6h2v10H6V4zM2 8h2v6H2V8z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-link-text ms-1">{{ __('dashboard.reports') }}</span>
                 </a>
             </li>
             

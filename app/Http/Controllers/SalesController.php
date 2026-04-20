@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSalesRequest;
+use App\Http\Requests\UpdateSalesRequest;
 use App\Http\Services\SalesService;
 use Illuminate\Http\Request;
 
@@ -33,7 +35,7 @@ class SalesController extends Controller
      */
     public function create()
     {
-        //
+        return view('sales.create');
     }
 
     /**
@@ -42,9 +44,15 @@ class SalesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreSalesRequest $request)
     {
-        //
+        $response = $this->sales_service->createSales($request->validated());
+
+        if($response['response_code'] == 201) {
+            return redirect()->route('sales.get')->with('success', 'Sales representative created successfully.');
+        }
+
+        return redirect()->back()->withInput()->with('error', $response['response_message']);
     }
 
     /**
@@ -55,7 +63,13 @@ class SalesController extends Controller
      */
     public function show($id)
     {
-        //
+        $response = $this->sales_service->getById($id);
+
+        if($response['response_code'] != 200) {
+            return redirect()->route('sales.get')->with('error', $response['response_message']);
+        }
+
+        return view('sales.show', ['sales' => $response['response_data']]);
     }
 
     /**
@@ -76,9 +90,15 @@ class SalesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateSalesRequest $request, $id)
     {
-        //
+        $response = $this->sales_service->updateSales($id, $request->validated());
+
+        if($response['response_code'] == 200) {
+            return redirect()->route('sales.show', ['id' => $id])->with('success', 'Sales updated successfully.');
+        }
+
+        return redirect()->back()->with('error', $response['response_message']);
     }
 
     /**

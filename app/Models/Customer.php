@@ -22,4 +22,15 @@ class Customer extends Model
         'latitude',
         'longitude',
     ];
+
+    public function sales() 
+    {
+        return $this->belongsTo(Sales::class, 'sales_id');
+    }
+
+    public function orders() 
+    {
+        return $this->hasMany(Order::class, 'customer_id');
+    }
+
 }
