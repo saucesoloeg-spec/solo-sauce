@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SalesController;
 use App\Http\Middleware\AdminMiddleware;
@@ -60,9 +61,21 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 
     Route::get('/schedules', [SalesController::class, 'schedule'])->name('schedules.get');
+    Route::get('/schedules/create', [SalesController::class, 'createSchedule'])->name('schedules.create');
+    Route::post('/schedules', [SalesController::class, 'storeSchedule'])->name('schedules.store');
 
     // API routes for sales schedules
     Route::post('/api/sales/update_visit_date', [SalesController::class, 'updateVisitDate']);
     Route::post('/api/sales/delete_schedule', [SalesController::class, 'deleteSchedule']);
 
+});
+    
+Route::middleware([AdminMiddleware::class, 'role:super_admin'])->group(function () {
+    Route::get('/admins', [AdminController::class, 'index'])->name('admins.get');
+    Route::get('/admins/create', [AdminController::class, 'create'])->name('admins.create');
+    Route::post('/admins/store', [AdminController::class, 'store'])->name('admins.store');
+
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.get');
+    Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
+    Route::post('/messages/store', [MessageController::class, 'store'])->name('messages.store');
 });

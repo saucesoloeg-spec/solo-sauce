@@ -50,4 +50,15 @@ class SalesRepository
     {
         return $this->model->create($data);
     }
+
+    public function createSchedule($data) 
+    {
+        return $this->sales_customers_model->create([
+            'sales_id'    => $data['sales_id'],
+            'customer_id' => $data['customer_id'],
+            'visit_at'    => $data['visit_date'],
+            'status'      => 'pending',
+            'notes'       => $data['notes']
+        ]);
+    }
 }

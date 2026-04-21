@@ -2,15 +2,18 @@
 
 namespace App\Http\Services;
 
+use App\Http\Repositories\CustomerRepository;
 use App\Http\Repositories\SalesRepository;
 
 class SalesService
 {
     private $sales_repository;
+    private $customer_repository;
 
-    public function __construct(SalesRepository $sales_repository) 
+    public function __construct(SalesRepository $sales_repository, CustomerRepository $customer_repository) 
     {
-        $this->sales_repository = $sales_repository;
+        $this->sales_repository    = $sales_repository;
+        $this->customer_repository = $customer_repository;
     }
 
     public function getAll() 
@@ -154,6 +157,48 @@ class SalesService
             'response_code'    => 400,
             'response_message' => 'Failed to create sales.',
             'response_data'    => null
+        ];
+    }
+
+    public function getScheduleInfo() 
+    {
+        $sales     = $this->sales_repository->getAll();
+        $customers = $this->customer_repository->getAll();
+        
+        if($sales && $customers) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Data retrieved successfully',
+                'response_data'    => [
+                    'sales'     => $sales,
+                    'customers' => $customers
+                ]
+            ];
+        }
+
+        return [
+            'response_code'    => 500,
+            'response_message' => 'Data retrieved Faild',
+            'response_data'    => []
+        ];
+    }
+
+    public function createSchedule($data) 
+    {
+        $result = $this->sales_repository->createSchedule($data);
+
+        if($result) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Visit date Schedule successfully',
+                'response_data'    => []
+            ];
+        }
+
+        return [
+            'response_code'    => 500,
+            'response_message' => 'Create Visit date Schedule Failed',
+            'response_data'    => []
         ];
     }
 }

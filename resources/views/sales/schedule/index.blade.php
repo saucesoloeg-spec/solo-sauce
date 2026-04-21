@@ -72,6 +72,20 @@
     .updateModal .modal-footer {
         border-top: 1px solid #dee2e6;
     }
+    .btn-outline-secondary {
+        border: 1px solid #dcdcdc;
+        background-color: #f8f9fa;
+        color: #333;
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #e9ecef;
+        color: #000;
+    }
 </style>
 @stop
 
@@ -84,6 +98,14 @@
                     <div>
                         <h6 class="font-weight-semibold text-lg mb-0">Sales Schedule</h6>
                         <p class="text-sm">See information about all Sales Schedules</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="{{ route('schedules.create') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center" style="gap: 5px; white-space: nowrap;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                            </svg>
+                            Create
+                        </a>
                     </div>
                 </div>
             </div>
@@ -137,6 +159,12 @@
                     </div>
                 </div>
                 <div class="table-responsive p-0">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
                     <table class="table align-items-center mb-0" id="scheduleTable">
                         <thead class="bg-gray-100">
                             <tr>
@@ -396,7 +424,6 @@
                     if (data.response_code === 200) {
                         const row = document.getElementById(`row-${scheduleIdToDelete}`);
                         row.remove();
-                        alert('Schedule deleted successfully.');
                     } else {
                         alert(data.response_message || 'Failed to delete schedule');
                     }
