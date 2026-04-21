@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSalesRequest;
+use App\Http\Requests\StoreScheduleRequest;
 use App\Http\Requests\UpdateSalesRequest;
 use App\Http\Services\SalesService;
 use Illuminate\Http\Request;
@@ -121,7 +122,39 @@ class SalesController extends Controller
     {
         $response = $this->sales_service->getSchedule();
 
-        return view('sales.schedule', ['schedules' => $response['response_data']]);
+        return view('sales.schedule.index', ['schedules' => $response['response_data']]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createSchedule()
+    {
+        $response = $this->sales_service->getScheduleInfo();
+
+        return view('sales.schedule.create', [
+            'sales'     => $response['response_data']['sales'],
+            'customers' => $response['response_data']['customers']
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeSchedule(StoreScheduleRequest $request)
+    {
+        $response = $this->sales_service->createSchedule($request->validated());
+
+        if($response['response_code'] == 200) {
+            return redirect()->route('schedules.get')->with('success', 'Sales representative created successfully.');
+        }
+
+        return redirect()->back()->withInput()->with('error', $response['response_message']);
     }
 
     /**
