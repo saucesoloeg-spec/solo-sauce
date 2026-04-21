@@ -171,6 +171,7 @@
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7">Salesman</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Customer</th>
                                 <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Visit At</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Status</th>
                                 <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Created At</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
@@ -206,6 +207,21 @@
                                 </td>
                                 <td class="text-center">
                                     <p class="text-sm text-dark font-weight-semibold mb-0">{{ $schedule->visit_at ? \Carbon\Carbon::parse($schedule->visit_at)->format('Y-m-d') : 'Not Set' }}</p>
+                                </td>
+                                <td class="align-middle text-center text-sm">
+                                    @if($schedule->status == 'pending')
+                                    <span class="badge badge-sm border border-secondary text-secondary bg-secondary reservation">
+                                        Pending
+                                    </span>
+                                    @elseif($schedule->status == 'completed')
+                                    <span class="badge badge-sm border border-success text-success bg-success reservation">
+                                        Delivered
+                                    </span>
+                                    @elseif($schedule->status == 'canceled')
+                                    <span class="badge badge-sm border border-danger text-danger bg-danger reservation">
+                                        Canceled
+                                    </span>
+                                    @endif
                                 </td>
                                 <td class="align-middle text-center">
                                     <span class="text-secondary text-sm font-weight-normal">{{ $schedule->created_at->format('Y-m-d') }}</span>
