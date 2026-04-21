@@ -7,6 +7,7 @@ use App\Http\Repositories\MessageRepository;
 use App\Notifications\SendPushNotification;
 
 use App\Models\Admin;
+use App\Models\Customer;
 use App\Models\Sales;
 use App\Models\User;
 
@@ -29,8 +30,8 @@ class MessageService
         if($request['type'] == 'sales') {
             $user = Sales::first();
         }
-        elseif($request['type'] == 'users') {
-            $user = User::first();
+        elseif($request['type'] == 'customers') {
+            $user = Customer::first();
         }
         else {
             $user = Admin::first();

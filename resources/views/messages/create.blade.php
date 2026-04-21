@@ -75,8 +75,8 @@
                                 id="type" 
                                 required>
                                 <option value="" {{ old('type') === null ? 'selected' : '' }}>Select Type</option>
-                                <option value="companies" {{ old('type') === 'companies' ? 'selected' : '' }}>Companies</option>
-                                <option value="users" {{ old('type') === 'users' ? 'selected' : '' }}>Users</option>
+                                <option value="customers" {{ old('type') === 'customers' ? 'selected' : '' }}>Customers</option>
+                                <option value="sales" {{ old('type') === 'sales' ? 'selected' : '' }}>Sales</option>
                                 <option value="admin" {{ old('type') === 'admin' ? 'selected' : '' }}>All</option>
                             </select>
                             @error('type')
