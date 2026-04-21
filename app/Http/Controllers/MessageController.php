@@ -23,7 +23,7 @@ class MessageController extends Controller
     {
         $messages = $this->message_service->getAll();
 
-        return view('pages/messages/index', compact('messages')); 
+        return view('messages/index', compact('messages')); 
     }
 
     /**
@@ -31,7 +31,7 @@ class MessageController extends Controller
      */
     public function create()
     {
-        return view('pages/messages/create');
+        return view('messages/create');
     }
 
     /**
