@@ -129,7 +129,7 @@ class AdminController extends Controller
     {
         $admins = $this->admin_service->get_all();
         
-        return view('pages/admins/index', compact('admins'));
+        return view('admins/index', compact('admins'));
     }
 
     /**
@@ -137,7 +137,7 @@ class AdminController extends Controller
      */
     public function create()
     {
-        return view('pages/admins/create');
+        return view('admins/create');
     }
 
     /**
