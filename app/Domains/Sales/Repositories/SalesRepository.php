@@ -24,9 +24,16 @@ class SalesRepository
         return $this->sales_customer_model->where->with('sales', 'customer')->get();    
     }
 
-    public function getSchedule($id) 
+    public function getSchedule($id, $filters = []) 
     {
-        return $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', now())->with('order')->get();
+        $query = $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', now())->with('order');
+        
+        if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
+            $query->whereDate('visit_at', '>=', $filters['from'])
+                  ->whereDate('visit_at', '<=', $filters['to']);
+        }
+        
+        return $query->get();
     }
 
     public function getPastSchedule($id)

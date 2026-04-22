@@ -6,6 +6,7 @@ use App\Models\sales;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Domains\Sales\Services\SalesService;
+use App\Http\Requests\GetScheduleRequest;
 
 class SalesController extends Controller
 {
@@ -54,9 +55,9 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function schedule()
+    public function schedule(GetScheduleRequest $request)
     {
-        $response = $this->sales_service->getSchedule();
+        $response = $this->sales_service->getSchedule($request->validated());
 
         return response()->json($response, $response['response_code']);
     }

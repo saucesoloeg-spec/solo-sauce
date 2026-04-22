@@ -5,6 +5,7 @@ namespace App\Domains\Orders\Repositories;
 use App\Models\Order;
 use Illuminate\Support\Str;
 use App\Models\SalesCustomer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrderRepository
@@ -79,4 +80,41 @@ class OrderRepository
 
         return sprintf('SO%06d', $nextId);
     }
+
+    public function getNewDealsForSales($id, $filters = []) 
+    {
+        $query = DB::table('orders as o')
+                ->where('o.sales_id', $id)
+                ->whereRaw('o.created_at = (
+                    SELECT MIN(created_at)
+                    FROM orders
+                    WHERE customer_id = o.customer_id
+                )');
+
+        if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
+            $query->whereDate('created_at', '>=', $filters['from'])
+                  ->whereDate('created_at', '<=', $filters['to']);
+        }
+                
+        return $query->get();
+    }
+
+    public function getRegularDealsForSales($id, $filters = []) 
+    {
+        $query = DB::table('orders as o')
+                 ->where('o.sales_id', $id)
+                 ->whereRaw('o.created_at > (
+                     SELECT MIN(created_at)
+                     FROM orders
+                     WHERE customer_id = o.customer_id
+                 )');
+
+        if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
+            $query->whereDate('created_at', '>=', $filters['from'])
+                  ->whereDate('created_at', '<=', $filters['to']);
+        }
+                
+        return $query->get();
+    }
+
 }
