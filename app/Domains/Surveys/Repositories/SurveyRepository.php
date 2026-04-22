@@ -5,6 +5,7 @@ namespace App\Domains\Surveys\Repositories;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SalesCustomer;
+use Illuminate\Support\Facades\DB;
 
 class SurveyRepository
 {
@@ -26,30 +27,33 @@ class SurveyRepository
 
     public function store($data)
     {
-        $customer_id = 0;
-        // Assuming $data is an array of answers
-        foreach ($data['answers'] as $answer) {
-            $this->answers_model->create($answer);
-            $customer_id = $answer['customer_id']; // Assuming all answers have the same customer_id
-        }
+        $customer_id = $data['answers'][0]['customer_id']; // Assuming all answers have the same customer_id
         
         $visit = $this->sales_customers_model->where('customer_id', $customer_id)
-            ->whereDate('visit_at', date('Y-m-d'))
-            ->where('status', 'pending')
-            ->first();
-        
+                                             ->whereDate('visit_at', date('Y-m-d'))
+                                             ->where('status', 'pending')
+                                             ->first();
+
         if ($visit) {
             $update_visit = $this->sales_customers_model->where('id', $visit->id)->update(['survey' => true, 'status' => 'completed']);
         }
         else {
-            $this->sales_customers_model->create([
-                'sales_id'    => auth('sales')->id(),
-                'customer_id' => $customer_id,
-                'visit_at'    => now(),
-                'survey'      => true,
-                'status'      => 'completed',
+            $visit = $this->sales_customers_model->create([
+                'sales_id'          => auth('sales')->id(),
+                'customer_id'       => $customer_id,
+                'visit_at'          => now(),
+                'survey'            => true,
+                'status'            => 'completed',
             ]);
         }
+
+        // Assuming $data is an array of answers
+        foreach ($data['answers'] as $answer) {
+            $answer['sales_id']          = auth('sales')->id();
+            $answer['sales_customer_id'] = $visit->id; 
+            $this->answers_model->create($answer);
+        }
+        
         return true;
     }
 
@@ -68,4 +72,21 @@ class SurveyRepository
                     ->select('surveys.*', 'survey_answers.answer')
                     ->get();
     }
+
+    public function getAnswersBySalesId($id)
+    {
+        return DB::table('survey_answers as a')
+                 ->join('sales_customers as sc', 'sc.id', '=', 'a.sales_customer_id')
+                 ->join('surveys as s', 's.id', '=', 'a.survey_id') // optional if you want question
+                 ->select(
+                     'a.*',
+                     'sc.visit_at',
+                     's.*' // optional
+                 )
+                 ->where('a.sales_id', $id) 
+                 ->orderBy('a.sales_customer_id')
+                 ->get()
+                 ->groupBy('sales_customer_id');
+    }
+
 }

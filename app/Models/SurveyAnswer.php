@@ -10,6 +10,8 @@ class SurveyAnswer extends Model
     use HasFactory;
 
     protected $fillable = [
+        'sales_id',
+        'sales_customer_id',
         'survey_id',
         'customer_id',
         'answer',

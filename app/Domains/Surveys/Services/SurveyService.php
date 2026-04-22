@@ -68,5 +68,25 @@ class SurveyService
             'response_message' => 'No survey answers found for this customer',
             'response_data'    => null
         ];
+    }
+
+    public function getSurveyAnswersBySalesId()
+    {
+        $sales_id = auth('sales')->id();
+        $answers  = $this->survey_repository->getAnswersBySalesId($sales_id);
+
+        if ($answers) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Survey answers retrieved successfully',
+                'response_data'    => $answers
+            ];
+        }
+        
+        return [
+            'response_code'    => 404,
+            'response_message' => 'No survey answers found for this customer',
+            'response_data'    => null
+        ];
     }   
 }
