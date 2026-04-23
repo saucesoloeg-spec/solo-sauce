@@ -22,9 +22,9 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(GetScheduleRequest $request)
     {
-        $response = $this->sales_service->dashboard();
+        $response = $this->sales_service->dashboard($request->validated());
 
         return response()->json($response, $response['response_code']);
     }
@@ -67,9 +67,9 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function scheduleHistory()
+    public function scheduleHistory(GetScheduleRequest $request)
     {
-        $response = $this->sales_service->scheduleHistory();
+        $response = $this->sales_service->scheduleHistory($request->validated());
 
         return response()->json($response, $response['response_code']);
     }

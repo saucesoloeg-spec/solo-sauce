@@ -19,14 +19,14 @@ class SalesService
         $this->survey_repository = $survey_repository;
     }
 
-    public function dashboard() 
+    public function dashboard($data) 
     {
         $sales = auth('sales')->user();
 
-        $visits = $this->sales_repository->getAllBySalesId($sales->id);
-
-        $new_deals = $this->order_repository->getNewDealsForSales($sales->id);
-        $regular_deals = $this->order_repository->getRegularDealsForSales($sales->id);
+        $visits = $this->sales_repository->getAllBySalesId($sales->id, $data);
+        
+        $new_deals = $this->order_repository->getNewDealsForSales($sales->id, $data);
+        $regular_deals = $this->order_repository->getRegularDealsForSales($sales->id, $data);
 
         $response = [
             'total_visits'     => $visits->count(),
@@ -38,7 +38,7 @@ class SalesService
             'regular_deal'     => $regular_deals->count()
         ];
 
-        if($visits->isNotEmpty()) {
+        if($visits->isNotEmpty() || $new_deals->isNotEmpty() || $regular_deals->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Dashboard data retrieved successfully.',
@@ -76,10 +76,10 @@ class SalesService
     {
         $sales         = auth('sales')->user();
     
-        $schedules     = $this->sales_repository->getSchedule($sales->id, $request);  
+        $schedules     = $this->sales_repository->getSchedule($sales->id, $request);
         $new_deals     = $this->order_repository->getNewDealsForSales($sales->id, $request);
         $regular_deals = $this->order_repository->getRegularDealsForSales($sales->id, $request);
-        $surveys       = $this->survey_repository->getAnswersBySalesId($sales->id);
+        $surveys       = $this->survey_repository->getAnswersBySalesId($sales->id); 
         
         if($schedules->isNotEmpty()) {
             return [
@@ -101,16 +101,24 @@ class SalesService
         ];
     }
 
-    public function scheduleHistory() 
+    public function scheduleHistory($request) 
     {
-        $sales     = auth('sales')->user();
-        $schedules = $this->sales_repository->getPastSchedule($sales->id); 
+        $sales         = auth('sales')->user();
+        $schedules     = $this->sales_repository->getPastSchedule($sales->id, $request);
+        $new_deals     = $this->order_repository->getNewDealsForSales($sales->id, $request);
+        $regular_deals = $this->order_repository->getRegularDealsForSales($sales->id, $request);
+        $surveys       = $this->survey_repository->getAnswersBySalesId($sales->id); 
         
         if($schedules->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Schedule history retrieved successfully.',
-                'response_data'    => $schedules
+                'response_data'    => [
+                    'visits'         => $schedules,
+                    'new_deals'      => $new_deals,
+                    'regular_deals'  => $regular_deals,
+                    'surveys'        => $surveys
+                ]
             ];
         }
 

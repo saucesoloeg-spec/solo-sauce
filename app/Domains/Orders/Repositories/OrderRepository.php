@@ -92,8 +92,8 @@ class OrderRepository
                 )');
 
         if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
-            $query->whereDate('created_at', '>=', $filters['from'])
-                  ->whereDate('created_at', '<=', $filters['to']);
+            $query->whereDate('created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
+                  ->whereDate('created_at', '<=', date("Y-m-d", strtotime($filters['to'])));
         }
                 
         return $query->get();
@@ -110,8 +110,8 @@ class OrderRepository
                  )');
 
         if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
-            $query->whereDate('created_at', '>=', $filters['from'])
-                  ->whereDate('created_at', '<=', $filters['to']);
+            $query->whereDate('created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
+                  ->whereDate('created_at', '<=', date("Y-m-d", strtotime($filters['to'])));
         }
                 
         return $query->get();

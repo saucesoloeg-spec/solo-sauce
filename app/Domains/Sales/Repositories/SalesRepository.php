@@ -14,9 +14,16 @@ class SalesRepository
         $this->sales_customer_model = $sales_customer_model;
     }
 
-    public function getAllBySalesId($id) 
+    public function getAllBySalesId($id, $filters = []) 
     {
-        return $this->sales_customer_model->where('sales_id', $id)->with('order')->get();    
+        $query = $this->sales_customer_model->where('sales_id', $id);
+        
+        if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
+            $query->whereDate('visit_at', '>=', date("Y-m-d", strtotime($filters['from'])))
+                  ->whereDate('visit_at', '<=', date("Y-m-d", strtotime($filters['to'])));
+        }
+        
+        return $query->with('order')->get();    
     }
 
     public function getAll() 
@@ -29,16 +36,24 @@ class SalesRepository
         $query = $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', now())->with('order');
         
         if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
-            $query->whereDate('visit_at', '>=', $filters['from'])
-                  ->whereDate('visit_at', '<=', $filters['to']);
+            $query->whereDate('visit_at', '>=', date("Y-m-d", strtotime($filters['from'])))
+                  ->whereDate('visit_at', '<=', date("Y-m-d", strtotime($filters['to'])));
         }
         
         return $query->get();
     }
 
-    public function getPastSchedule($id)
+    public function getPastSchedule($id, $filters = [])
     {
-        return $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '<', now())->with('order')->get();
+        $query = $this->sales_customer_model->where('sales_id', $id)
+                                            ->where('visit_at', '<', now());
+
+        if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
+            $query->whereDate('visit_at', '>=', date("Y-m-d", strtotime($filters['from'])))
+                  ->whereDate('visit_at', '<=', date("Y-m-d", strtotime($filters['to'])));
+        }
+
+        return $query->with('order')->get();
     }
 
     public function cancelSchedule($scheduleId, $salesId)
