@@ -96,7 +96,7 @@ class SalesService
         $regular_deals = $this->order_repository->getRegularDealsForSales($sales->id, $request);
         $surveys       = $this->survey_repository->getAnswersBySalesId($sales->id); 
         
-        if($schedules->isNotEmpty()) {
+        if($schedules->isNotEmpty() || $new_deals->isNotEmpty() || $regular_deals->isNotEmpty() || $surveys->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Schedule retrieved successfully.',
@@ -124,7 +124,7 @@ class SalesService
         $regular_deals = $this->order_repository->getRegularDealsForSales($sales->id, $request);
         $surveys       = $this->survey_repository->getAnswersBySalesId($sales->id); 
         
-        if($schedules->isNotEmpty()) {
+        if($schedules->isNotEmpty() || $new_deals->isNotEmpty() || $regular_deals->isNotEmpty() || $surveys->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Schedule history retrieved successfully.',
