@@ -20,7 +20,7 @@ class OrderRepository
 
     public function getById($id) 
     {
-        return $this->model->find($id)->first();    
+        return $this->model->with(['customer', 'sales'])->find($id);    
     }
 
 }

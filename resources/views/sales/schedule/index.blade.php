@@ -149,6 +149,32 @@
             </div>
             <div class="card-body px-0 py-0">
                 <div class="border-bottom py-3 px-3 d-sm-flex align-items-center">
+                    <div class="py-3 px-3 d-sm-flex align-items-center">
+                        <!-- Date Filtration -->
+                        <select id="yearFilter" class="form-select" style="width: 150px;">
+                            <option value="" selected>Year</option>
+                            <!-- Populate with years dynamically -->
+                        </select>
+
+                        <select id="monthFilter" class="form-select" style="width: 150px;">
+                            <option value="" selected>Month</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+
+                        <button id="filterByDate" class="btn btn-primary mx-2 mb-0">Filter</button>
+                        <button id="resetFilters" class="btn btn-secondary mr-2 mb-0">Reset</button>
+                    </div>
                     <div class="input-group w-sm-25 ms-auto">
                         <span class="input-group-text text-body">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -205,7 +231,7 @@
                                 <td>
                                     <p class="text-sm text-dark font-weight-semibold mb-0">{{ $schedule->customer->name }}</p>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" data-date="{{ date('Y-m-d', strtotime($schedule->visit_at)) }}">
                                     <p class="text-sm text-dark font-weight-semibold mb-0">{{ $schedule->visit_at ? \Carbon\Carbon::parse($schedule->visit_at)->format('Y-m-d') : 'Not Set' }}</p>
                                 </td>
                                 <td class="align-middle text-center text-sm">
@@ -271,9 +297,33 @@
         const rowsPerPage    = 10;
         let currentPage      = 1;
 
+        const yearFilter     = document.getElementById("yearFilter");
+        const monthFilter    = document.getElementById("monthFilter");
+        const filterButton   = document.getElementById("filterByDate");
+
         const pageInfo       = document.querySelector('.paging');
         const prevButton     = document.querySelector('.previous');
         const nextButton     = document.querySelector('.next');
+
+        // Populate year dropdown based on available data
+        const populateYears = () => {
+            const years = new Set();
+            tableRows.forEach(row => {
+                const dateCell = row.querySelector("td[data-date]");
+                if (dateCell) {
+                    const year = dateCell.getAttribute("data-date").slice(0, 4); // Extract year from "YYYY-MM-DD"
+                    years.add(year);
+                }
+            });
+
+            // Sort years in descending order
+            Array.from(years).sort((a, b) => b - a).forEach(year => {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
+        };
 
         function updateTable() {
             if (filteredRows.length === 0) {
@@ -314,6 +364,34 @@
             updateTable();
         }
 
+        // Filter table by date
+        const filterTableByDate = (year, month) => {
+            const formattedDate = `${year}-${month}`;
+            filteredRows = filteredRows.filter(row => {
+                const dateCell = row.querySelector("td[data-date]");
+                if (dateCell) {
+                    const cellDate = dateCell.getAttribute("data-date").slice(0, 7); // Get "YYYY-MM"
+                    return cellDate === formattedDate;
+                }
+                return false;
+            });
+
+            currentPage = 1;
+            updateTable();
+        };
+
+        // Reset filters to show the original table
+        const resetFilters = () => {
+            yearFilter.value = "";
+            monthFilter.value = "";
+            
+            // Reapply the current filter and search
+            filterTable(currentFilter);
+            searchTable();
+            currentPage = 1;
+            updateTable();
+        };
+
         searchInput.addEventListener('input', function () {
             searchTable();
         });
@@ -325,6 +403,8 @@
             }
         });
 
+        document.getElementById("resetFilters").addEventListener("click", resetFilters);
+
         nextButton.addEventListener('click', () => {
             const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
             if (currentPage < totalPages) {
@@ -332,6 +412,22 @@
                 updateTable();
             }
         });
+
+        // Event listener for date filter
+        filterButton.addEventListener("click", () => {
+            const selectedYear = yearFilter.value;
+            const selectedMonth = monthFilter.value;
+
+            if (!selectedYear || !selectedMonth) {
+                alert("Please select both a year and a month!");
+                return;
+            }
+
+            filterTableByDate(selectedYear, selectedMonth);
+        });
+
+        // Initialize table and populate year filter
+        populateYears();
 
         updateTable();
 

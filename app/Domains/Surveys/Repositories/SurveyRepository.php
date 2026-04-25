@@ -2,10 +2,10 @@
 
 namespace App\Domains\Surveys\Repositories;
 
+use App\Models\Customer;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SalesCustomer;
-use Illuminate\Support\Facades\DB;
 
 class SurveyRepository
 {
@@ -73,20 +73,24 @@ class SurveyRepository
                     ->get();
     }
 
-    public function getAnswersBySalesId($id)
+    public function getAnswersBySalesId($id, $filters = [])
     {
-        return DB::table('survey_answers as a')
-                 ->join('sales_customers as sc', 'sc.id', '=', 'a.sales_customer_id')
-                 ->join('surveys as s', 's.id', '=', 'a.survey_id') // optional if you want question
-                 ->select(
-                     'a.*',
-                     'sc.visit_at',
-                     's.*' // optional
-                 )
-                 ->where('a.sales_id', $id) 
-                 ->orderBy('a.sales_customer_id')
-                 ->get()
-                 ->groupBy('sales_customer_id');
+        return Customer::with([
+            'answers' => function ($q) use ($id, $filters) {
+                $q->where('sales_id', $id)
+                ->with('survey');
+                if(isset($filters['from']) && isset($filters['to'])) {
+                    $q->whereBetween('created_at', [$filters['from'], $filters['to']]);
+                }
+            }
+        ])
+        ->whereHas('answers', function ($q) use ($id, $filters) {
+            $q->where('sales_id', $id);
+            if(isset($filters['from']) && isset($filters['to'])) {
+                $q->whereBetween('created_at', [$filters['from'], $filters['to']]);
+            }
+        })
+        ->get();
     }
 
 }

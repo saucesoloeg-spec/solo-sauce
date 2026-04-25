@@ -51,6 +51,18 @@ class SalesController extends Controller
     }
 
     /**
+     * Show the list of salesmen.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Request $request)
+    {
+        $result = $this->sales_service->getAll($request->customer_id ?? null);
+
+        return response()->json($result['response_data'], $result['response_code']);
+    }
+
+    /**
      * Display a listing of the schedule.
      *
      * @return \Illuminate\Http\Response

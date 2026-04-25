@@ -53,7 +53,7 @@ class ImportCustomersCommand extends Command
         ];
         $emails = [];
         $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
-
+        dd($odoo_customers);
         while($filters['page'] <= $odoo_customers['pagination']['total_pages']) {
             $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
             
@@ -70,14 +70,18 @@ class ImportCustomersCommand extends Command
 
                             // create customer
                             $customer_data = [
-                                'id'       => $odoo_customer['id'],
-                                'sales_id' => null, // assign to sales later
-                                'name'     => $odoo_customer['name'],
-                                'phone'    => $odoo_customer['phone'],
-                                'email'    => $odoo_customer['email'],
-                                'address'  => $odoo_customer['address'],
-                                'zone'     => $odoo_customer['city'],
-                                'city'     => $odoo_customer['state'],
+                                'id'              => $odoo_customer['id'],
+                                'sales_id'        => null, // assign to sales later
+                                'name'            => $odoo_customer['name'],
+                                'phone'           => $odoo_customer['phone'],
+                                'email'           => $odoo_customer['email'],
+                                'address'         => $odoo_customer['address'],
+                                'zone'            => $odoo_customer['city'],
+                                'city'            => $odoo_customer['state'],
+                                'country_odoo_id' => $odoo_customer['country_id'],
+                                'state_odoo_id'   => $odoo_customer['state_id'],
+                                'city_odoo_id'    => $odoo_customer['city_id']
+                                
                             ];
                             $customer = $this->customer_service->createCustomers($customer_data);
 

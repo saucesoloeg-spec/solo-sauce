@@ -19,6 +19,7 @@ use App\Domains\Sales\Controllers\SalesAuthController;
 Route::post('/register', [SalesAuthController::class, 'register']);
 Route::post('/login', [SalesAuthController::class, 'login']);
 
+Route::get('/all/{city_id?}', [SalesController::class, 'show']);
 Route::middleware('auth:sales')->group(function () {
     Route::get('/sales_profile', function (Request $request) {
         return $request->user();

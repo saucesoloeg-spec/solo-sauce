@@ -24,14 +24,17 @@ class StoreSalesRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:sales,email',
-            'phone' => 'required|string|max:20',
+            'name'            => 'required|string|max:255',
+            'email'           => 'required|email|max:255|unique:sales,email',
+            'phone'           => 'required|string|max:20',
             'national_number' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'zone' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'password' => 'required|string|min:8|confirmed',
+            'address'         => 'nullable|string',
+            'zone'            => 'nullable|string|max:255',
+            'city'            => 'nullable|string|max:255',
+            'country_odoo_id' => 'required|integer',
+            'state_odoo_id'   => 'required|integer',
+            'city_odoo_id'    => 'required|integer',
+            'password'        => 'required|string|min:8|confirmed',
         ];
     }
 

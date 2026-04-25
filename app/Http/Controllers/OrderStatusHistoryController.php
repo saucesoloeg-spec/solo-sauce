@@ -2,18 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Services\OrderService;
+use App\Models\OrderStatusHistory;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class OrderStatusHistoryController extends Controller
 {
-    public $order_service;
-
-    public function __construct(OrderService $order_service) 
-    {
-        $this->order_service = $order_service;
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -21,9 +14,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $response = $this->order_service->getAll();
-
-        return view('orders.index', ['orders' => $response['response_data']]);
+        //
     }
 
     /**
@@ -50,27 +41,21 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\OrderStatusHistory  $orderStatusHistory
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(OrderStatusHistory $orderStatusHistory)
     {
-        $response = $this->order_service->getById($id);
-        
-        if($response['response_code'] == 200) {
-            return view('orders.show', ['order' => $response['response_data']]);
-        }
-
-        return redirect()->route('orders.get')->with('error', $response['response_message']);
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\OrderStatusHistory  $orderStatusHistory
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(OrderStatusHistory $orderStatusHistory)
     {
         //
     }
@@ -79,10 +64,10 @@ class OrderController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\OrderStatusHistory  $orderStatusHistory
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, OrderStatusHistory $orderStatusHistory)
     {
         //
     }
@@ -90,10 +75,10 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\OrderStatusHistory  $orderStatusHistory
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(OrderStatusHistory $orderStatusHistory)
     {
         //
     }
