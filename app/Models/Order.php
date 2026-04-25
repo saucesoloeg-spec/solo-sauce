@@ -26,6 +26,17 @@ class Order extends Model
         'notes'
     ];
 
+    protected $appends = ['order_type'];
+
+    public function getOrderTypeAttribute()
+    {
+        $firstOrderId = self::where('customer_id', $this->customer_id)
+            ->orderBy('created_at')
+            ->value('id');
+
+        return $this->id == $firstOrderId ? 'New Deal' : 'Reorder';
+    }
+
     public function driver()
     {
         return $this->belongsTo(Driver::class);
@@ -44,5 +55,10 @@ class Order extends Model
     public function products()
     {
         return $this->hasMany(OrderProduct::class);
+    }
+
+    public function statusHistory()
+    {
+        return $this->hasMany(OrderStatusHistory::class)->orderBy('created_at');
     }
 }

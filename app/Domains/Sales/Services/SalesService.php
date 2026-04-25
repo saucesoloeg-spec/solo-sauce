@@ -2,6 +2,8 @@
 
 namespace App\Domains\Sales\Services;
 
+use App\Domains\Customers\Repositories\CustomerRepository;
+use App\Domains\Customers\Services\CustomerService;
 use App\Domains\Orders\Repositories\OrderRepository;
 use App\Domains\Sales\Repositories\SalesRepository;
 use App\Domains\Surveys\Repositories\SurveyRepository;
@@ -11,12 +13,19 @@ class SalesService
     protected $sales_repository;
     protected $order_repository;
     protected $survey_repository;
+    protected $customer_repository;
 
-    public function __construct(SalesRepository $sales_repository, OrderRepository $order_repository, SurveyRepository $survey_repository)
+    public function __construct(
+        SalesRepository $sales_repository, 
+        OrderRepository $order_repository, 
+        SurveyRepository $survey_repository,
+        CustomerRepository $customer_repository
+    )
     {
-        $this->sales_repository  = $sales_repository;
-        $this->order_repository  = $order_repository;
-        $this->survey_repository = $survey_repository;
+        $this->sales_repository    = $sales_repository;
+        $this->order_repository    = $order_repository;
+        $this->survey_repository   = $survey_repository;
+        $this->customer_repository = $customer_repository;
     }
 
     public function dashboard($data) 
@@ -53,9 +62,15 @@ class SalesService
         ];
     }
 
-    public function getAll() 
+    public function getAll($customer_id = null) 
     {
-        $sales = $this->sales_repository->getAll();  
+        $customer = null;
+
+        if($customer_id) {
+            $customer = $this->customer_repository->find($customer_id);
+        }
+
+        $sales = $this->sales_repository->getAllSales($customer?->city_odoo_id);  
         
         if($sales->isNotEmpty()) {
             return [
@@ -75,7 +90,7 @@ class SalesService
     public function getSchedule($request) 
     {
         $sales         = auth('sales')->user();
-    
+        
         $schedules     = $this->sales_repository->getSchedule($sales->id, $request);
         $new_deals     = $this->order_repository->getNewDealsForSales($sales->id, $request);
         $regular_deals = $this->order_repository->getRegularDealsForSales($sales->id, $request);

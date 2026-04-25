@@ -163,16 +163,34 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="zone" class="form-label">Zone</label>
-                                <input type="text" class="form-control @error('zone') is-invalid @enderror" id="zone" name="zone" value="{{ old('zone') }}">
-                                @error('zone')
+                                <label for="country_odoo_id" class="form-label">Country</label>
+                                <select id="country" name="country_odoo_id" class="form-select">
+                                    <option value="">Select Country</option>
+                                    @foreach($countries as $country)
+                                        <option value="{{ $country['id'] }}">{{ $country['name'] }}</option>
+                                    @endforeach
+                                </select>
+                                @error('country')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group">
-                                <label for="city" class="form-label">City</label>
-                                <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city') }}">
+                                <label for="state_odoo_id" class="form-label">State</label>
+                                <select id="state" name="state_odoo_id" class="form-select" disabled>
+                                    <option value="">Select State</option>
+                                </select>
+
+                                @error('state')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="city_odoo_id" class="form-label">City</label>
+                                <select id="city" name="city_odoo_id" class="form-select" disabled>
+                                    <option value="">Select City</option>
+                                </select>
                                 @error('city')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
@@ -218,4 +236,77 @@
         </div>
     </div>
 </div>
+@stop
+
+@section('JavaScript')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const country  = document.getElementById('country');
+    const state    = document.getElementById('state');
+    const city     = document.getElementById('city');
+    const salesman = document.getElementById('salesman');
+
+    const resetSelect = (el, placeholder) => {
+        el.innerHTML = `<option value="">${placeholder}</option>`;
+        el.disabled  = true;
+    };
+
+    const populateSelect = (el, data) => {
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name;
+            el.appendChild(option);
+        });
+        el.disabled = false;
+    };
+
+    // Country → States
+    country.addEventListener('change', async () => {
+        const countryId = country.value;
+
+        resetSelect(state, 'Select State');
+        resetSelect(city, 'Select City');
+        // resetSelect(salesman, 'Select Salesman');
+
+        if (!countryId) return;
+
+        const res = await fetch(`/api/odoo/states/${countryId}`);
+        const data = await res.json();
+
+        populateSelect(state, data);
+    });
+
+    // State → Cities
+    state.addEventListener('change', async () => {
+        const stateId = state.value;
+
+        resetSelect(city, 'Select City');
+        // resetSelect(salesman, 'Select Salesman');
+
+        if (!stateId) return;
+
+        const res = await fetch(`/api/odoo/cities/${stateId}`);
+        const data = await res.json();
+
+        populateSelect(city, data);
+    });
+
+    // // City → Salesmen
+    // city.addEventListener('change', async () => {
+    //     const cityId = city.value;
+
+    //     resetSelect(salesman, 'Select Salesman');
+
+    //     if (!cityId) return;
+
+    //     const res = await fetch(`/api/salesmen?city_id=${cityId}`);
+    //     const data = await res.json();
+
+    //     populateSelect(salesman, data);
+    // });
+
+});
+</script>
 @stop

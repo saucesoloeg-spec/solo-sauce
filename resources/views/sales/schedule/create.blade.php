@@ -130,25 +130,25 @@
                         <h6 class="font-weight-semibold mb-3">Basic Information</h6>
                         
                         <div class="row-fields">
-                            <select class="form-control @error('sales_id') is-invalid @enderror" id="sales" name="sales_id" required>
-                                <option value="">-- Select Representative --</option>
+                            <div class="form-group">
+                                <label for="customer_id" class="form-label">Customer</label>
+                                <select class="form-control @error('customer_id') is-invalid @enderror" id="customers" name="customer_id" required>
+                                    <option value=""> Select Customer </option>
 
-                                @foreach($sales as $salesman)
-                                    <option value="{{ $salesman->id }}" {{ old('sales_id') == $salesman->id ? 'selected' : '' }}>
-                                        {{ $salesman->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <select class="form-control @error('customer_id') is-invalid @enderror" id="customers" name="customer_id" required>
-                                <option value="">-- Select Representative --</option>
-
-                                @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                                        {{ $customer->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                                    @foreach($customers as $customer)
+                                        <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+                                            {{ $customer->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sales_id" class="form-label">Sales</label>
+                                <select class="form-control @error('sales_id') is-invalid @enderror" id="salesmen" name="sales_id" disabled required>
+                                    <option value=""> Select Representative </option>
+                                </select>
+                            </div>
 
                             <div class="form-group">
                                 <label for="visit_date" class="form-label">
@@ -189,4 +189,44 @@
         </div>
     </div>
 </div>
+@stop
+
+@section('JavaScript')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const customers = document.getElementById('customers');
+    const salesman  = document.getElementById('salesmen');
+
+    const resetSelect = (el, placeholder) => {
+        el.innerHTML = `<option value="">${placeholder}</option>`;
+        el.disabled  = true;
+    };
+
+    const populateSelect = (el, data) => {
+        data.forEach(item => {
+            const option       = document.createElement('option');
+            option.value       = item.id;
+            option.textContent = item.name;
+            el.appendChild(option);
+        });
+        el.disabled = false;
+    };
+
+    // Customers → Salesmen
+    customers.addEventListener('change', async () => {
+        const customerId = customers.value;
+
+        resetSelect(salesman, 'Select Representative');
+
+        if (!customerId) return;
+
+        const res  = await fetch(`/api/sales/all?customer_id=${customerId}`);
+        const data = await res.json();
+
+        populateSelect(salesman, data);
+    });
+
+});
+</script>
 @stop

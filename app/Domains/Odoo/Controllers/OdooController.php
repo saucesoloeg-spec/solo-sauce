@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Domains\Odoo\Controllers;
 
-use App\Http\Services\OrderService;
+use App\Domains\Odoo\Services\OdooAuthService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class OdooController extends Controller
 {
-    public $order_service;
+    public $odoo_service;
 
-    public function __construct(OrderService $order_service) 
+    public function __construct(OdooAuthService $odoo_service) 
     {
-        $this->order_service = $order_service;
+        $this->odoo_service = $odoo_service;
     }
 
     /**
@@ -21,9 +22,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $response = $this->order_service->getAll();
-
-        return view('orders.index', ['orders' => $response['response_data']]);
+        //
     }
 
     /**
@@ -55,13 +54,33 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $response = $this->order_service->getById($id);
-        
-        if($response['response_code'] == 200) {
-            return view('orders.show', ['order' => $response['response_data']]);
-        }
+        //
+    }
 
-        return redirect()->route('orders.get')->with('error', $response['response_message']);
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $country_id
+     * @return \Illuminate\Http\Response
+     */
+    public function states($country_id)
+    {
+        $response = $this->odoo_service->getStates($country_id);
+        
+        return response()->json($response['response_data']['states'], $response['response_code']);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $city_id
+     * @return \Illuminate\Http\Response
+     */
+    public function cities($state_id)
+    {
+        $response = $this->odoo_service->getCities($state_id);
+        
+        return response()->json($response['response_data']['cities'], $response['response_code']);
     }
 
     /**

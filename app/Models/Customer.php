@@ -19,6 +19,9 @@ class Customer extends Model
         'address',
         'zone',
         'city',
+        'country_odoo_id',
+        'state_odoo_id',
+        'city_odoo_id',
         'latitude',
         'longitude',
     ];
@@ -31,6 +34,16 @@ class Customer extends Model
     public function orders() 
     {
         return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    public function visits()
+    {
+        return $this->hasMany(SalesCustomer::class);
+    }
+
+    public function answers()
+    {
+        return $this->hasMany(SurveyAnswer::class);
     }
 
 }

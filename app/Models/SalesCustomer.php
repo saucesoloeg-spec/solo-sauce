@@ -33,5 +33,10 @@ class SalesCustomer extends Model
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
+
+    public function answers()
+    {
+        return $this->hasMany(SurveyAnswer::class);
+    }
     
 }

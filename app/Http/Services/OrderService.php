@@ -34,13 +34,13 @@ class OrderService
 
     public function getById($id) 
     {
-        $orders = $this->order_repository->getById($id);  
+        $order = $this->order_repository->getById($id);  
         
-        if($orders) {
+        if($order) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Customer retrieved successfully.',
-                'response_data'    => $orders
+                'response_data'    => $order
             ];
         }
 

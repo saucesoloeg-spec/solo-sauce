@@ -78,6 +78,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('app/Domains/Orders/Routes/route.php'));
 
+            Route::prefix('api/odoo')
+                ->middleware('api')
+                ->namespace($this->namespace)
+                ->group(base_path('app/Domains/Odoo/Routes/route.php'));
+
             Route::middleware('web')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));

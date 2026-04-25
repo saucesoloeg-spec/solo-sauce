@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Odoo\Services\OdooAuthService;
 use App\Http\Requests\StoreSalesRequest;
 use App\Http\Requests\StoreScheduleRequest;
 use App\Http\Requests\UpdateSalesRequest;
@@ -11,10 +12,12 @@ use Illuminate\Http\Request;
 class SalesController extends Controller
 {
     public $sales_service;
+    public $odoo_service;
 
-    public function __construct(SalesService $sales_service) 
+    public function __construct(SalesService $sales_service, OdooAuthService $odoo_service) 
     {
         $this->sales_service = $sales_service;
+        $this->odoo_service  = $odoo_service;
     }
 
     /**
@@ -36,7 +39,9 @@ class SalesController extends Controller
      */
     public function create()
     {
-        return view('sales.create');
+        $countries = $this->odoo_service->getCountries();
+        
+        return view('sales.create', ['countries' => $countries['data']['countries']]);
     }
 
     /**
@@ -132,8 +137,8 @@ class SalesController extends Controller
      */
     public function createSchedule()
     {
-        $response = $this->sales_service->getScheduleInfo();
-
+        $response  = $this->sales_service->getScheduleInfo();
+        
         return view('sales.schedule.create', [
             'sales'     => $response['response_data']['sales'],
             'customers' => $response['response_data']['customers']

@@ -304,4 +304,118 @@ class OdooAuthService
         return $result;
     }
 
+    public function getCountries()
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/locations/countries';
+
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'content-type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+            }
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch order from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
+    public function getStates($country_id)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/locations/states?country_id=' . $country_id;
+
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            // 'content-type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+            }
+            
+            if($result['success']) {
+                return [
+                    'response_code'    => 200,
+                    'response_message' => 'states retrieved successfully',
+                    'response_data'    => $result['data'],
+                ];
+            }
+
+            return [
+                'response_code'    => 400,
+                'response_message' => 'states retrieving Faild',
+                'response_data'    => [],
+            ];
+
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch order from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
+    public function getCities($state_id)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/locations/cities?state_id=' . $state_id;
+
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_HTTPGET, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            // 'content-type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+            }
+            
+            if($result['success']) {
+                return [
+                    'response_code'    => 200,
+                    'response_message' => 'Cities retrieved successfully',
+                    'response_data'    => $result['data'],
+                ];
+            }
+
+            return [
+                'response_code'    => 400,
+                'response_message' => 'Cities retrieving Faild',
+                'response_data'    => [],
+            ];
+
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to fetch order from Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
 }

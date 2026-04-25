@@ -3,6 +3,7 @@
 namespace App\Domains\Orders\Repositories;
 
 use App\Models\Order;
+use App\Models\OrderStatusHistory;
 use Illuminate\Support\Str;
 use App\Models\SalesCustomer;
 use Illuminate\Support\Facades\DB;
@@ -12,11 +13,13 @@ class OrderRepository
 {
     protected $model;
     protected $sales_customer_model;
+    protected $order_status_history;
 
-    public function __construct(Order $model, SalesCustomer $sales_customer_model)
+    public function __construct(Order $model, SalesCustomer $sales_customer_model, OrderStatusHistory $order_status_history)
     {
         $this->model = $model;
         $this->sales_customer_model = $sales_customer_model;
+        $this->order_status_history = $order_status_history;
     }
 
     public function saveOrder(array $data)
@@ -48,6 +51,11 @@ class OrderRepository
                     ]);
                 }
             }
+
+            $status = $this->order_status_history->create([
+                'order_id' => $order->id,
+                'status'   => $data['status'] ?? 'pending'
+            ]);
 
             $visit = $this->sales_customer_model->where('customer_id', $order->customer_id)
                 ->whereDate('visit_at', date('Y-m-d'))
@@ -83,37 +91,47 @@ class OrderRepository
 
     public function getNewDealsForSales($id, $filters = []) 
     {
-        $query = DB::table('orders as o')
-                ->where('o.sales_id', $id)
-                ->whereRaw('o.created_at = (
-                    SELECT MIN(created_at)
-                    FROM orders
-                    WHERE customer_id = o.customer_id
-                )');
+        $query = Order::query()
+            ->from('orders as o')
+            ->select('o.*')
+            ->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class)
+            ->whereNull('o.deleted_at')
+            ->where('o.sales_id', $id)
+            ->whereRaw('o.created_at = (
+                SELECT MIN(created_at)
+                FROM orders
+                WHERE customer_id = o.customer_id
+            )')
+            ->with(['customer']);
 
-        if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
-            $query->whereDate('created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
-                  ->whereDate('created_at', '<=', date("Y-m-d", strtotime($filters['to'])));
+        if (!empty($filters) && isset($filters['from'], $filters['to'])) {
+            $query->whereDate('o.created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
+                ->whereDate('o.created_at', '<=', date("Y-m-d", strtotime($filters['to'])));
         }
-                
+
         return $query->get();
     }
 
     public function getRegularDealsForSales($id, $filters = []) 
     {
-        $query = DB::table('orders as o')
-                 ->where('o.sales_id', $id)
-                 ->whereRaw('o.created_at > (
-                     SELECT MIN(created_at)
-                     FROM orders
-                     WHERE customer_id = o.customer_id
-                 )');
+        $query = Order::query()
+            ->from('orders as o')
+            ->select('o.*')
+            ->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class)
+            ->whereNull('o.deleted_at')
+            ->where('o.sales_id', $id)
+            ->whereRaw('o.created_at > (
+                SELECT MIN(created_at)
+                FROM orders
+                WHERE customer_id = o.customer_id
+            )')
+            ->with(['customer']);
 
-        if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
-            $query->whereDate('created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
-                  ->whereDate('created_at', '<=', date("Y-m-d", strtotime($filters['to'])));
+        if (!empty($filters) && isset($filters['from'], $filters['to'])) {
+            $query->whereDate('o.created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
+                ->whereDate('o.created_at', '<=', date("Y-m-d", strtotime($filters['to'])));
         }
-                
+
         return $query->get();
     }
 

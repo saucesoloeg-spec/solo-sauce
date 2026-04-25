@@ -139,6 +139,7 @@
                         <input id="filter-pending" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
                         <label class="btn btn-white px-3 mb-0" for="filter-pending">Pending</label>
                     </div>
+                    
                     <div class="input-group w-sm-25 ms-auto" style="display: flex; gap: 10px;">
                         <span class="input-group-text text-body">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -407,6 +408,7 @@
                     alert("Error updating percentage. Please try again.");
                 });
         });
+        
     });
 
 

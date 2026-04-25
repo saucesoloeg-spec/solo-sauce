@@ -27,6 +27,9 @@ class Sales extends Authenticatable
         'address',
         'zone',
         'city',
+        'country_odoo_id',
+        'state_odoo_id',
+        'city_odoo_id',
         'password',
     ];
 
