@@ -102,7 +102,7 @@ class OrderRepository
                 FROM orders
                 WHERE customer_id = o.customer_id
             )')
-            ->with(['customer']);
+            ->with(['customer', 'products']);
 
         if (!empty($filters) && isset($filters['from'], $filters['to'])) {
             $query->whereDate('o.created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
@@ -125,7 +125,7 @@ class OrderRepository
                 FROM orders
                 WHERE customer_id = o.customer_id
             )')
-            ->with(['customer']);
+            ->with(['customer', 'products']);
 
         if (!empty($filters) && isset($filters['from'], $filters['to'])) {
             $query->whereDate('o.created_at', '>=', date("Y-m-d", strtotime($filters['from'])))
