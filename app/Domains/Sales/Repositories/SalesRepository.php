@@ -57,7 +57,8 @@ class SalesRepository
     public function getPastSchedule($id, $filters = [])
     {
         $query = $this->sales_customer_model->where('sales_id', $id)
-                                            ->where('visit_at', '<', now());
+                                            ->where('visit_at', '<', now())
+                                            ->with(['order', 'customer']);
 
         if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
             $query->whereDate('visit_at', '>=', date("Y-m-d", strtotime($filters['from'])))
