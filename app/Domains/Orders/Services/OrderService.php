@@ -36,6 +36,8 @@ class OrderService
                 })->toArray(),
             ];
             $send_order = $this->odoo_service->sendOrderToOdoo($payload);
+
+            $order->update(['odoo_id' => $send_order['data']['id'] ?? null]);
             
             if(isset($send_order['success']) && $send_order['success'] === true) {
                 return [
@@ -57,6 +59,11 @@ class OrderService
             'response_message' => 'Failed to create order',
             'response_data'    => null
         ];
+    }
+
+    public function getOrderById($id)
+    {
+        return $this->order_repository->getOrderById($id);
     }
 
 }

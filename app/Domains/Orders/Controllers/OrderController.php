@@ -15,7 +15,10 @@ class OrderController extends Controller
     public $odoo_service;
     public $order_service;
 
-    public function __construct(OdooAuthService $odoo_service, OrderService $order_service)
+    public function __construct(
+        OdooAuthService $odoo_service, 
+        OrderService $order_service
+    )
     {
         $this->odoo_service  = $odoo_service;
         $this->order_service = $order_service;
@@ -68,12 +71,13 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = $this->odoo_service->getOrderById($id);
+        $order = $this->order_service->getOrderById($id);
+        $odoo_order = $this->odoo_service->getOrderById($order->odoo_id);
 
         return response()->json([
             'response_code'    => 200,
             'response_message' => 'Order fetched successfully',
-            'response_data'    => $order['data'] ?? []
+            'response_data'    => $odoo_order['data'] ?? []
         ]);
     }
 
