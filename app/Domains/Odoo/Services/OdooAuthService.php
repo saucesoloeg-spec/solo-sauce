@@ -265,7 +265,7 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to send order to Odoo: ' . $result['error']['details']);
+                throw new \Exception('Failed to send order to Odoo: ' . $result['error']['detail']);
             }
         } catch (\Throwable $th) {
             throw new \Exception('Failed to send order to Odoo: ' . $th->getMessage());
@@ -293,7 +293,7 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['detail']);
             }
         } catch (\Throwable $th) {
             throw new \Exception('Failed to fetch order from Odoo: ' . $th->getMessage());
@@ -321,7 +321,7 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['detail']);
             }
         } catch (\Throwable $th) {
             throw new \Exception('Failed to fetch order from Odoo: ' . $th->getMessage());
@@ -349,7 +349,7 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['detail']);
             }
             
             if($result['success']) {
@@ -392,7 +392,7 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['details']);
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['detail']);
             }
             
             if($result['success']) {

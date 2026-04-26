@@ -135,4 +135,9 @@ class OrderRepository
         return $query->get();
     }
 
+    public function getOrderById($id)
+    {
+        return $this->model->with(['customer', 'products'])->find($id);
+    }
+
 }
