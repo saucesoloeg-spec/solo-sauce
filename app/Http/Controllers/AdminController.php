@@ -115,11 +115,13 @@ class AdminController extends Controller
 
     public function dashboard() 
     {
-        $admin          = $this->admin_service->loggedinAdmin();
-        $monthly_income = $this->admin_service->getMonthlyIncome();
-        $yearly_income  = $this->admin_service->getYearlyIncome();
+        $admin               = $this->admin_service->loggedinAdmin();
+        $past_monthly_income = $this->admin_service->getPastMonthlyIncome();
+        $monthly_income      = $this->admin_service->getMonthlyIncome();
+        $monthly_orders      = $this->admin_service->getMonthlyOrders();
+        $yearly_income       = $this->admin_service->getYearlyIncome();
         
-        return view('dashboard.dashboard', compact('admin', 'monthly_income', 'yearly_income'));
+        return view('dashboard.dashboard', compact('admin', 'past_monthly_income', 'monthly_income', 'monthly_orders', 'yearly_income'));
     }
 
     /**

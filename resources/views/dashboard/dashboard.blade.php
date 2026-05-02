@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container-fluid py-4 px-5">
+
     <div class="row">
         <div class="col-md-12">
             <div class="d-md-flex align-items-center mb-3 mx-2">
@@ -28,32 +29,414 @@
             </div>
         </div>
     </div>
+
     <hr class="mt-0 mb-5">
+
+    <div class="row">
+        <div class="col-xl-2 col-sm-3 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg height="16" width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3.75a.75.75 0 01.53.22l8.25 8.25a.75.75 0 11-1.06 1.06L18.75 12.31V19.5A2.25 2.25 0 0116.5 21.75h-3.75a.75.75 0 01-.75-.75v-3.75h-1.5V21a.75.75 0 01-.75.75H7.5A2.25 2.25 0 015.25 19.5v-7.19l-.97.97a.75.75 0 11-1.06-1.06l8.25-8.25A.75.75 0 0112 3.75z"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.total_visits') }}</p>
+                                <h4 class="mb-2 font-weight-bold"> {{$monthly_income->total_visits ?? 0}} </h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->total_visits >= $past_monthly_income->total_visits)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                        <i class="fa fa-chevron-up text-xs me-1"></i> +{{ $monthly_income->total_visits ? round((($monthly_income->total_visits - $past_monthly_income->total_visits) / $past_monthly_income->total_visits) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                        <i class="fa fa-chevron-down text-xs me-1"></i> -{{ $monthly_income->total_visits ? round((($past_monthly_income->total_visits - $monthly_income->total_visits) / $past_monthly_income->total_visits) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{$past_monthly_income->total_visits ?? 0}} {{__('dashboard.previous_month')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-sm-3 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Rounded square background -->
+                            <rect x="0" y="0" width="48" height="48" rx="12" fill="#22C58B"/>
+                            <!-- White circle -->
+                            <circle cx="24" cy="24" r="10" fill="none" stroke="white" stroke-width="2"/>
+                            <!-- Check mark -->
+                            <path d="M20.5 24.5l2.5 2.5 5-5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.completed_visits') }}</p>
+                                <h4 class="mb-2 font-weight-bold"> {{ $monthly_income->completed_visits ?? 0 }} </h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->completed_visits >= $past_monthly_income->completed_visits)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->completed_visits ? round((($monthly_income->completed_visits - $past_monthly_income->completed_visits) / $past_monthly_income->completed_visits) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->completed_visits ? round((($past_monthly_income->completed_visits - $monthly_income->completed_visits) / $past_monthly_income->completed_visits) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->completed_visits ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-sm-3 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background -->
+                            <rect width="48" height="48" rx="12" fill="#3B82F6"/>
+                            <!-- Circle -->
+                            <circle cx="24" cy="24" r="10" fill="none" stroke="white" stroke-width="2"/>
+                            <!-- Clock icon -->
+                            <path d="M24 19v5l3 2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.opened') }}</p>
+                                <h4 class="mb-2 font-weight-bold"> {{ $monthly_income->open_visits ?? 0 }} </h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->open_visits >= $past_monthly_income->open_visits)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->open_visits ? round((($monthly_income->open_visits - $past_monthly_income->open_visits) / $past_monthly_income->open_visits) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->open_visits ? round((($past_monthly_income->open_visits - $monthly_income->open_visits) / $past_monthly_income->open_visits) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->open_visits ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-sm-3 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background -->
+                            <rect width="48" height="48" rx="12" fill="#F59E0B"/>
+                            <!-- Circle -->
+                            <circle cx="24" cy="24" r="10" fill="none" stroke="white" stroke-width="2"/>
+                            <!-- Exclamation mark -->
+                            <path d="M24 18v6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="24" cy="27.5" r="1" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.delayed') }}</p>
+                                <h4 class="mb-2 font-weight-bold"> {{ $monthly_income->delayed ?? 0 }} </h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->delayed >= $past_monthly_income->delayed)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->delayed ? round((($monthly_income->delayed - $past_monthly_income->delayed) / $past_monthly_income->delayed) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->delayed ? round((($past_monthly_income->delayed - $monthly_income->delayed) / $past_monthly_income->delayed) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{$past_monthly_income->delayed ?? 0}} {{ __('dashboard.previous_month') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-sm-3 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background -->
+                            <rect width="48" height="48" rx="12" fill="#EF4444"/>
+                            <!-- Circle -->
+                            <circle cx="24" cy="24" r="10" fill="none" stroke="white" stroke-width="2"/>
+                            <!-- X mark -->
+                            <path d="M21 21l6 6M27 21l-6 6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.cancelled') }}</p>
+                                <h4 class="mb-2 font-weight-bold"> {{ $monthly_income->cancelled ?? 0 }} </h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->cancelled >= $past_monthly_income->cancelled)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->cancelled ? round((($monthly_income->cancelled - $past_monthly_income->cancelled) / ($past_monthly_income->cancelled ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->cancelled ? round((($past_monthly_income->cancelled - $monthly_income->cancelled) / ($past_monthly_income->cancelled ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{$past_monthly_income->cancelled ?? 0}} {{ __('dashboard.previous_month') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-sm-3 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Background -->
+                        <rect width="48" height="48" rx="12" fill="#111827"/> 
+                        <!-- Dollar sign (bigger + cleaner) -->
+                        <path d="M24 14v20
+                                M29 19c0-2-2-3.5-5-3.5s-5 1.5-5 3.5 2 3.5 5 3.5 5 1.5 5 3.5-2 3.5-5 3.5-5-1.5-5-3.5"
+                                fill="none"
+                                stroke="white"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.total_monthly_income') }}</p>
+                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->income ?? 0 }}</h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->income >= $past_monthly_income->income)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->income ? round((($monthly_income->income - $past_monthly_income->income) / ($past_monthly_income->income ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->income ? round((($past_monthly_income->income - $monthly_income->income) / ($past_monthly_income->income ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} ${{$monthly_income->income ?? 0}}  {{__('dashboard.previous_month')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-xl-4 col-sm-6 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background -->
+                            <rect width="48" height="48" rx="12" fill="#1F2937"/>
+                            <!-- List container -->
+                            <rect x="14" y="14" width="20" height="20" rx="3" fill="none" stroke="white" stroke-width="2"/>
+                            <!-- Bullets -->
+                            <circle cx="18" cy="20" r="1.5" fill="white"/>
+                            <circle cx="18" cy="24" r="1.5" fill="white"/>
+                            <circle cx="18" cy="28" r="1.5" fill="white"/>
+                            <!-- Lines -->
+                            <path d="M22 20h8M22 24h8M22 28h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.surveys') }}</p>
+                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->total_surveys ?? 0 }}</h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->total_surveys >= $past_monthly_income->total_surveys)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->total_surveys ? round((($monthly_income->total_surveys - $past_monthly_income->total_surveys) / ($past_monthly_income->total_surveys ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->total_surveys ? round((($past_monthly_income->total_surveys - $monthly_income->total_surveys) / ($past_monthly_income->total_surveys ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->total_surveys ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-sm-6 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background -->
+                            <rect width="48" height="48" rx="12" fill="#1F2937"/>
+                            <!-- Circular arrow -->
+                            <path d="M32 24a8 8 0 10-2.3 5.7" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                            <!-- Arrow head -->
+                            <path d="M30 17v6h6" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.reorders') }}</p>
+                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->total_reorders ?? 0 }}</h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->total_reorders >= $past_monthly_income->total_reorders)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->total_reorders ? round((($monthly_income->total_reorders - $past_monthly_income->total_reorders) / ($past_monthly_income->total_reorders ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->total_reorders ? round((($past_monthly_income->total_reorders - $monthly_income->total_reorders) / ($past_monthly_income->total_reorders ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->total_reorders ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-sm-6 mb-xl-0">
+            <div class="card border shadow-xs mb-4">
+                <div class="card-body text-start p-3 w-100">
+                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
+                        <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background -->
+                            <rect width="48" height="48" rx="12" fill="#1F2937"/>
+                            <!-- Inner badge -->
+                            <rect x="12" y="16" width="24" height="16" rx="4" fill="white"/>
+                            <!-- Text -->
+                            <text x="24" y="27" text-anchor="middle" font-size="10" font-family="Arial, sans-serif" fill="#1F2937" font-weight="bold">
+                                NEW
+                            </text>
+                        </svg>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="w-100">
+                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.new_deals') }}</p>
+                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->total_new_orders ?? 0 }}</h4>
+                                <div class="d-flex align-items-center">
+                                    @if($monthly_income->total_new_orders >= $past_monthly_income->total_new_orders)
+                                    <span class="text-sm text-success font-weight-bolder">
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->total_new_orders ? round((($monthly_income->total_new_orders - $past_monthly_income->total_new_orders) / ($past_monthly_income->total_new_orders ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @else
+                                    <span class="text-sm text-danger font-weight-bolder">
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->total_new_orders ? round((($past_monthly_income->total_new_orders - $monthly_income->total_new_orders) / ($past_monthly_income->total_new_orders ?: 1)) * 100, 2) : 0 }}%
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->total_new_orders ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <!-- <div class="row my-4">
-        <div class="col-lg-4 col-md-6 mb-md-0 mb-4">
+    <div class="row my-4">
+        <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
             <div class="card shadow-xs border h-100">
                 <div class="card-header pb-0">
-                    <h6 class="font-weight-semibold text-lg mb-0">Balances over time</h6>
-                    <p class="text-sm">Here you have details about the balance.</p>
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <h6 class="font-weight-semibold text-lg mb-0">{{ __('dashboard.reorder_by_representative') }}</h6>
+                    <p class="text-sm">{{ __('dashboard.reorder_by_representative_description') }}</p>
+                    <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
                         <label class="btn btn-white px-3 mb-0" for="btnradio1">12 months</label>
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
                         <label class="btn btn-white px-3 mb-0" for="btnradio2">30 days</label>
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
                         <label class="btn btn-white px-3 mb-0" for="btnradio3">7 days</label>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="card-body py-3">
-                    <div class="chart mb-2">
-                        <canvas id="chart-bars" class="chart-canvas" height="240"></canvas>
+                    <div class="reorder_chart mb-2">
+                        <canvas id="reorder_chart-bars" class="chart-canvas" height="240"></canvas>
                     </div>
-                    <button class="btn btn-white mb-0 ms-auto">View report</button>
+                    <!-- <button class="btn btn-white mb-0 ms-auto">View report</button> -->
                 </div>
             </div>
         </div>
-        <div class="col-lg-8 col-md-6">
+        <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
+            <div class="card shadow-xs border h-100">
+                <div class="card-header pb-0">
+                    <h6 class="font-weight-semibold text-lg mb-0">{{ __('dashboard.new_deals_by_representative') }}</h6>
+                    <p class="text-sm">{{ __('dashboard.new_deals_by_representative_description') }}</p>
+                    <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                        <label class="btn btn-white px-3 mb-0" for="btnradio1">12 months</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio2">30 days</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio3">7 days</label>
+                    </div> -->
+                </div>
+                <div class="card-body py-3">
+                    <div class="new_deals_chart mb-2">
+                        <canvas id="new_deals_chart-bars" class="chart-canvas" height="240"></canvas>
+                    </div>
+                    <!-- <button class="btn btn-white mb-0 ms-auto">View report</button> -->
+                </div>
+            </div>
+        </div>
+        <!-- <div class="col-lg-8 col-md-6">
             <div class="card shadow-xs border">
                 <div class="card-header border-bottom pb-0">
                     <div class="d-sm-flex align-items-center mb-3">
@@ -256,112 +639,34 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div> -->
-    <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0">
-            <div class="card border shadow-xs mb-4">
-                <div class="card-body text-start p-3 w-100">
-                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
-                        <svg height="16" width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15z" />
-                            <path fill-rule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 003 3h15a3 3 0 003-3v-7.5zm-18 3.75a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="w-100">
-                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.revenue') }}</p>
-                                <h4 class="mb-2 font-weight-bold">${{$monthly_income->income ?? 0}}</h4>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-sm text-success font-weight-bolder">
-                                    <i class="fa fa-chevron-up text-xs me-1"></i>{{$yearly_income->sum('income') != 0 ? round(($monthly_income->income/$yearly_income->sum('income'))*100,2) : 0}}%
-                                    </span>
-                                    <span class="text-sm ms-1">{{__('dashboard.from')}} ${{$yearly_income->sum('income') ?? 0}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        </div> -->
+    </div>
+
+    <div class="row my-4">
+        <div class="col-lg-12 col-md-6 mb-md-0 mb-4">
+            <div class="card shadow-xs border h-100">
+                <div class="card-header pb-0">
+                    <h6 class="font-weight-semibold text-lg mb-0">{{ __('dashboard.surveys_by_representative') }}</h6>
+                    <p class="text-sm">{{ __('dashboard.surveys_by_representative_description') }}</p>
+                    <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                        <label class="btn btn-white px-3 mb-0" for="btnradio1">12 months</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio2">30 days</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio3">7 days</label>
+                    </div> -->
                 </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0">
-            <div class="card border shadow-xs mb-4">
-                <div class="card-body text-start p-3 w-100">
-                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
-                        <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path fill-rule="evenodd" d="M7.5 5.25a3 3 0 013-3h3a3 3 0 013 3v.205c.933.085 1.857.197 2.774.334 1.454.218 2.476 1.483 2.476 2.917v3.033c0 1.211-.734 2.352-1.936 2.752A24.726 24.726 0 0112 15.75c-2.73 0-5.357-.442-7.814-1.259-1.202-.4-1.936-1.541-1.936-2.752V8.706c0-1.434 1.022-2.7 2.476-2.917A48.814 48.814 0 017.5 5.455V5.25zm7.5 0v.09a49.488 49.488 0 00-6 0v-.09a1.5 1.5 0 011.5-1.5h3a1.5 1.5 0 011.5 1.5zm-3 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
-                            <path d="M3 18.4v-2.796a4.3 4.3 0 00.713.31A26.226 26.226 0 0012 17.25c2.892 0 5.68-.468 8.287-1.335.252-.084.49-.189.713-.311V18.4c0 1.452-1.047 2.728-2.523 2.923-2.12.282-4.282.427-6.477.427a49.19 49.19 0 01-6.477-.427C4.047 21.128 3 19.852 3 18.4z" />
-                        </svg>
+                <div class="card-body py-3">
+                    <div class="reorder_chart mb-2">
+                        <canvas id="surveys_chart-bars" class="chart-canvas" height="240"></canvas>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="w-100">
-                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.new_companies') }}</p>
-                                <h4 class="mb-2 font-weight-bold">{{$monthly_income->active_companies ?? 0}}</h4>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-sm text-success font-weight-bolder">
-                                    <i class="fa fa-chevron-up text-xs me-1"></i>{{$yearly_income->sum('active_companies') != 0 ? round(($monthly_income->active_companies/$yearly_income->sum('active_companies'))*100,2) : 0}}%
-                                    </span>
-                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{$yearly_income->sum('active_companies') ?? 0}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0">
-            <div class="card border shadow-xs mb-4">
-                <div class="card-body text-start p-3 w-100">
-                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
-                        <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm4.5 7.5a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25a.75.75 0 01.75-.75zm3.75-1.5a.75.75 0 00-1.5 0v4.5a.75.75 0 001.5 0V12zm2.25-3a.75.75 0 01.75.75v6.75a.75.75 0 01-1.5 0V9.75A.75.75 0 0113.5 9zm3.75-1.5a.75.75 0 00-1.5 0v9a.75.75 0 001.5 0v-9z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="w-100">
-                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.published_packages') }}</p>
-                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->active_packages ?? 0 }}</h4>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-sm text-success font-weight-bolder">
-                                    <i class="fa fa-chevron-up text-xs me-1"></i>{{$yearly_income->sum('active_packages') != 0 ? round(($monthly_income->active_packages/$yearly_income->sum('active_packages'))*100,2) : 0}}%
-                                    </span>
-                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{$yearly_income->sum('active_packages') ?? 0}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6">
-            <div class="card border shadow-xs mb-4">
-                <div class="card-body text-start p-3 w-100">
-                    <div class="icon icon-shape icon-sm bg-dark text-white text-center border-radius-sm d-flex align-items-center justify-content-center mb-3">
-                        <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5.25 2.25a3 3 0 00-3 3v4.318a3 3 0 00.879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 005.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 00-2.122-.879H5.25zM6.375 7.5a1.125 1.125 0 100-2.25 1.125 1.125 0 000 2.25z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="w-100">
-                                <p class="text-sm text-secondary mb-1">{{ __('dashboard.purchased_packages') }}</p>
-                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->confirmed_packages ?? 0 }}</h4>
-                                <div class="d-flex align-items-center">
-                                    <span class="text-sm text-success font-weight-bolder">
-                                    <i class="fa fa-chevron-up text-xs me-1"></i>{{$yearly_income->sum('confirmed_packages') != 0 ? round(($monthly_income->confirmed_packages/$yearly_income->sum('confirmed_packages'))*100, 2) : 0}}%
-                                    </span>
-                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{$yearly_income->sum('confirmed_packages') ?? 0}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- <button class="btn btn-white mb-0 ms-auto">View report</button> -->
                 </div>
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card shadow-xs border">
@@ -391,6 +696,53 @@
                     <div class="chart mt-n6">
                         <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-4">
+        <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
+            <div class="card shadow-xs border h-100">
+                <div class="card-header pb-0">
+                    <h6 class="font-weight-semibold text-lg mb-0">{{ __('dashboard.total_orders') }}</h6>
+                    <p class="text-sm">{{ __('dashboard.total_orders_description') }}</p>
+                    <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                        <label class="btn btn-white px-3 mb-0" for="btnradio1">12 months</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio2">30 days</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio3">7 days</label>
+                    </div> -->
+                </div>
+                <div class="card-body py-3">
+                    <div class="total_orders_chart mb-2">
+                        <canvas id="total_orders_chart-bars" class="chart-canvas" height="240"></canvas>
+                    </div>
+                    <!-- <button class="btn btn-white mb-0 ms-auto">View report</button> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
+            <div class="card shadow-xs border h-100">
+                <div class="card-header pb-0">
+                    <h6 class="font-weight-semibold text-lg mb-0">{{ __('dashboard.total_orders_by_status') }}</h6>
+                    <p class="text-sm">{{ __('dashboard.total_orders_by_status_description') }}</p>
+                    <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                        <label class="btn btn-white px-3 mb-0" for="btnradio1">12 months</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio2">30 days</label>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                        <label class="btn btn-white px-3 mb-0" for="btnradio3">7 days</label>
+                    </div> -->
+                </div>
+                <div class="card-body py-3">
+                    <div class="total_orders_by_status_chart mb-2">
+                        <canvas id="total_orders_by_status_chart-bars" class="chart-canvas" height="240"></canvas>
+                    </div>
+                    <!-- <button class="btn btn-white mb-0 ms-auto">View report</button> -->
                 </div>
             </div>
         </div>
@@ -431,108 +783,491 @@
 @stop
 @section('JavaScript')
 <script>
-    // if (document.getElementsByClassName('mySwiper')) {
-    //     var swiper = new Swiper(".mySwiper", {
-    //         effect: "cards",
-    //         grabCursor: true,
-    //         initialSlide: 1,
-    //         navigation: {
-    //             nextEl: '.swiper-button-next',
-    //             prevEl: '.swiper-button-prev',
-    //         },
-    //     });
-    // };
+    if (document.getElementsByClassName('mySwiper')) {
+        var swiper = new Swiper(".mySwiper", {
+            effect: "cards",
+            grabCursor: true,
+            initialSlide: 1,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+    };
 
-    // var ctx = document.getElementById("chart-bars").getContext("2d");
+    const monthlyIncome = @json($monthly_income);
+    const monthlyOrders = @json($monthly_orders);
 
-    // new Chart(ctx, {
-    //     type: "bar",
-    //     data: {
-    //         labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-    //         datasets: [{
-    //                 label: "Sales",
-    //                 tension: 0.4,
-    //                 borderWidth: 0,
-    //                 borderSkipped: false,
-    //                 backgroundColor: "#2ca8ff",
-    //                 data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
-    //                 maxBarThickness: 6
-    //             },
-    //             {
-    //                 label: "Sales",
-    //                 tension: 0.4,
-    //                 borderWidth: 0,
-    //                 borderSkipped: false,
-    //                 backgroundColor: "#7c3aed",
-    //                 data: [200, 300, 200, 420, 400, 200, 300, 430, 400, 300],
-    //                 maxBarThickness: 6
-    //             },
-    //         ],
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         maintainAspectRatio: false,
-    //         plugins: {
-    //             legend: {
-    //                 display: false,
-    //             },
-    //             tooltip: {
-    //                 backgroundColor: '#fff',
-    //                 titleColor: '#1e293b',
-    //                 bodyColor: '#1e293b',
-    //                 borderColor: '#e9ecef',
-    //                 borderWidth: 1,
-    //                 usePointStyle: true
-    //             }
-    //         },
-    //         interaction: {
-    //             intersect: false,
-    //             mode: 'index',
-    //         },
-    //         scales: {
-    //             y: {
-    //                 stacked: true,
-    //                 grid: {
-    //                     drawBorder: false,
-    //                     display: true,
-    //                     drawOnChartArea: true,
-    //                     drawTicks: false,
-    //                     borderDash: [4, 4],
-    //                 },
-    //                 ticks: {
-    //                     beginAtZero: true,
-    //                     padding: 10,
-    //                     font: {
-    //                         size: 12,
-    //                         family: "Noto Sans",
-    //                         style: 'normal',
-    //                         lineHeight: 2
-    //                     },
-    //                     color: "#64748B"
-    //                 },
-    //             },
-    //             x: {
-    //                 stacked: true,
-    //                 grid: {
-    //                     drawBorder: false,
-    //                     display: false,
-    //                     drawOnChartArea: false,
-    //                     drawTicks: false
-    //                 },
-    //                 ticks: {
-    //                     font: {
-    //                         size: 12,
-    //                         family: "Noto Sans",
-    //                         style: 'normal',
-    //                         lineHeight: 2
-    //                     },
-    //                     color: "#64748B"
-    //                 },
-    //             },
-    //         },
-    //     },
-    // });
+    var reorder_ctx                = document.getElementById("reorder_chart-bars").getContext("2d");
+    var new_deals_ctx              = document.getElementById("new_deals_chart-bars").getContext("2d");
+    var surveys_ctx                = document.getElementById("surveys_chart-bars").getContext("2d");
+    var total_orders_ctx           = document.getElementById("total_orders_chart-bars").getContext("2d");
+    var total_orders_by_status_ctx = document.getElementById("total_orders_by_status_chart-bars").getContext("2d");
 
+    new Chart(reorder_ctx, {
+        type: "bar",
+        data: {
+            labels: ["Ahmad", "Mohamad", "Zain", "Islam", "Yasser", "Ali", "Khaled", "Mona", "Nada", "Sarah"],
+            datasets: [{
+                label: "Reorders",
+                tension: 0.4,
+                borderWidth: 0,
+                borderSkipped: false,
+                backgroundColor: "rgba(56, 189, 248, 0.75)",
+                borderColor: "rgba(56, 189, 248, 1)",
+                data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
+                maxBarThickness: 10
+            },
+            {
+                label: "Sales",
+                tension: 0.4,
+                borderWidth: 0,
+                borderSkipped: 'bottom',
+                borderRadius: {
+                    topLeft: 2,
+                    topRight: 2,
+                    bottomLeft: 0,
+                    bottomRight: 0
+                },
+                backgroundColor: "rgba(124, 58, 237, 0.75)",
+                borderColor: "rgba(124, 58, 237, 1)",
+                data: [200, 300, 200, 420, 400, 200, 300, 430, 400, 300],
+                maxBarThickness: 10
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#1e293b',
+                    bodyColor: '#1e293b',
+                    borderColor: '#e9ecef',
+                    borderWidth: 1,
+                    usePointStyle: true
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [4, 4],
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        padding: 10,
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+                x: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+            },
+        },
+    });
+
+    new Chart(new_deals_ctx, {
+        type: "bar",
+        data: {
+            labels: ["Ahmad", "Mohamad", "Zain", "Islam", "Yasser", "Ali", "Khaled", "Mona", "Nada", "Sarah"],
+            datasets: [{
+                    label: "New Deals",
+                    tension: 0.4,
+                    borderWidth: 0,
+                    borderSkipped: false,
+                    backgroundColor: "rgba(56, 189, 248, 0.75)",
+                    borderColor: "rgba(56, 189, 248, 1)",
+                    data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
+                    maxBarThickness: 10
+                },
+                {
+                    label: "Sales",
+                    tension: 0.4,
+                    borderWidth: 0,
+                    borderSkipped: 'bottom',
+                    borderRadius: {
+                        topLeft: 2,
+                        topRight: 2,
+                        bottomLeft: 0,
+                        bottomRight: 0
+                    },
+                    backgroundColor: "rgba(124, 58, 237, 0.75)",
+                    borderColor: "rgba(124, 58, 237, 1)",
+                    data: [200, 300, 200, 420, 400, 200, 300, 430, 400, 300],
+                    maxBarThickness: 10
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#1e293b',
+                    bodyColor: '#1e293b',
+                    borderColor: '#e9ecef',
+                    borderWidth: 1,
+                    usePointStyle: true
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [4, 4],
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        padding: 10,
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+                x: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+            },
+        },
+    });
+
+    new Chart(surveys_ctx, {
+        type: "bar",
+        data: {
+            labels: ["Ahmad", "Mohamad", "Zain", "Islam", "Yasser", "Ali", "Khaled", "Mona", "Nada", "Sarah"],
+            datasets: [{
+                    label: "Surveys",
+                    tension: 0.8,
+                    borderWidth: 0,
+                    borderSkipped: 'bottom',
+                    borderRadius: {
+                        topLeft: 4,
+                        topRight: 4,
+                        bottomLeft: 0,
+                        bottomRight: 0
+                    },
+                    backgroundColor: 'rgba(56, 189, 248, 0.75)',
+                    borderColor: 'rgba(56, 189, 248, 1)',
+                    data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
+                    maxBarThickness: 24
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#1e293b',
+                    bodyColor: '#1e293b',
+                    borderColor: '#e9ecef',
+                    borderWidth: 1,
+                    usePointStyle: true
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [4, 4],
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        padding: 10,
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+                x: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+            },
+        },
+    });
+
+    new Chart(total_orders_ctx, {
+        type: "bar",
+        data: {
+            labels: ["Reorders", "New Deals", "Surveys"],
+            datasets: [{
+                    label: "Total Orders",
+                    tension: 0.8,
+                    borderWidth: 0,
+                    borderSkipped: 'bottom',
+                    borderRadius: {
+                        topLeft: 6,
+                        topRight: 6,
+                        bottomLeft: 0,
+                        bottomRight: 0
+                    },
+                    backgroundColor: 'rgba(56, 189, 248, 0.75)',
+                    borderColor: 'rgba(56, 189, 248, 1)',
+                    data: [monthlyIncome.total_reorders, monthlyIncome.total_new_orders, monthlyIncome.total_surveys],
+                    maxBarThickness: 36
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#1e293b',
+                    bodyColor: '#1e293b',
+                    borderColor: '#e9ecef',
+                    borderWidth: 1,
+                    usePointStyle: true
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [4, 4],
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        padding: 10,
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+                x: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+            },
+        },
+    });
+
+    new Chart(total_orders_by_status_ctx, {
+        type: "bar",
+        data: {
+            labels: ["Pending", "Confirmed", "Shipped", "Completed", "Cancelled", "Suspended", "Returned"],
+            datasets: [{
+                    label: "Total Orders by Status",
+                    tension: 0.8,
+                    borderWidth: 0,
+                    borderSkipped: 'bottom',
+                    borderRadius: {
+                        topLeft: 6,
+                        topRight: 6,
+                        bottomLeft: 0,
+                        bottomRight: 0
+                    },
+                    backgroundColor: [
+                        'rgba(245, 158, 11, 0.75)', // Pending - amber
+                        'rgba(56, 189, 248, 0.75)', // Confirmed - sky blue
+                        'rgba(251, 146, 60, 0.75)', // Shipped - orange
+                        'rgba(34, 197, 94, 0.75)', // Completed - green
+                        'rgba(244, 63, 94, 0.75)', // Cancelled - red
+                        'rgba(148, 163, 184, 0.75)', // Suspended - gray
+                        'rgba(139, 92, 246, 0.75)'  // Returned - purple
+                    ],
+                    borderColor: [
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(56, 189, 248, 1)',
+                        'rgba(251, 146, 60, 1)',
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(244, 63, 94, 1)',
+                        'rgba(148, 163, 184, 1)',
+                        'rgba(139, 92, 246, 1)'
+                    ],
+                    data: [monthlyOrders['pending'] ?? 0, monthlyOrders['confirmed'] ?? 0, monthlyOrders['shipped'] ?? 0, monthlyOrders['completed'] ?? 0, monthlyOrders['cancelled'] ?? 0, monthlyOrders['suspended'] ?? 0, monthlyOrders['returned'] ?? 0],
+                    maxBarThickness: 36
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#1e293b',
+                    bodyColor: '#1e293b',
+                    borderColor: '#e9ecef',
+                    borderWidth: 1,
+                    usePointStyle: true
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [4, 4],
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        padding: 10,
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+                x: {
+                    stacked: true,
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            family: "Noto Sans",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#64748B"
+                    },
+                },
+            },
+        },
+    });
 
     // Assuming `$yearly_income` is passed to the frontend as JSON
     const yearlyIncome = @json($yearly_income);

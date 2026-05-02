@@ -13,28 +13,33 @@ class OdooAuthService
         $this->odoo_auth_repository = $odoo_auth_repository;
     }
 
-    protected function createOdooAccount()
+    public function createOdooAccount($request = [])
     {
         $response = curl_init(env('ODOO_API_URL').'/auth/signup');
         curl_setopt($response, CURLOPT_POST, true);
         curl_setopt($response, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
-            'name'     => "Solo Sauce",
-            'email'    => env('ODOO_EMAIL'),
-            'password' => env('ODOO_PASSWORD'),
-            'phone'    => "01234567890",
+            'name'       => $request['name'] ?? "Solo Sauce",
+            'email'      => $request['email'] ?? env('ODOO_EMAIL'),
+            'password'   => env('ODOO_PASSWORD'),
+            'phone'      => $request['phone'] ?? "01234567890",
+            'country_id' => $request['country_odoo_id'] ?? 65, // Egypt country id in Odoo
+            'state_id'   => $request['state_odoo_id'] ?? null,
+            'city_id'    => $request['city_odoo_id'] ?? 5, // Egypt city id in Odoo
         ]));
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to create Odoo account: ' . $result['error']['details']);
+                throw new \Exception('Failed to create Odoo account: ' . $result['error']['detail']);
             }            
 
             $this->odoo_auth_repository->create([
-                'email'         => env('ODOO_EMAIL'),
+                'email'         => $request['email'] ?? env('ODOO_EMAIL'),
             ]);
+            
+            return $result;
         } catch (\Throwable $th) {
             dd($result, $th->getMessage());
             throw new \Exception($result);
@@ -45,12 +50,46 @@ class OdooAuthService
         return $result;
     }
 
+    public function updateOdooAccount($request = [])
+    {
+        $token    = $this->getAccessToken()['access_token'];
+        $response = curl_init(env('ODOO_API_URL').'/managers/salespersons/'.$request['odoo_id']);
+        curl_setopt($response, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
+            'allowed_city_ids' => [$request['city_odoo_id']] ?? 5, // Egypt city id in Odoo
+        ]));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                throw new \Exception('Failed to update Odoo account: ' . $result['error']['detail']);
+            }
+            
+            return $result;
+        } catch (\Throwable $th) {
+            dd($result, $th->getMessage());
+            throw new \Exception($result);
+        }
+
+        curl_close($response);
+        return $result;
+    }
+
     protected function getAccessToken()
     {
+        $sales = auth('sales')->user();
+        $email = $sales ? $sales->email : env('ODOO_SUPERUSER_EMAIL');
+        $password = $sales ? env('ODOO_PASSWORD') : env('ODOO_SUPERUSER_PASSWORD');
+        
         $result = [];
         $true = true;
         while ($true) {
-            if($exists = $this->odoo_auth_repository->getLatestToken(env('ODOO_EMAIL'))) {
+            if($exists = $this->odoo_auth_repository->getLatestToken($email)) {
                 // add the number of minutes in expires_at to the created_at timestamp and compare it with the current time to check if the token is still valid
                 if(isset($exists->access_token) && isset($exists->expires_at) && strtotime($exists->updated_at) + $exists->expires_at > now()->timestamp){
                     $true = false;
@@ -61,17 +100,17 @@ class OdooAuthService
                     curl_setopt($response, CURLOPT_POST, true);
                     curl_setopt($response, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
                     curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
-                        'email'    => env('ODOO_EMAIL'),
-                        'password' => env('ODOO_PASSWORD'),
+                        'email'    => $email,
+                        'password' => $password,
                     ]));
                     curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
                     $data = curl_exec($response);
                     $data = json_decode($data, true);
                     curl_close($response);
                     
-                    if(isset($data['data']['tokens'])) {
+                    if($data['success'] && isset($data['data']['tokens'])) {
                         $result = $this->odoo_auth_repository->create([
-                            'email'         => env('ODOO_EMAIL'),
+                            'email'         => $email,
                             'access_token'  => $data['data']['tokens']['access_token'],
                             'refresh_token' => $data['data']['tokens']['refresh_token'],
                             'expires_at'    => $data['data']['tokens']['expires_in'],
@@ -81,7 +120,15 @@ class OdooAuthService
                 }
             }
             else {
-                $this->createOdooAccount();
+                $this->createOdooAccount([
+                    'name'       => $sales->name ?? "Solo Sauce",
+                    'email'      => $email,
+                    'password'   => env('ODOO_PASSWORD'),
+                    'phone'      => $sales->phone ?? "01234567890",
+                    'country_id' => $sales->country_odoo_id ?? 65, // Egypt country id in Odoo
+                    'state_id'   => $sales->state_odoo_id ?? null,
+                    'city_id'    => $sales->city_odoo_id ?? 5, // Egypt city id in Odoo
+                ]);
             }
         }
         

@@ -60,6 +60,18 @@ class OdooController extends Controller
     /**
      * Display the specified resource.
      *
+     * @return \Illuminate\Http\Response
+     */
+    public function countries()
+    {
+        $response = $this->odoo_service->getCountries();
+        
+        return response()->json($response['response_data']['countries'], $response['response_code']);
+    }
+
+    /**
+     * Display the specified resource.
+     *
      * @param  int  $country_id
      * @return \Illuminate\Http\Response
      */

@@ -132,6 +132,15 @@
                         <div class="modal-body">
                             <form id="updateForm">
                                 <div class="mb-3">
+                                    <label for="visitDateInput" class="form-label">Representative: </label>
+                                    <select class="form-select" id="representativeSelect">
+                                        <option value="" selected>Select Representative</option>
+                                        @foreach($sales as $salesman)
+                                            <option value="{{ $salesman->id }}">{{ $salesman->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-3">
                                     <label for="visitDateInput" class="form-label">New Visit Date</label>
                                     <input type="date" class="form-control" id="visitDateInput" required>
                                 </div>
@@ -224,7 +233,7 @@
                                             <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
                                         </div>
                                         <div class="d-flex flex-column justify-content-center ms-1">
-                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $schedule->sales->name }}</h6>
+                                            <h6 class="mb-0 text-sm font-weight-semibold" data-sales-id="{{ $schedule->sales->id }}">{{ $schedule->sales->name }}</h6>
                                         </div>
                                     </div>
                                 </td>
@@ -253,11 +262,19 @@
                                     <span class="text-secondary text-sm font-weight-normal">{{ $schedule->created_at->format('Y-m-d') }}</span>
                                 </td>
                                 <td class="align-middle">
+                                    @if($schedule->status == 'pending')
                                     <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 edit cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Edit Visit Date">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                                             <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 3L3 11.207V13h1.793L13 4.793 11.207 3zM14 4.5 11.5 2 12.5 1 15 3.5 14 4.5z"/>
                                         </svg>
                                     </a>
+                                    @else
+                                    <span class="text-secondary font-weight-bold text-xs m-2" style="visibility: hidden;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 3L3 11.207V13h1.793L13 4.793 11.207 3zM14 4.5 11.5 2 12.5 1 15 3.5 14 4.5z"/>
+                                        </svg>
+                                    </span>
+                                    @endif
                                     <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Delete Schedule">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -441,6 +458,7 @@
                 const scheduleRow = this.closest("tr");
                 currentScheduleId = scheduleRow.getAttribute("data-schedule-id");
                 const currentVisitDate = scheduleRow.cells[2].textContent.trim();
+                const currentRepresentative = scheduleRow.querySelector("h6[data-sales-id]").getAttribute("data-sales-id");
 
                 // Set input value
                 if (currentVisitDate !== 'Not Set') {
@@ -448,6 +466,10 @@
                 } else {
                     visitDateInput.value = "";
                 }
+
+                // Set representative name in the select (disabled)
+                const representativeSelect = document.getElementById("representativeSelect");
+                representativeSelect.value = currentRepresentative;
 
                 // Show modal
                 updateModal.show();
@@ -460,6 +482,7 @@
         // Update button click handler
         updateVisitDateButton.addEventListener("click", function () {
             const newVisitDate = visitDateInput.value;
+            const newRepresentative = document.getElementById("representativeSelect").value;
 
             // Validate input
             if (newVisitDate === "") {
@@ -478,7 +501,7 @@
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({schedule_id: currentScheduleId, visit_date: newVisitDate })
+                body: JSON.stringify({schedule_id: currentScheduleId, visit_date: newVisitDate, sales_id: newRepresentative })
             })
                 .then(response => {
                     if (!response.ok) {

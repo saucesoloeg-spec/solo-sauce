@@ -33,8 +33,11 @@ class CreateCustomerRequest extends FormRequest
             'email'           => ['nullable','email', $customer_id ? Rule::unique('customers', 'email')->ignore($customer_id) : 'unique:customers,email'],
             'phone'           => 'required|string|max:20',
             'address'         => 'required|string|max:255',
-            'zone'            => 'required|string|max:100',
-            'city'            => 'required|string|max:100',
+            'city'            => 'required|string|max:255',
+            'state'           => 'required|string|max:255',
+            'city_id'         => 'required|integer',
+            'state_id'        => 'required|integer',
+            'country_id'      => 'required|integer',
             'latitude'        => 'nullable|numeric',
             'longitude'       => 'nullable|numeric',
         ];
