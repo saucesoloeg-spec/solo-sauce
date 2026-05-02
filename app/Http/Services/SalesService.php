@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Domains\Odoo\Services\OdooAuthService;
 use App\Http\Repositories\CustomerRepository;
 use App\Http\Repositories\SalesRepository;
 
@@ -9,11 +10,17 @@ class SalesService
 {
     private $sales_repository;
     private $customer_repository;
+    private $odoo_service;
 
-    public function __construct(SalesRepository $sales_repository, CustomerRepository $customer_repository) 
+    public function __construct(
+        SalesRepository $sales_repository, 
+        CustomerRepository $customer_repository,
+        OdooAuthService $odoo_service
+    ) 
     {
         $this->sales_repository    = $sales_repository;
         $this->customer_repository = $customer_repository;
+        $this->odoo_service = $odoo_service;
     }
 
     public function getAll() 
@@ -37,13 +44,17 @@ class SalesService
 
     public function getSchedule() 
     {
-        $schedules = $this->sales_repository->getSchedule();  
+        $schedules = $this->sales_repository->getSchedule();
+        $all_sales = $this->sales_repository->getAll();
         
         if($schedules->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Schedule retrieved successfully.',
-                'response_data'    => $schedules
+                'response_data'    => [
+                    'schedules' => $schedules,
+                    'sales'     => $all_sales
+                ]
             ];
         }
 
@@ -54,9 +65,9 @@ class SalesService
         ];
     }
 
-    public function updateVisitDate($scheduleId, $visitDate)
+    public function updateVisitDate($scheduleId, $visitDate, $salesId)
     {
-        $updated = $this->sales_repository->updateVisitDate($scheduleId, $visitDate);
+        $updated = $this->sales_repository->updateVisitDate($scheduleId, $visitDate, $salesId);
 
         if($updated) {
             return [
@@ -143,13 +154,29 @@ class SalesService
         $data['uuid']     = \Illuminate\Support\Str::uuid();
         $data['password'] = bcrypt($data['password']);
 
-        $sales = $this->sales_repository->create($data);
+        $authResponse = $this->odoo_service->createOdooAccount($data);
 
-        if($sales) {
+        if($authResponse['success'] == true) {
+            $data['odoo_id'] = $authResponse['data']['user']['id'];
+            $sales  = $this->sales_repository->create($data);
+
+            $updated = $this->odoo_service->updateOdooAccount([
+                'odoo_id'      => $data['odoo_id'],
+                'city_odoo_id' => $data['city_odoo_id']
+            ]);
+            dd($updated);
+            if($sales && $updated['success'] == true) {
+                return [
+                    'response_code'    => 201,
+                    'response_message' => $updated['error']['detail'] ?? 'Sales created successfully.',
+                    'response_data'    => $sales
+                ];
+            }
+
             return [
-                'response_code'    => 201,
-                'response_message' => 'Sales created successfully.',
-                'response_data'    => $sales
+                'response_code'    => 400,
+                'response_message' => 'Failed to create sales in Odoo.',
+                'response_data'    => null
             ];
         }
 

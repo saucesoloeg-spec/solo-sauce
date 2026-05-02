@@ -34,7 +34,20 @@ class CustomerRepository
 
     public function create(array $data)
     {
-        return $this->customer_model->create($data);
+        return $this->customer_model->create([
+            'sales_id'        => $data['sales_id'] ?? null,
+            'name'            => $data['name'],
+            'email'           => $data['email'],
+            'phone'           => $data['phone'],
+            'address'         => $data['address'],
+            'city'            => $data['city'] ?? null,
+            'state'           => $data['state'] ?? null,
+            'city_odoo_id'    => $data['city_id'],
+            'state_odoo_id'   => $data['state_id'],
+            'country_odoo_id' => $data['country_id'],
+            'latitude'        => $data['latitude'] ?? null,
+            'longitude'       => $data['longitude'] ?? null,
+        ]);
     }
 
 }

@@ -12,9 +12,15 @@ class MonthlyIncome extends Model
     protected $fillable = [
         'income',
         'collect_date',
-        'active_companies',
-        'active_packages',
-        'confirmed_packages'
+        'total_visits',
+        'completed_visits',
+        'open_visits',
+        'delayed_visits',
+        'canceled_visits',
+        'total_orders',
+        'total_reorders',
+        'total_new_orders',
+        'total_surveys'
     ];
     
 }

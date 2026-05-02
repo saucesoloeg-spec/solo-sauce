@@ -103,15 +103,15 @@
             <div class="card-header border-bottom pb-0">
                 <div class="d-sm-flex align-items-center">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Sales list</h6>
-                        <p class="text-sm">See information about all Salesman</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('sales.sales_list') }}</h6>
+                        <p class="text-sm">{{ __('sales.sales_list_description') }}</p>
                     </div>
-                    <div class="ms-auto">
+                    <div class="d-flex align-items-center @if(app()->getLocale() == 'ar') me-auto @else ms-auto @endif" style="gap: 10px;">
                         <a href="{{ route('sales.create') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center" style="gap: 5px; white-space: nowrap;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                             </svg>
-                            Create
+                            {{ __('sales.create') }}
                         </a>
                     </div>
                 </div>
@@ -119,12 +119,12 @@
             <!-- Confirmation Modal -->
             <div id="delete-modal" class="modal">
                 <div class="modal-content">
-                    <h3>Confirm Deletion</h3>
-                    <p>Are you sure you want to delete this Sale?</p>
+                    <h3>{{ __('sales.confirm_deletion') }}</h3>
+                    <p>{{ __('sales.delete_confirmation_message') }}</p>
                     <div class="modal-buttons">
-                        <button id="confirm-delete" class="btn-confirm">Confirm</button>
+                        <button id="confirm-delete" class="btn-confirm">{{ __('sales.confirm') }}</button>
                         <span id="loader" class="loader" style="display: none;"></span>
-                        <button id="cancel-delete" class="btn-cancel">Cancel</button>
+                        <button id="cancel-delete" class="btn-cancel">{{ __('sales.cancel') }}</button>
                     </div>
                 </div>
             </div>
@@ -133,30 +133,30 @@
                 <div class="border-bottom py-3 px-3 d-sm-flex align-items-center">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                         <input id="filter-all" type="radio" class="btn-check" name="btnradiotable" autocomplete="off" checked>
-                        <label class="btn btn-white px-3 mb-0" for="filter-all">All</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-all">{{ __('sales.filter_all') }}</label>
                         <input id="filter-verified" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-verified">Verified</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-verified">{{ __('sales.filter_verified') }}</label>
                         <input id="filter-pending" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-pending">Pending</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-pending">{{ __('sales.filter_pending') }}</label>
                     </div>
                     
-                    <div class="input-group w-sm-25 ms-auto" style="display: flex; gap: 10px;">
+                    <div class="input-group w-sm-25 @if(app()->getLocale() == 'ar') me-auto @else ms-auto @endif" style="display: flex; gap: 10px;">
                         <span class="input-group-text text-body">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                         </svg>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search">
+                        <input type="text" class="form-control" id="searchInput" placeholder="{{ __('sales.search_by_name') }}" aria-label="Search by name">
                     </div>
                 </div>
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0" id="salesTable">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7">Salesman</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">E-mail</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Phone No.</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Registered At</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.salesman') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('sales.email') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.phone') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.registered_at') }}</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
@@ -185,13 +185,13 @@
                                     <span class="text-secondary text-sm font-weight-normal">{{ $sales->created_at->toDateString() }}</span>
                                 </td>
                                 <td class="align-middle">
-                                    <a href="{{ route('sales.show', ['id' => $sales->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="View Sale">
+                                    <a href="{{ route('sales.show', ['id' => $sales->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('sales.view_sale') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
                                         </svg>
                                     </a>
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Delete Sale">
+                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('sales.delete_sale') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -209,8 +209,8 @@
                 <div class="border-top py-3 px-3 d-flex align-items-center">
                     <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
                     <div class="ms-auto">
-                        <button class="btn btn-sm btn-white mb-0 previous">Previous</button>
-                        <button class="btn btn-sm btn-white mb-0 next">Next</button>
+                        <button class="btn btn-sm btn-white mb-0 previous">{{ __('sales.previous') }}</button>
+                        <button class="btn btn-sm btn-white mb-0 next">{{ __('sales.next') }}</button>
                     </div>
                 </div>
             </div>

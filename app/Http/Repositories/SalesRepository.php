@@ -26,9 +26,9 @@ class SalesRepository
         return $this->sales_customers_model->with('sales', 'customer')->get();    
     }
 
-    public function updateVisitDate($scheduleId, $visitDate)
+    public function updateVisitDate($scheduleId, $visitDate, $salesId)
     {
-        return $this->sales_customers_model->where('id', $scheduleId)->update(['visit_at' => $visitDate]);
+        return $this->sales_customers_model->where('id', $scheduleId)->update(['visit_at' => $visitDate, 'sales_id' => $salesId]);
     }
 
     public function deleteSchedule($scheduleId)

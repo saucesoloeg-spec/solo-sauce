@@ -13,11 +13,17 @@ return new class extends Migration
     {
         Schema::create('monthly_incomes', function (Blueprint $table) {
             $table->id();
-            $table->integer('income');
+            $table->integer('income')->unsigned();
             $table->date('collect_date');
-            $table->integer('active_companies');
-            $table->integer('active_packages');
-            $table->integer('confirmed_packages');
+            $table->integer('total_visits')->unsigned();
+            $table->integer('completed_visits')->unsigned();
+            $table->integer('open_visits')->unsigned();
+            $table->integer('delayed_visits')->unsigned();
+            $table->integer('canceled_visits')->unsigned();
+            $table->integer('total_orders')->unsigned();
+            $table->integer('total_reorders')->unsigned();
+            $table->integer('total_new_orders')->unsigned();
+            $table->integer('total_surveys')->unsigned();
             $table->timestamps();
         });
     }

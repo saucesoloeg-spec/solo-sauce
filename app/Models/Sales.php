@@ -19,6 +19,7 @@ class Sales extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'odoo_id',
         'uuid',
         'name',
         'email',

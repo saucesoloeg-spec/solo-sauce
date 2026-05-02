@@ -26,8 +26,8 @@ class StoreSalesRequest extends FormRequest
         return [
             'name'            => 'required|string|max:255',
             'email'           => 'required|email|max:255|unique:sales,email',
-            'phone'           => 'required|string|max:20',
-            'national_number' => 'nullable|string|max:20',
+            'phone'           => 'required|string|max:20|unique:sales,phone',
+            'national_number' => 'nullable|string|max:14|unique:sales,national_number',
             'address'         => 'nullable|string',
             'zone'            => 'nullable|string|max:255',
             'city'            => 'nullable|string|max:255',

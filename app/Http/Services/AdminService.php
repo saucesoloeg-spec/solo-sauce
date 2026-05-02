@@ -23,9 +23,19 @@ class AdminService
         return Auth::guard('admin')->user();    
     }
 
+    public function getPastMonthlyIncome() 
+    {
+        return $this->admin_repository->PastMonthlyIncome();
+    }
+
     public function getMonthlyIncome() 
     {
         return $this->admin_repository->monthlyIncome();
+    }
+
+    public function getMonthlyOrders() 
+    {
+        return $this->admin_repository->monthlyOrders();
     }
 
     public function getYearlyIncome() 

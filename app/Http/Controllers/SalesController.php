@@ -127,7 +127,7 @@ class SalesController extends Controller
     {
         $response = $this->sales_service->getSchedule();
 
-        return view('sales.schedule.index', ['schedules' => $response['response_data']]);
+        return view('sales.schedule.index', ['schedules' => $response['response_data']['schedules'], 'sales' => $response['response_data']['sales']]);
     }
 
     /**
@@ -172,10 +172,11 @@ class SalesController extends Controller
     {
         $request->validate([
             'schedule_id' => 'required|exists:sales_customers,id',
-            'visit_date' => 'required|date'
+            'visit_date'  => 'required|date',
+            'sales_id'    => 'required|exists:sales,id'
         ]);
 
-        $response = $this->sales_service->updateVisitDate($request->schedule_id, $request->visit_date);
+        $response = $this->sales_service->updateVisitDate($request->schedule_id, $request->visit_date, $request->sales_id);
 
         return response()->json($response, $response['response_code']);
     }
