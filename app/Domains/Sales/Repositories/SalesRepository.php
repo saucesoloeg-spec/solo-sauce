@@ -47,7 +47,6 @@ class SalesRepository
         $query = $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', date("Y-m-d"))->with(['order', 'customer']);
         
         if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
-            dd($filters);
             $query->whereDate('visit_at', '>=', date("Y-m-d", strtotime($filters['from'])))
                   ->whereDate('visit_at', '<=', date("Y-m-d", strtotime($filters['to'])));
         }
