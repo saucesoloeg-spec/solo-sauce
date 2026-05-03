@@ -66,7 +66,11 @@ class OdooController extends Controller
     {
         $response = $this->odoo_service->getCountries();
         
-        return response()->json($response['response_data']['countries'], $response['response_code']);
+        return response()->json([
+            'response_code'    => 200,
+            'response_message' => 'Countries fetched successfully',
+            'response_data'    => $response['data']['countries']
+        ], 200);
     }
 
     /**
@@ -79,7 +83,7 @@ class OdooController extends Controller
     {
         $response = $this->odoo_service->getStates($country_id);
         
-        return response()->json($response['response_data']['states'], $response['response_code']);
+        return response()->json($response, $response['response_code']);
     }
 
     /**
@@ -92,7 +96,7 @@ class OdooController extends Controller
     {
         $response = $this->odoo_service->getCities($state_id);
         
-        return response()->json($response['response_data']['cities'], $response['response_code']);
+        return response()->json($response, $response['response_code']);
     }
 
     /**

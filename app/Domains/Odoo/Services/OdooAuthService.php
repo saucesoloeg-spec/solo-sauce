@@ -367,6 +367,7 @@ class OdooAuthService
 
         try {
             $result = json_decode(curl_exec($response), true);
+            
             if(isset($result['error'])) {
                 throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['detail']);
             }
