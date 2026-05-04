@@ -160,12 +160,13 @@ class SalesService
             $data['odoo_id'] = $authResponse['data']['user']['id'];
             $sales  = $this->sales_repository->create($data);
 
-            $updated = $this->odoo_service->updateOdooAccount([
-                'odoo_id'      => $data['odoo_id'],
-                'city_odoo_id' => $data['city_odoo_id']
-            ]);
-            dd($updated);
-            if($sales && $updated['success'] == true) {
+            // $updated = $this->odoo_service->updateOdooAccount([
+            //     'odoo_id'      => $data['odoo_id'],
+            //     'city_odoo_id' => $data['city_odoo_id']
+            // ]);
+            // dd($updated);
+
+            if($sales && $sales->id) {// && $updated['success'] == true
                 return [
                     'response_code'    => 201,
                     'response_message' => $updated['error']['detail'] ?? 'Sales created successfully.',

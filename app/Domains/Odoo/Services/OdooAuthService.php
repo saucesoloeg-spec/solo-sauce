@@ -15,18 +15,23 @@ class OdooAuthService
 
     public function createOdooAccount($request = [])
     {
+        $token    = $this->getAccessToken()['access_token'];
         $response = curl_init(env('ODOO_API_URL').'/auth/signup');
         curl_setopt($response, CURLOPT_POST, true);
-        curl_setopt($response, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
         curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
-            'name'       => $request['name'] ?? "Solo Sauce",
-            'email'      => $request['email'] ?? env('ODOO_EMAIL'),
-            'password'   => env('ODOO_PASSWORD'),
-            'phone'      => $request['phone'] ?? "01234567890",
-            'country_id' => $request['country_odoo_id'] ?? 65, // Egypt country id in Odoo
-            'state_id'   => $request['state_odoo_id'] ?? null,
-            'city_id'    => $request['city_odoo_id'] ?? 5, // Egypt city id in Odoo
-        ]));
+            'name'             => $request['name'] ?? "Solo Sauce",
+            'email'            => $request['email'] ?? env('ODOO_EMAIL'),
+            'password'         => env('ODOO_PASSWORD'),
+            'phone'            => $request['phone'] ?? "01234567890",
+            'role'             => 'salesperson',
+            'allowed_city_ids' => [
+                $request['city_odoo_id'] ?? 5
+            ], // Egypt city id in Odoo
+        ]));  
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
         try {
@@ -38,7 +43,7 @@ class OdooAuthService
             $this->odoo_auth_repository->create([
                 'email'         => $request['email'] ?? env('ODOO_EMAIL'),
             ]);
-            
+
             return $result;
         } catch (\Throwable $th) {
             dd($result, $th->getMessage());
