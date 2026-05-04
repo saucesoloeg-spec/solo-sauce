@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await fetch(`/api/odoo/states/${countryId}`);
         const data = await res.json();
 
-        populateSelect(state, data);
+        populateSelect(state, data['response_data']['states']);
     });
 
     // State → Cities
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await fetch(`/api/odoo/cities/${stateId}`);
         const data = await res.json();
 
-        populateSelect(city, data);
+        populateSelect(city, data['response_data']['cities']);
     });
 
     // // City → Salesmen
