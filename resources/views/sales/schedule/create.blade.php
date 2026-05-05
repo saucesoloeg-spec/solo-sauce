@@ -104,10 +104,10 @@
             <div class="card-header border-bottom pb-3">
                 <div class="d-sm-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Create New Representative Schedule</h6>
-                        <p class="text-sm mb-0">Fill in the information below to create a new representative Schedule</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('visits.add_schedule') }}</h6>
+                        <p class="text-sm mb-0">{{ __('visits.sales_schedules_description') }}</p>
                     </div>
-                    <a href="{{ route('schedules.get') }}" class="btn btn-back mt-3 mt-sm-0">Back to Schedules</a>
+                    <a href="{{ route('schedules.get') }}" class="btn btn-back mt-3 mt-sm-0">{{ __('visits.back_to_schedules') }}</a>
                 </div>
             </div>
 
@@ -127,13 +127,13 @@
                     @csrf
 
                     <div class="form-section">
-                        <h6 class="font-weight-semibold mb-3">Basic Information</h6>
+                        <h6 class="font-weight-semibold mb-3">{{ __('visits.basic_information') }}</h6>
                         
                         <div class="row-fields">
                             <div class="form-group">
-                                <label for="customer_id" class="form-label">Customer</label>
+                                <label for="customer_id" class="form-label">{{ __('visits.customer') }}</label>
                                 <select class="form-control @error('customer_id') is-invalid @enderror" id="customers" name="customer_id" required>
-                                    <option value=""> Select Customer </option>
+                                    <option value=""> {{ __('visits.select_customer') }} </option>
 
                                     @foreach($customers as $customer)
                                         <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
@@ -144,15 +144,15 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="sales_id" class="form-label">Sales</label>
+                                <label for="sales_id" class="form-label">{{ __('visits.salesman') }}</label>
                                 <select class="form-control @error('sales_id') is-invalid @enderror" id="salesmen" name="sales_id" disabled required>
-                                    <option value=""> Select Representative </option>
+                                    <option value=""> {{ __('visits.select_salesman') }} </option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label for="visit_date" class="form-label">
-                                    Visit Date <span style="color: red;">*</span>
+                                    {{ __('visits.visit_at') }} <span style="color: red;">*</span>
                                 </label>
 
                                 <input 
@@ -173,7 +173,7 @@
                     </div>
 
                     <div class="form-section">
-                        <label for="address" class="form-label">Visitation Notes</label>
+                        <label for="address" class="form-label">{{ __('visits.visitation_notes') }}</label>
                         <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
                         @error('notes')
                             <div class="error-message">{{ $message }}</div>
@@ -181,8 +181,8 @@
                     </div>
 
                     <div class="btn-group-action " style="justify-content: flex-end;">
-                        <a href="{{ route('schedules.get') }}" class="btn btn-back">Cancel</a>
-                        <button type="submit" class="btn-create">Create</button>
+                        <a href="{{ route('schedules.get') }}" class="btn btn-back">{{ __('visits.cancel') }}</a>
+                        <button type="submit" class="btn-create">{{ __('visits.create') }}</button>
                     </div>
                 </form>
             </div>

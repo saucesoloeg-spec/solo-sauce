@@ -104,10 +104,10 @@
             <div class="card-header border-bottom pb-3">
                 <div class="d-sm-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Create New Sales Representative</h6>
-                        <p class="text-sm mb-0">Fill in the information below to create a new sales representative</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('sales.create_sales_representative') }}</h6>
+                        <p class="text-sm mb-0">{{ __('sales.create_sales_representative_description') }}</p>
                     </div>
-                    <a href="{{ route('sales.get') }}" class="btn btn-back mt-3 mt-sm-0">Back to Sales</a>
+                    <a href="{{ route('sales.get') }}" class="btn btn-back mt-3 mt-sm-0">{{ __('sales.back_to_sales') }}</a>
                 </div>
             </div>
 
@@ -127,11 +127,11 @@
                     @csrf
 
                     <div class="form-section">
-                        <h6 class="font-weight-semibold mb-3">Basic Information</h6>
+                        <h6 class="font-weight-semibold mb-3">{{ __('sales.basic_information') }}</h6>
                         
                         <div class="row-fields">
                             <div class="form-group">
-                                <label for="name" class="form-label">Name <span style="color: red;">*</span></label>
+                                <label for="name" class="form-label">{{ __('sales.name') }} <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
                                 @error('name')
                                     <div class="error-message">{{ $message }}</div>
@@ -139,7 +139,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="email" class="form-label">Email <span style="color: red;">*</span></label>
+                                <label for="email" class="form-label">{{ __('sales.email') }} <span style="color: red;">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
                                 @error('email')
                                     <div class="error-message">{{ $message }}</div>
@@ -147,7 +147,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="phone" class="form-label">Phone <span style="color: red;">*</span></label>
+                                <label for="phone" class="form-label">{{ __('sales.phone') }} <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}" required>
                                 @error('phone')
                                     <div class="error-message">{{ $message }}</div>
@@ -155,7 +155,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="national_number" class="form-label">National Number</label>
+                                <label for="national_number" class="form-label">{{ __('sales.national_number') }}</label>
                                 <input type="text" class="form-control @error('national_number') is-invalid @enderror" id="national_number" name="national_number" value="{{ old('national_number') }}">
                                 @error('national_number')
                                     <div class="error-message">{{ $message }}</div>
@@ -163,7 +163,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="country_odoo_id" class="form-label">Country</label>
+                                <label for="country_odoo_id" class="form-label">{{ __('sales.country') }}</label>
                                 <select id="country" name="country_odoo_id" class="form-select">
                                     <option value="">Select Country</option>
                                     @foreach($countries as $country)
@@ -176,7 +176,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="state_odoo_id" class="form-label">State</label>
+                                <label for="state_odoo_id" class="form-label">{{ __('sales.state') }}</label>
                                 <select id="state" name="state_odoo_id" class="form-select" disabled>
                                     <option value="">Select State</option>
                                 </select>
@@ -187,7 +187,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="city_odoo_id" class="form-label">City</label>
+                                <label for="city_odoo_id" class="form-label">{{ __('sales.city') }}</label>
                                 <select id="city" name="city_odoo_id" class="form-select" disabled>
                                     <option value="">Select City</option>
                                 </select>
@@ -199,7 +199,7 @@
                     </div>
 
                     <div class="form-section">
-                        <label for="address" class="form-label">Address</label>
+                        <label for="address" class="form-label">{{ __('sales.address') }}</label>
                         <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3">{{ old('address') }}</textarea>
                         @error('address')
                             <div class="error-message">{{ $message }}</div>
@@ -207,11 +207,10 @@
                     </div>
 
                     <div class="form-section">
-                        <h6 class="font-weight-semibold mb-3">Password Setup</h6>
-                        
+                        <h6 class="font-weight-semibold mb-3">{{ __('sales.password_setup') }}</h6>
                         <div class="row-fields">
                             <div class="form-group">
-                                <label for="password" class="form-label">Password <span style="color: red;">*</span></label>
+                                <label for="password" class="form-label">{{ __('sales.password') }} <span style="color: red;">*</span></label>
                                 <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" placeholder="Enter password (min 8 characters)" required>
                                 @error('password')
                                     <div class="error-message">{{ $message }}</div>
@@ -219,7 +218,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="password_confirmation" class="form-label">Confirm Password <span style="color: red;">*</span></label>
+                                <label for="password_confirmation" class="form-label">{{ __('sales.password_confirmation') }} <span style="color: red;">*</span></label>
                                 <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" placeholder="Confirm password" required>
                                 @error('password_confirmation')
                                     <div class="error-message">{{ $message }}</div>
@@ -228,8 +227,8 @@
                         </div>
                     </div>
                     <div class="btn-group-action " style="justify-content: flex-end;">
-                        <a href="{{ route('sales.get') }}" class="btn btn-back">Cancel</a>
-                        <button type="submit" class="btn-create">Create</button>
+                        <a href="{{ route('sales.get') }}" class="btn btn-back">{{ __('sales.cancel') }}</a>
+                        <button type="submit" class="btn-create">{{ __('sales.create') }}</button>
                     </div>
                 </form>
             </div>

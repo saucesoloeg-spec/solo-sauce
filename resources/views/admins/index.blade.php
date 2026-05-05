@@ -76,17 +76,17 @@
             <div class="card-header border-bottom pb-0">
                 <div class="d-sm-flex align-items-center">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Admins list</h6>
-                        <p class="text-sm">See information about all Admins</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('admins.admins_list') }}</h6>
+                        <p class="text-sm">{{ __('admins.admins_list_description') }}</p>
                     </div>
-                    <div class="ms-auto d-flex">
+                    <div class="d-flex align-items-center @if(app()->getLocale() == 'ar') me-auto @else ms-auto @endif">
                         <a type="button" class="btn btn-sm btn-dark btn-icon d-flex align-items-center me-2" href="{{ route('admins.create')}}">
                             <span class="btn-inner--icon">
                                 <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="d-block me-2">
                                     <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
                                 </svg>
                             </span>
-                            <span class="btn-inner--text">Add member</span>
+                            <span class="btn-inner--text">{{ __('admins.add_member') }}</span>
                         </a>
                     </div>
                 </div>
@@ -94,12 +94,12 @@
             <!-- Confirmation Modal -->
             <div id="delete-modal" class="modal">
                 <div class="modal-content">
-                    <h3>Confirm Deletion</h3>
-                    <p>Are you sure you want to delete this admin?</p>
+                    <h3>{{ __('admins.confirm_deletion') }}</h3>
+                    <p>{{ __('admins.confirm_deletion_message') }}</p>
                     <div class="modal-buttons">
-                        <button id="confirm-delete" class="btn-confirm">Confirm</button>
+                        <button id="confirm-delete" class="btn-confirm">{{ __('admins.confirm') }}</button>
                         <span id="loader" class="loader" style="display: none;"></span>
-                        <button id="cancel-delete" class="btn-cancel">Cancel</button>
+                        <button id="cancel-delete" class="btn-cancel">{{ __('admins.cancel') }}</button>
                     </div>
                 </div>
             </div>
@@ -108,28 +108,28 @@
                 <div class="border-bottom py-3 px-3 d-sm-flex align-items-center">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                         <input id="filter-all" type="radio" class="btn-check" name="btnradiotable" autocomplete="off" checked>
-                        <label class="btn btn-white px-3 mb-0" for="filter-all">All</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-all">{{ __('admins.all') }}</label>
                         <input id="filter-super" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-super">Super Admin</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-super">{{ __('admins.super_admin') }}</label>
                         <input id="filter-admin" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-admin">Admin</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-admin">{{ __('admins.admin') }}</label>
                     </div>
-                    <div class="input-group w-sm-25 ms-auto">
+                    <div class="input-group w-sm-25 @if(app()->getLocale() == 'ar') me-auto @else ms-auto @endif">
                         <span class="input-group-text text-body">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                         </svg>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search">
+                        <input type="text" class="form-control" id="searchInput" placeholder="{{ __('admins.search_admins') }}">
                     </div>
                 </div>
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0" id="adminsTable">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7">Admin</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Role</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Reegistered At</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('admins.admin') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('admins.role') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('admins.registered_at') }}</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
@@ -150,11 +150,11 @@
                                 <td class="align-middle text-center text-sm">
                                     @if($admin->role == "super_admin")
                                     <span class="badge badge-sm border border-success text-success bg-success cursor-pointer status-tag">
-                                        Super Admin
+                                        {{ __('admins.super_admin') }}
                                     </span>
                                     @else
                                     <span class="badge badge-sm border border-secondary text-secondary bg-secondary cursor-pointer status-tag">
-                                        Admin
+                                        {{ __('admins.admin') }}
                                     </span>
                                     @endif
                                 </td>
@@ -163,7 +163,7 @@
                                 </td>
                                 <td class="align-middle">
                                     @if($admin->role != "super_admin")
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Delete Admin">
+                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('admins.delete_admin') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -180,8 +180,8 @@
                 <div class="border-top py-3 px-3 d-flex align-items-center">
                     <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
                     <div class="ms-auto">
-                        <button class="btn btn-sm btn-white mb-0 previous">Previous</button>
-                        <button class="btn btn-sm btn-white mb-0 next">Next</button>
+                        <button class="btn btn-sm btn-white mb-0 previous">{{ __('admins.previous') }}</button>
+                        <button class="btn btn-sm btn-white mb-0 next">{{ __('admins.next') }}</button>
                     </div>
                 </div>
             </div>

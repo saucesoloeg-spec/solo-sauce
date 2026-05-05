@@ -89,20 +89,20 @@
             <div class="card-header border-bottom pb-0">
                 <div class="d-sm-flex align-items-center">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Orders list</h6>
-                        <p class="text-sm">See information about all Orders</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('orders.orders_list') }}</h6>
+                        <p class="text-sm">{{ __('orders.orders_list_description') }}</p>
                     </div>
                 </div>
             </div>
             <!-- Confirmation Modal -->
             <div id="delete-modal" class="modal">
                 <div class="modal-content">
-                    <h3>Confirm Deletion</h3>
-                    <p>Are you sure you want to delete this Order?</p>
+                    <h3>{{ __('orders.confirm_deletion') }}</h3>
+                    <p>{{ __('orders.confirm_deletion_message') }}</p>
                     <div class="modal-buttons">
-                        <button id="confirm-delete" class="btn-confirm">Confirm</button>
+                        <button id="confirm-delete" class="btn-confirm">{{ __('orders.confirm') }}</button>
                         <span id="loader" class="loader" style="display: none;"></span>
-                        <button id="cancel-delete" class="btn-cancel">Cancel</button>
+                        <button id="cancel-delete" class="btn-cancel">{{ __('orders.cancel') }}</button>
                     </div>
                 </div>
             </div>
@@ -111,70 +111,70 @@
                 <div class="py-3 px-3 d-sm-flex align-items-center">
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                         <input id="filter-all" type="radio" class="btn-check" name="btnradiotable" autocomplete="off" checked>
-                        <label class="btn btn-white px-3 mb-0" for="filter-all">All</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-all">{{ __('orders.all') }}</label>
                         <input id="filter-pending" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-pending">Pending</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-pending">{{ __('orders.pending') }}</label>
                         <input id="filter-confirmed" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-confirmed">Confirmed</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-confirmed">{{ __('orders.confirmed') }}</label>
                         <input id="filter-shipped" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-shipped">Shipped</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-shipped">{{ __('orders.shipped') }}</label>
                         <input id="filter-delivered" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-delivered">Delivered</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-delivered">{{ __('orders.delivered') }}</label>
                         <input id="filter-canceled" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-canceled">Canceled</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-canceled">{{ __('orders.canceled') }}</label>
                         <input id="filter-suspended" type="radio" class="btn-check" name="btnradiotable" autocomplete="off">
-                        <label class="btn btn-white px-3 mb-0" for="filter-suspended">Suspended</label>
+                        <label class="btn btn-white px-3 mb-0" for="filter-suspended">{{ __('orders.suspended') }}</label>
                     </div>
-                    <div class="input-group w-sm-25 ms-auto">
+                    <div class="input-group w-sm-25 @if(app()->getLocale() == 'ar') me-auto @else ms-auto @endif">
                         <span class="input-group-text text-body">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                         </svg>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search">
+                        <input type="text" class="form-control" id="searchInput" placeholder="{{ __('orders.search_orders') }}">
                     </div>
                 </div>
                 <div class="border-bottom py-3 px-3 d-sm-flex align-items-center">
                     <div class="py-3 px-3 d-sm-flex align-items-center">
                         <!-- Date Filtration -->
                         <select id="yearFilter" class="form-select" style="width: 150px;">
-                            <option value="" selected>Year</option>
+                            <option value="" selected>{{ __('visits.year') }}</option>
                             <!-- Populate with years dynamically -->
                         </select>
 
                         <select id="monthFilter" class="form-select" style="width: 150px;">
-                            <option value="" selected>Month</option>
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                            <option value="" selected>{{ __('visits.month') }}</option>
+                            <option value="01">{{ __('visits.january') }}</option>
+                            <option value="02">{{ __('visits.february') }}</option>
+                            <option value="03">{{ __('visits.march') }}</option>
+                            <option value="04">{{ __('visits.april') }}</option>
+                            <option value="05">{{ __('visits.may') }}</option>
+                            <option value="06">{{ __('visits.june') }}</option>
+                            <option value="07">{{ __('visits.july') }}</option>
+                            <option value="08">{{ __('visits.august') }}</option>
+                            <option value="09">{{ __('visits.september') }}</option>
+                            <option value="10">{{ __('visits.october') }}</option>
+                            <option value="11">{{ __('visits.november') }}</option>
+                            <option value="12">{{ __('visits.december') }}</option>
                         </select>
 
-                        <button id="filterByDate" class="btn btn-primary mx-2 mb-0">Filter</button>
-                        <button id="resetFilters" class="btn btn-secondary mr-2 mb-0">Reset</button>
+                        <button id="filterByDate" class="btn btn-primary mx-2 mb-0">{{ __('visits.filter') }}</button>
+                        <button id="resetFilters" class="btn btn-secondary mr-2 mb-0">{{ __('visits.reset') }}</button>
                     </div>
                 </div>
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0" id="companiesTable">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7">Order Code</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Customer Name</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Order Status</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Total Amount</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Address</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Zone</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">City</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Delivered At</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Rep. Name</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('orders.order_code') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.customer_name') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.order_status') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.total_amount') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('orders.address') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('orders.state') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('orders.city') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('orders.delivered_at') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('orders.rep_name') }}</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
@@ -199,38 +199,38 @@
                                 <td class="align-middle text-center text-sm">
                                     @if($order->state == 'pending')
                                     <span class="badge badge-sm border border-secondary text-secondary bg-secondary reservation">
-                                        Pending
+                                        {{ __('orders.pending') }}
                                     </span>
                                     @elseif($order->state == 'confirmed')
                                     <span class="badge badge-sm border border-info text-info bg-info reservation">
-                                        Confirmed
+                                        {{ __('orders.confirmed') }}
                                     </span>
                                     @elseif($order->state == 'shipped')
                                     <span class="badge badge-sm border border-warning text-warning bg-warning reservation">
-                                        Shipped
+                                        {{ __('orders.shipped') }}
                                     </span>
                                     @elseif($order->state == 'delivered')
                                     <span class="badge badge-sm border border-success text-success bg-success reservation">
-                                        Delivered
+                                        {{ __('orders.delivered') }}
                                     </span>
                                     @elseif($order->state == 'canceled')
                                     <span class="badge badge-sm border border-danger text-danger bg-danger reservation">
-                                        Canceled
+                                        {{ __('orders.canceled') }}
                                     </span>
                                     @elseif($order->state == 'suspended')
                                     <span class="badge badge-sm border border-danger text-danger bg-danger reservation">
-                                        Suspended
+                                        {{ __('orders.suspended') }}
                                     </span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->address }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->amount_total }}</p>
                                 </td>
                                 <td class="text-center">
                                     <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->address }}</p>
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->zone }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->state }}</p>
                                 </td>
                                 <td class="text-center">
                                     <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->customer->city }}</p>
@@ -303,8 +303,8 @@
                 <div class="border-top py-3 px-3 d-flex align-items-center">
                     <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
                     <div class="ms-auto">
-                        <button class="btn btn-sm btn-white mb-0 previous">Previous</button>
-                        <button class="btn btn-sm btn-white mb-0 next">Next</button>
+                        <button class="btn btn-sm btn-white mb-0 previous">{{ __('orders.previous') }}</button>
+                        <button class="btn btn-sm btn-white mb-0 next">{{ __('orders.next') }}</button>
                     </div>
                 </div>
             </div>

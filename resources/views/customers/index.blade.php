@@ -89,20 +89,20 @@
             <div class="card-header border-bottom pb-0">
                 <div class="d-sm-flex align-items-center">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Customers list</h6>
-                        <p class="text-sm">See information about all Customers</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('customers.customer_list') }}</h6>
+                        <p class="text-sm">{{ __('customers.customer_list_description') }}</p>
                     </div>
                 </div>
             </div>
             <!-- Confirmation Modal -->
             <div id="delete-modal" class="modal">
                 <div class="modal-content">
-                    <h3>Confirm Deletion</h3>
-                    <p>Are you sure you want to delete this Customer?</p>
+                    <h3>{{ __('sales.confirm_deletion') }}</h3>
+                    <p>{{ __('sales.delete_confirmation_message') }}</p>
                     <div class="modal-buttons">
-                        <button id="confirm-delete" class="btn-confirm">Confirm</button>
+                        <button id="confirm-delete" class="btn-confirm">{{ __('sales.confirm') }}</button>
                         <span id="loader" class="loader" style="display: none;"></span>
-                        <button id="cancel-delete" class="btn-cancel">Cancel</button>
+                        <button id="cancel-delete" class="btn-cancel">{{ __('sales.cancel') }}</button>
                     </div>
                 </div>
             </div>
@@ -123,20 +123,20 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                         </svg>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search">
+                        <input type="text" class="form-control" id="searchInput" placeholder="{{ __('customers.search_by_name') }}">
                     </div>
                 </div>
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0" id="companiesTable">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7">Customer</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Registration No.</th>
-                                <!-- <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Registration Files</th> -->
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Address</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Zone</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">City</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Registered At</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('customers.customer') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('customers.registration_no') }}</th>
+                                <!-- <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('customers.registration_files') }}</th> -->
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('customers.address') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('customers.zone') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('customers.city') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('customers.registered_at') }}</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
@@ -194,12 +194,12 @@
                                             <circle cx="12" cy="12" r="3"></circle>
                                         </svg>
                                     </a>
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 edit cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Edit Company">
+                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 edit cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('customers.edit_customer') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                                             <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 3L3 11.207V13h1.793L13 4.793 11.207 3zM14 4.5 11.5 2 12.5 1 15 3.5 14 4.5z"/>
                                         </svg>
                                     </a>
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="Delete Company">
+                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('customers.delete_customer') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -246,22 +246,22 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="updateModalLabel">Update Percentage</h5>
+                                <h5 class="modal-title" id="updateModalLabel">{{ __('customers.update_customer') }}</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <form id="updatePercentageForm">
                                     <div class="mb-3">
-                                        <label for="percentageInput" class="form-label">Percentage</label>
+                                        <label for="percentageInput" class="form-label">{{ __('customers.percentage') }}</label>
                                         <input type="number" class="form-control" id="percentageInput" placeholder="Enter percentage">
                                         @csrf
                                     </div>
                                 </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('customers.close') }}</button>
                                 <span id="updateLoader" class="loader" style="display: none;"></span>
-                                <button type="button" class="btn btn-primary" id="updatePercentageButton">Update</button>
+                                <button type="button" class="btn btn-primary" id="updatePercentageButton">{{ __('customers.update') }}</button>
                             </div>
                         </div>
                     </div>
@@ -270,8 +270,8 @@
                 <div class="border-top py-3 px-3 d-flex align-items-center">
                     <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
                     <div class="ms-auto">
-                        <button class="btn btn-sm btn-white mb-0 previous">Previous</button>
-                        <button class="btn btn-sm btn-white mb-0 next">Next</button>
+                        <button class="btn btn-sm btn-white mb-0 previous">{{ __('sales.previous') }}</button>
+                        <button class="btn btn-sm btn-white mb-0 next">{{ __('sales.next') }}</button>
                     </div>
                 </div>
             </div>

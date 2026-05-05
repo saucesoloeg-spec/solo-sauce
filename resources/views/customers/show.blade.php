@@ -124,10 +124,10 @@
             <div class="card-header border-bottom pb-3">
                 <div class="d-sm-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Customer Details</h6>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('customers.customer_details') }}</h6>
                         <p class="text-sm mb-0">{{ $customer->name }}</p>
                     </div>
-                    <a href="{{ route('customers.get') }}" class="btn btn-back mt-3 mt-sm-0">Back to Customers</a>
+                    <a href="{{ route('customers.get') }}" class="btn btn-back mt-3 mt-sm-0">{{ __('customers.back_to_customers') }}</a>
                 </div>
             </div>
 
@@ -162,11 +162,11 @@
                     @method('PUT')
 
                     <div class="form-section">
-                        <h6 class="font-weight-semibold mb-3">Basic Information</h6>
+                        <h6 class="font-weight-semibold mb-3">{{ __('customers.basic_information') }}</h6>
                         
                         <div class="row-fields">
                             <div class="form-group">
-                                <label for="name" class="form-label">Name <span style="color: red;">*</span></label>
+                                <label for="name" class="form-label">{{ __('customers.name') }} <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $customer->name) }}" required>
                                 @error('name')
                                     <div class="error-message">{{ $message }}</div>
@@ -174,7 +174,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="email" class="form-label">Email <span style="color: red;">*</span></label>
+                                <label for="email" class="form-label">{{ __('customers.email') }} <span style="color: red;">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $customer->email) }}" required>
                                 @error('email')
                                     <div class="error-message">{{ $message }}</div>
@@ -182,7 +182,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="phone" class="form-label">Phone <span style="color: red;">*</span></label>
+                                <label for="phone" class="form-label">{{ __('customers.phone') }} <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $customer->phone) }}" required>
                                 @error('phone')
                                     <div class="error-message">{{ $message }}</div>
@@ -190,15 +190,15 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="zone" class="form-label">Zone</label>
-                                <input type="text" class="form-control @error('zone') is-invalid @enderror" id="zone" name="zone" value="{{ old('zone', $customer->zone) }}">
-                                @error('zone')
+                                <label for="state" class="form-label">{{ __('customers.state') }}</label>
+                                <input type="text" class="form-control @error('state') is-invalid @enderror" id="state" name="state" value="{{ old('state', $customer->state) }}">
+                                @error('state')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group">
-                                <label for="city" class="form-label">City</label>
+                                <label for="city" class="form-label">{{ __('customers.city') }}</label>
                                 <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city', $customer->city) }}">
                                 @error('city')
                                     <div class="error-message">{{ $message }}</div>
@@ -208,7 +208,7 @@
                     </div>
 
                     <div class="form-section">
-                        <label for="address" class="form-label">Address</label>
+                        <label for="address" class="form-label">{{ __('customers.address') }}</label>
                         <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3">{{ old('address', $customer->address) }}</textarea>
                         @error('address')
                             <div class="error-message">{{ $message }}</div>
@@ -216,19 +216,19 @@
                     </div>
 
                     <div class="form-section">
-                        <h6 class="font-weight-semibold mb-3">Order History</h6>
+                        <h6 class="font-weight-semibold mb-3">{{ __('customers.order_history') }}</h6>
                         @if($customer->orders->isEmpty())
                             <p>No orders found for this customer.</p>
                         @else
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Order ID</th>
-                                        <th>Delivery Date</th>
-                                        <th>Creation Date</th>
-                                        <th>Total Amount</th>
-                                        <th>Payment Method</th>
-                                        <th>Status</th>
+                                        <th>{{ __('customers.order_id') }}</th>
+                                        <th>{{ __('customers.delivery_date') }}</th>
+                                        <th>{{ __('customers.creation_date') }}</th>
+                                        <th>{{ __('customers.total_amount') }}</th>
+                                        <th>{{ __('customers.payment_method') }}</th>
+                                        <th>{{ __('customers.status') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody style="text-align: center;">
@@ -265,8 +265,8 @@
                         </div>
 
                     <div class="btn-group-action" style="justify-content: flex-end;">
-                        <a href="{{ route('sales.get') }}" class="btn btn-back">Cancel</a>
-                        <button type="submit" class="btn-update">Update</button>
+                        <a href="{{ route('sales.get') }}" class="btn btn-back">{{ __('customers.cancel') }}</a>
+                        <button type="submit" class="btn-update">{{ __('customers.update') }}</button>
                     </div>
                 </form>
             </div>
