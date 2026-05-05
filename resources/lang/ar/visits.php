@@ -39,4 +39,7 @@ return [
     'visitation_notes'           => 'ملاحظات الزيارة',
     'select_customer'            => 'اختر العميل',
     'select_salesman'            => 'اختر المندوب',
+    'update_visit_date'          => 'تحديث موعد الزيارة',
+    'new_visit_date'             => 'موعد الزيارة الجديد',
+    'representative'             => 'المندوب'
 ];
