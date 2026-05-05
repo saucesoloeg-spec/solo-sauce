@@ -96,15 +96,15 @@
             <div class="card-header border-bottom pb-0">
                 <div class="d-sm-flex align-items-center">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Sales Schedule</h6>
-                        <p class="text-sm">See information about all Sales Schedules</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('visits.sales_schedules') }}</h6>
+                        <p class="text-sm">{{ __('visits.sales_schedules_description') }}</p>
                     </div>
-                    <div class="ms-auto">
+                    <div class="d-flex align-items-center @if(app()->getLocale() == 'ar') me-auto @else ms-auto @endif">
                         <a href="{{ route('schedules.create') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center" style="gap: 5px; white-space: nowrap;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                             </svg>
-                            Create
+                            {{ __('visits.add_schedule') }}
                         </a>
                     </div>
                 </div>
@@ -112,12 +112,12 @@
             <!-- Delete Confirmation Modal -->
             <div id="delete-modal" class="modal">
                 <div class="modal-content">
-                    <h3>Confirm Deletion</h3>
-                    <p>Are you sure you want to delete this schedule?</p>
+                    <h3>{{ __('visits.confirm_deletion') }}</h3>
+                    <p>{{ __('visits.delete_schedule_confirmation') }}</p>
                     <div class="modal-buttons">
-                        <button id="confirm-delete" class="btn-confirm">Confirm</button>
+                        <button id="confirm-delete" class="btn-confirm">{{ __('visits.confirm') }}</button>
                         <span id="loader" class="loader" style="display: none;"></span>
-                        <button id="cancel-delete" class="btn-cancel">Cancel</button>
+                        <button id="cancel-delete" class="btn-cancel">{{ __('visits.cancel') }}</button>
                     </div>
                 </div>
             </div>
@@ -126,31 +126,31 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="updateModalLabel">Update Visit Date</h5>
+                            <h5 class="modal-title" id="updateModalLabel">{{ __('visits.update_visit_date') }}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <form id="updateForm">
                                 <div class="mb-3">
-                                    <label for="visitDateInput" class="form-label">Representative: </label>
+                                    <label for="visitDateInput" class="form-label">{{ __('visits.representative') }}: </label>
                                     <select class="form-select" id="representativeSelect">
-                                        <option value="" selected>Select Representative</option>
+                                        <option value="" selected>{{ __('visits.select_representative') }}</option>
                                         @foreach($sales as $salesman)
                                             <option value="{{ $salesman->id }}">{{ $salesman->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="visitDateInput" class="form-label">New Visit Date</label>
+                                    <label for="visitDateInput" class="form-label">{{ __('visits.new_visit_date') }}</label>
                                     <input type="date" class="form-control" id="visitDateInput" required>
                                 </div>
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('visits.cancel') }}</button>
                             <button type="button" class="btn btn-primary" id="updateVisitDateButton">
                                 <span id="updateLoader" class="loader" style="display: none;"></span>
-                                Update
+                                {{ __('visits.update') }}
                             </button>
                         </div>
                     </div>
@@ -161,36 +161,36 @@
                     <div class="py-3 px-3 d-sm-flex align-items-center">
                         <!-- Date Filtration -->
                         <select id="yearFilter" class="form-select" style="width: 150px;">
-                            <option value="" selected>Year</option>
+                            <option value="" selected>{{ __('visits.year') }}</option>
                             <!-- Populate with years dynamically -->
                         </select>
 
                         <select id="monthFilter" class="form-select" style="width: 150px;">
-                            <option value="" selected>Month</option>
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                            <option value="" selected>{{ __('visits.month') }}</option>
+                            <option value="01">{{ __('visits.january') }}</option>
+                            <option value="02">{{ __('visits.february') }}</option>
+                            <option value="03">{{ __('visits.march') }}</option>
+                            <option value="04">{{ __('visits.april') }}</option>
+                            <option value="05">{{ __('visits.may') }}</option>
+                            <option value="06">{{ __('visits.june') }}</option>
+                            <option value="07">{{ __('visits.july') }}</option>
+                            <option value="08">{{ __('visits.august') }}</option>
+                            <option value="09">{{ __('visits.september') }}</option>
+                            <option value="10">{{ __('visits.october') }}</option>
+                            <option value="11">{{ __('visits.november') }}</option>
+                            <option value="12">{{ __('visits.december') }}</option>
                         </select>
 
-                        <button id="filterByDate" class="btn btn-primary mx-2 mb-0">Filter</button>
-                        <button id="resetFilters" class="btn btn-secondary mr-2 mb-0">Reset</button>
+                        <button id="filterByDate" class="btn btn-primary mx-2 mb-0">{{ __('visits.filter') }}</button>
+                        <button id="resetFilters" class="btn btn-secondary mr-2 mb-0">{{ __('visits.reset') }}</button>
                     </div>
-                    <div class="input-group w-sm-25 ms-auto">
+                    <div class="input-group w-sm-25 @if(app()->getLocale() == 'ar') me-auto @else ms-auto @endif">
                         <span class="input-group-text text-body">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                         </svg>
                         </span>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search">
+                        <input type="text" class="form-control" id="searchInput" placeholder="{{ __('visits.search_by_salesman') }}">
                     </div>
                 </div>
                 <div class="table-responsive p-0">
@@ -203,11 +203,11 @@
                     <table class="table align-items-center mb-0" id="scheduleTable">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7">Salesman</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">Customer</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Visit At</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Status</th>
-                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">Created At</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('visits.salesman') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('visits.customer') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('visits.visit_at') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('visits.status') }}</th>
+                                <th class="text-center text-secondary text-xs font-weight-semibold opacity-7">{{ __('visits.created_at') }}</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
@@ -246,15 +246,15 @@
                                 <td class="align-middle text-center text-sm">
                                     @if($schedule->status == 'pending')
                                     <span class="badge badge-sm border border-secondary text-secondary bg-secondary reservation">
-                                        Pending
+                                        {{ __('visits.pending') }}
                                     </span>
                                     @elseif($schedule->status == 'completed')
                                     <span class="badge badge-sm border border-success text-success bg-success reservation">
-                                        Delivered
+                                        {{ __('visits.delivered') }}
                                     </span>
                                     @elseif($schedule->status == 'canceled')
                                     <span class="badge badge-sm border border-danger text-danger bg-danger reservation">
-                                        Canceled
+                                        {{ __('visits.canceled') }}
                                     </span>
                                     @endif
                                 </td>
@@ -293,8 +293,8 @@
                 <div class="border-top py-3 px-3 d-flex align-items-center">
                     <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
                     <div class="ms-auto">
-                        <button class="btn btn-sm btn-white mb-0 previous">Previous</button>
-                        <button class="btn btn-sm btn-white mb-0 next">Next</button>
+                        <button class="btn btn-sm btn-white mb-0 previous">{{ __('visits.previous') }}</button>
+                        <button class="btn btn-sm btn-white mb-0 next">{{ __('visits.next') }}</button>
                     </div>
                 </div>
             </div>

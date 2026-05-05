@@ -29,8 +29,8 @@
             <div class="card-header border-bottom pb-0">
                 <div class="d-sm-flex align-items-center">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Create Admin</h6>
-                        <p class="text-sm">Here you can create a new Admin</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('admins.create_admin') }}</h6>
+                        <p class="text-sm">{{ __('admins.create_admin_description') }}</p>
                     </div>
                 </div>
             </div>
@@ -40,72 +40,72 @@
                     <form action="{{ route('admins.store') }}" method="POST" id="create-admin-form">
                         @csrf
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
+                            <label for="name" class="form-label">{{ __('admins.name') }}</label>
                             <input 
                                 type="text" 
                                 name="name" 
                                 class="form-control" 
                                 id="name" 
                                 value="{{ old('name') }}" 
-                                placeholder="Enter admin name" 
+                                placeholder="{{ __('admins.enter_admin_name') }}" 
                                 required>
                             @error('name')
                                 <small id="name-error" class="error-text">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label">{{ __('admins.email') }}</label>
                             <input 
                                 type="email" 
                                 name="email" 
                                 class="form-control" 
                                 id="email" 
                                 value="{{ old('email') }}" 
-                                placeholder="Enter admin email" 
+                                placeholder="{{ __('admins.enter_admin_email') }}" 
                                 required>
                             @error('email')
                                 <small id="email-error" class="error-text">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
+                            <label for="password" class="form-label">{{ __('admins.password') }}</label>
                             <input 
                                 type="password" 
                                 name="password" 
                                 class="form-control" 
                                 id="password" 
-                                placeholder="Enter password" 
+                                placeholder="{{ __('admins.enter_admin_password') }}" 
                                 required>
                             @error('password')
                                 <small id="password-error" class="error-text">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                            <label for="password_confirmation" class="form-label">{{ __('admins.confirm_password') }}</label>
                             <input 
                                 type="password" 
                                 name="password_confirmation" 
                                 class="form-control" 
                                 id="password_confirmation" 
-                                placeholder="Confirm password" 
+                                placeholder="{{ __('admins.confirm_admin_password') }}" 
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
+                            <label for="role" class="form-label">{{ __('admins.role') }}</label>
                             <select 
                                 name="role" 
                                 class="form-control" 
                                 id="role" 
                                 required>
-                                <option value="" {{ old('role') === null ? 'selected' : '' }}>Select role</option>
-                                <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
-                                <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="" {{ old('role') === null ? 'selected' : '' }}>{{ __('admins.select_role') }}</option>
+                                <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>{{ __('admins.super_admin') }}</option>
+                                <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>{{ __('admins.admin') }}</option>
                             </select>
                             @error('role')
                                 <small id="role-error" class="error-text">{{ $message }}</small>
                             @enderror
                         </div>
-                        <button type="submit" class="btn btn-primary">Create Admin</button>
+                        <button type="submit" class="btn btn-primary">{{ __('admins.create_admin') }}</button>
                     </form>
                 </div>
             </div>

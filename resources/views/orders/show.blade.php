@@ -169,10 +169,10 @@
             <div class="card-header border-bottom pb-3">
                 <div class="d-sm-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Order Details</h6>
-                        <p class="text-sm mb-0">Order {{$order->code}} details and status updates</p>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('orders.order_details') }}</h6>
+                        <p class="text-sm mb-0">{{ __('orders.order') }}: {{$order->code}} {{ __('orders.description') }}</p>
                     </div>
-                    <a href="{{ route('orders.get') }}" class="btn btn-back mt-3 mt-sm-0">Back to Orders</a>
+                    <a href="{{ route('orders.get') }}" class="btn btn-back mt-3 mt-sm-0">{{ __('orders.back_to_orders') }}</a>
                 </div>
             </div>
 
@@ -183,36 +183,36 @@
                     <div class="form-section">
                         <div class="row-fields">
                             <div class="form-group">
-                                <label for="name" class="form-label">Order Code</label>
+                                <label for="code" class="form-label">{{ __('orders.order_code') }}</label>
                                 <input type="text" class="form-control" id="code" name="code" value="{{ $order->code }}" disabled required>
                             </div>
 
                             <div class="form-group">
-                                <label for="name" class="form-label">Customer Name</label>
+                                <label for="name" class="form-label">{{ __('orders.customer_name') }}</label>
                                 <input type="text" class="form-control" id="name" name="name" value="{{ $order->customer->name }}" disabled required>
                             </div>
 
                             <div class="form-group">
-                                <label for="phone" class="form-label">Phone</label>
+                                <label for="phone" class="form-label">{{ __('orders.phone') }}</label>
                                 <input type="text" class="form-control" id="phone" name="phone" value="{{ $order->customer->phone }}" disabled required>
                             </div>
 
                             @if($order->sales)
                             <div class="form-group">
-                                <label for="sales" class="form-label">Representative</label>
+                                <label for="sales" class="form-label">{{ __('orders.representative') }}</label>
                                 <input type="text" class="form-control" id="sales" name="sales_id" value="{{ $order->sales->name }}" disabled required>
                             </div>
 
                             <div class="form-group">
-                                <label for="city" class="form-label">Work Area</label>
+                                <label for="city" class="form-label">{{ __('orders.work_area') }}</label>
                                 <input type="text" class="form-control" id="city" name="city_id" value="{{ $order->customer->city }}" disabled required>
                             </div>
                             @else
-                            <span class=""> << System Order >></span>
+                            <span class=""> << {{ __('orders.system_order') }} >></span>
                             @endif
                             
                             <div class="form-group">
-                                <label for="order_type" class="form-label">Order Type</label>
+                                <label for="order_type" class="form-label">{{ __('orders.order_type') }}</label>
                                 <input type="text" class="form-control" id="order_type" name="order_type" value="{{ $order->order_type }}" disabled required>
                             </div>
                         </div>
@@ -231,7 +231,7 @@
                                     </div>
 
                                     <div class="label">
-                                        PENDING
+                                        {{ __('orders.pending') }}
                                     </div>
 
                                     <div class="date">

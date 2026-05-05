@@ -46,8 +46,8 @@ class OdooAuthService
 
             return $result;
         } catch (\Throwable $th) {
-            dd($result, $th->getMessage());
-            throw new \Exception($result);
+            \Log::error('Failed to create Odoo account: ' . $th->getMessage());
+            throw new \Exception('Failed to create Odoo account: ' . $th->getMessage());
         }
 
         curl_close($response);
@@ -77,8 +77,8 @@ class OdooAuthService
             
             return $result;
         } catch (\Throwable $th) {
-            dd($result, $th->getMessage());
-            throw new \Exception($result);
+            \Log::error('Failed to update Odoo account: ' . $th->getMessage());
+            throw new \Exception('Failed to update Odoo account: ' . $th->getMessage());
         }
 
         curl_close($response);
@@ -262,16 +262,16 @@ class OdooAuthService
     public function getOrders($filters = [])
     {
         $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/sales-orders';
+        
         if(!empty($filters)) {
             $filters = array_filter($filters, function($value) {
                 return !is_null($value) && $value !== '';
             });
-            $url = env('ODOO_API_URL').'/sales-orders?'. http_build_query($filters);
-        }
-            $url = env('ODOO_API_URL').'/sales-orders';
-
-        if (!empty($filters)) {
-            $url .= '?' . http_build_query($filters);
+            
+            if (!empty($filters)) {
+                $url .= '?' . http_build_query($filters);
+            }
         }
         
         $response = curl_init($url);

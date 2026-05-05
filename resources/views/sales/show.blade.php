@@ -110,10 +110,10 @@
             <div class="card-header border-bottom pb-3">
                 <div class="d-sm-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="font-weight-semibold text-lg mb-0">Sales Details</h6>
+                        <h6 class="font-weight-semibold text-lg mb-0">{{ __('sales.basic_information') }}</h6>
                         <p class="text-sm mb-0">{{ $sales->name }}</p>
                     </div>
-                    <a href="{{ route('sales.get') }}" class="btn btn-back mt-3 mt-sm-0">Back to Sales</a>
+                    <a href="{{ route('sales.get') }}" class="btn btn-back mt-3 mt-sm-0">{{ __('sales.back_to_sales') }}</a>
                 </div>
             </div>
 
@@ -148,17 +148,17 @@
                     @method('PUT')
 
                     <div class="form-section">
-                        <h6 class="font-weight-semibold mb-3">Basic Information</h6>
+                        <h6 class="font-weight-semibold mb-3">{{ __('sales.basic_information') }}</h6>
                         
                         <div class="row-fields">
                             <div class="form-group">
-                                <label for="uuid" class="form-label">UUID</label>
+                                <label for="uuid" class="form-label">{{ __('sales.uuid') }}</label>
                                 <input type="text" class="form-control" id="uuid" name="uuid" value="{{ $sales->uuid }}" disabled readonly>
-                                <small class="text-muted">This field cannot be changed</small>
+                                <small class="text-muted">{{ __('sales.uuid_description') }}</small>
                             </div>
 
                             <div class="form-group">
-                                <label for="name" class="form-label">Name <span style="color: red;">*</span></label>
+                                <label for="name" class="form-label">{{ __('sales.name') }} <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $sales->name) }}" required>
                                 @error('name')
                                     <div class="error-message">{{ $message }}</div>
@@ -166,7 +166,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="email" class="form-label">Email <span style="color: red;">*</span></label>
+                                <label for="email" class="form-label">{{ __('sales.email') }} <span style="color: red;">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $sales->email) }}" required>
                                 @error('email')
                                     <div class="error-message">{{ $message }}</div>
@@ -174,7 +174,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="phone" class="form-label">Phone <span style="color: red;">*</span></label>
+                                <label for="phone" class="form-label">{{ __('sales.phone') }} <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $sales->phone) }}" required>
                                 @error('phone')
                                     <div class="error-message">{{ $message }}</div>
@@ -182,7 +182,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="national_number" class="form-label">National Number</label>
+                                <label for="national_number" class="form-label">{{ __('sales.national_number') }}</label>
                                 <input type="text" class="form-control @error('national_number') is-invalid @enderror" id="national_number" name="national_number" value="{{ old('national_number', $sales->national_number) }}">
                                 @error('national_number')
                                     <div class="error-message">{{ $message }}</div>
@@ -190,15 +190,15 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="zone" class="form-label">Zone</label>
-                                <input type="text" class="form-control @error('zone') is-invalid @enderror" id="zone" name="zone" value="{{ old('zone', $sales->zone) }}">
-                                @error('zone')
+                                <label for="state" class="form-label">{{ __('sales.state') }}</label>
+                                <input type="text" class="form-control @error('state') is-invalid @enderror" id="state" name="state" value="{{ old('state', $sales->state) }}">
+                                @error('state')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group">
-                                <label for="city" class="form-label">City</label>
+                                <label for="city" class="form-label">{{ __('sales.city') }}</label>
                                 <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city', $sales->city) }}">
                                 @error('city')
                                     <div class="error-message">{{ $message }}</div>
@@ -208,7 +208,7 @@
                     </div>
 
                     <div class="form-section">
-                        <label for="address" class="form-label">Address</label>
+                        <label for="address" class="form-label">{{ __('sales.address') }}</label>
                         <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3">{{ old('address', $sales->address) }}</textarea>
                         @error('address')
                             <div class="error-message">{{ $message }}</div>
@@ -216,21 +216,21 @@
                     </div>
 
                     <div class="form-section">
-                        <h6 class="font-weight-semibold mb-3">Password Management</h6>
-                        <p class="text-sm text-muted mb-3">Leave password fields empty if you don't want to change the password.</p>
+                        <h6 class="font-weight-semibold mb-3">{{ __('sales.password_setup') }}</h6>
+                        <p class="text-sm text-muted mb-3">{{ __('sales.password_setup_description') }}</p>
                         
                         <div class="row-fields">
                             <div class="form-group">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" placeholder="Enter new password (min 8 characters)">
+                                <label for="password" class="form-label">{{ __('sales.password') }}</label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" placeholder="{{ __('sales.password_optional') }}">
                                 @error('password')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group">
-                                <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" placeholder="Confirm new password">
+                                <label for="password_confirmation" class="form-label">{{ __('sales.password_confirmation') }}</label>
+                                <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" placeholder="{{ __('sales.password_confirmation_optional') }}">
                                 @error('password_confirmation')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
@@ -239,8 +239,8 @@
                     </div>
 
                     <div class="btn-group-action" style="justify-content: flex-end;">
-                        <a href="{{ route('sales.get') }}" class="btn btn-back">Cancel</a>
-                        <button type="submit" class="btn-update">Update</button>
+                        <a href="{{ route('sales.get') }}" class="btn btn-back">{{ __('sales.cancel') }}</a>
+                        <button type="submit" class="btn-update">{{ __('sales.update') }}</button>
                     </div>
                 </form>
             </div>
