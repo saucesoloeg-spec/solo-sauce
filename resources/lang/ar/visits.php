@@ -41,5 +41,6 @@ return [
     'select_salesman'            => 'اختر المندوب',
     'update_visit_date'          => 'تحديث موعد الزيارة',
     'new_visit_date'             => 'موعد الزيارة الجديد',
-    'representative'             => 'المندوب'
+    'representative'             => 'المندوب',
+    'update'                     => 'تحديث'
 ];

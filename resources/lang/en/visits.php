@@ -41,5 +41,6 @@ return [
     'select_salesman'            => 'Select Sales Representative',
     'update_visit_date'          => 'Update Visit Date',
     'new_visit_date'             => 'New Visit Date',
-    'representative'             => 'Representative'
+    'representative'             => 'Representative',
+    'update'                     => 'Update'
 ];
