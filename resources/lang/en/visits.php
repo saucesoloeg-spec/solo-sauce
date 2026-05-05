@@ -1,9 +1,11 @@
 <?php
 
 return [
-    'sales_schedules'             => 'Sales Schedules',
-    'sales_schedules_description' => 'Here you can manage the sales representatives\' visit schedules for clients, including creating new schedules, updating visit dates, and deleting unwanted schedules.',
-    'add_schedule'                => 'Add Visit Schedule',
+    'sales_schedules'              => 'Sales Schedules',
+    'sales_schedules_description'  => 'Here you can manage the sales representatives\' visit schedules for clients, including creating new schedules, updating visit dates, and deleting unwanted schedules.',
+    'add_schedule'                 => 'Add Visit Schedule',
+    'confirm_deletion'             => 'Confirm Deletion',
+    'delete_schedule_confirmation' => 'Are you sure you want to delete this visit schedule? This action cannot be undone.',
     'salesman'                   => 'Sales Representative',
     'customer'                   => 'Customer',
     'visit_at'                   => 'Visit Date',
