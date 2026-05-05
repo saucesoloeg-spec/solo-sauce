@@ -44,5 +44,6 @@ return [
     'update_visit_date'          => 'Update Visit Date',
     'new_visit_date'             => 'New Visit Date',
     'representative'             => 'Representative',
-    'update'                     => 'Update'
+    'update'                     => 'Update',
+    'confirm'                    => 'Confirm'
 ];

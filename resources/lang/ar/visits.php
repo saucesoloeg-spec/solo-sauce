@@ -44,5 +44,6 @@ return [
     'update_visit_date'          => 'تحديث موعد الزيارة',
     'new_visit_date'             => 'موعد الزيارة الجديد',
     'representative'             => 'المندوب',
-    'update'                     => 'تحديث'
+    'update'                     => 'تحديث',
+    'confirm'                    => 'تأكيد'
 ];
