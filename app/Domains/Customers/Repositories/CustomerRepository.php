@@ -39,6 +39,7 @@ class CustomerRepository
             'name'            => $data['name'],
             'email'           => $data['email'],
             'phone'           => $data['phone'],
+            'via'             => $data['via'],
             'address'         => $data['address'],
             'city'            => $data['city'] ?? null,
             'state'           => $data['state'] ?? null,

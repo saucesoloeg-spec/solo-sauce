@@ -102,6 +102,42 @@
                 color: white;
             }
 
+            /* Fix RTL main layout spacing and horizontal overflow */
+            html[dir="rtl"],
+            body.rtl {
+                overflow-x: hidden !important;
+            }
+
+            body.rtl .main-content {
+                margin-left: 0 !important;
+                margin-right: 17.125rem !important;
+                overflow-x: hidden !important;
+                width: calc(100% - 17.125rem) !important;
+                right: 0 !important;
+                left: auto !important;
+            }
+
+            body.rtl .sidenav.fixed-end ~ .main-content,
+            body.rtl.g-sidenav-show .sidenav.fixed-end ~ .main-content {
+                margin-left: 0 !important;
+                margin-right: 17.125rem !important;
+                width: calc(100% - 17.125rem) !important;
+                right: 0 !important;
+                left: auto !important;
+            }
+
+            body:not(.rtl) .sidenav.fixed-start ~ .main-content {
+                margin-left: 15.625rem !important;
+                margin-right: 0 !important;
+            }
+
+            @media (max-width: 1199.98px) {
+                body.rtl .main-content {
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                }
+            }
+
         </style>
 
         @yield('CSS')
@@ -112,7 +148,8 @@
         <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
             
             @include('layouts.navbar')
-            <div class="container-fluid py-4 px-5">
+
+            <div class="container-fluid py-4 px-3 px-md-4 px-lg-5">
 
                 @yield('content')
 
