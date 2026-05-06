@@ -3,7 +3,7 @@
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav">
         </i>
         <a class="navbar-brand d-flex align-items-center m-0" href="#">
-            <img src="{{ asset('assets/img/solo_sauce.png') }}" class="navbar-brand-img h-100" alt="main_logo">
+            <img src="{{ asset('assets/img/white_logo.png') }}" class="navbar-brand-img" alt="main_logo" style="width: 40px; height: 100px;">
             <span class="font-weight-bold text-lg">Solo Sauce</span>
         </a>
     </div>

@@ -105,6 +105,7 @@
 
 @section('content')
 <div class="row">
+    <div id="page-data" data-company-name="{{ $sales->name }}" style="display: none;"></div>
     <div class="col-12">
         <div class="card border shadow-xs mb-4">
             <div class="card-header border-bottom pb-3">

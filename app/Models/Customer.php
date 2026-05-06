@@ -16,6 +16,7 @@ class Customer extends Model
         'name',
         'email',
         'phone',
+        'via',
         'address',
         'zone',
         'city',
