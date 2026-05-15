@@ -120,8 +120,29 @@ class AdminController extends Controller
         $monthly_income      = $this->admin_service->getMonthlyIncome();
         $monthly_orders      = $this->admin_service->getMonthlyOrders();
         $yearly_income       = $this->admin_service->getYearlyIncome();
+
+        $top_new_deals = $this->formatTopRepresentatives($this->admin_service->getTopNewDealsByRepresentative());
+        $top_reorders  = $this->formatTopRepresentatives($this->admin_service->getTopReordersByRepresentative());
+        $top_surveys   = $this->formatTopRepresentatives($this->admin_service->getTopSurveyAnswersByRepresentative());
         
-        return view('dashboard.dashboard', compact('admin', 'past_monthly_income', 'monthly_income', 'monthly_orders', 'yearly_income'));
+        return view('dashboard.dashboard', compact(
+            'admin',
+            'past_monthly_income',
+            'monthly_income',
+            'monthly_orders',
+            'yearly_income',
+            'top_new_deals',
+            'top_reorders',
+            'top_surveys'
+        ));
+    }
+
+    private function formatTopRepresentatives($collection)
+    {
+        return [
+            'labels' => $collection->pluck('sales_name')->toArray(),
+            'data'   => $collection->pluck('total')->map(fn($value) => (int)$value)->toArray(),
+        ];
     }
 
     /**

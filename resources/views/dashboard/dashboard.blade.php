@@ -797,6 +797,9 @@
 
     const monthlyIncome = @json($monthly_income);
     const monthlyOrders = @json($monthly_orders);
+    const topReorders    = @json($top_reorders ?? ['labels' => [], 'data' => []]);
+    const topNewDeals    = @json($top_new_deals ?? ['labels' => [], 'data' => []]);
+    const topSurveys     = @json($top_surveys ?? ['labels' => [], 'data' => []]);
 
     var reorder_ctx                = document.getElementById("reorder_chart-bars").getContext("2d");
     var new_deals_ctx              = document.getElementById("new_deals_chart-bars").getContext("2d");
@@ -807,7 +810,7 @@
     new Chart(reorder_ctx, {
         type: "bar",
         data: {
-            labels: ["Ahmad", "Mohamad", "Zain", "Islam", "Yasser", "Ali", "Khaled", "Mona", "Nada", "Sarah"],
+            labels: topReorders.labels,
             datasets: [{
                 label: "Reorders",
                 tension: 0.4,
@@ -815,23 +818,7 @@
                 borderSkipped: false,
                 backgroundColor: "rgba(56, 189, 248, 0.75)",
                 borderColor: "rgba(56, 189, 248, 1)",
-                data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
-                maxBarThickness: 10
-            },
-            {
-                label: "Sales",
-                tension: 0.4,
-                borderWidth: 0,
-                borderSkipped: 'bottom',
-                borderRadius: {
-                    topLeft: 2,
-                    topRight: 2,
-                    bottomLeft: 0,
-                    bottomRight: 0
-                },
-                backgroundColor: "rgba(124, 58, 237, 0.75)",
-                borderColor: "rgba(124, 58, 237, 1)",
-                data: [200, 300, 200, 420, 400, 200, 300, 430, 400, 300],
+                data: topReorders.data,
                 maxBarThickness: 10
             }],
         },
@@ -902,7 +889,7 @@
     new Chart(new_deals_ctx, {
         type: "bar",
         data: {
-            labels: ["Ahmad", "Mohamad", "Zain", "Islam", "Yasser", "Ali", "Khaled", "Mona", "Nada", "Sarah"],
+            labels: topNewDeals.labels,
             datasets: [{
                     label: "New Deals",
                     tension: 0.4,
@@ -910,25 +897,9 @@
                     borderSkipped: false,
                     backgroundColor: "rgba(56, 189, 248, 0.75)",
                     borderColor: "rgba(56, 189, 248, 1)",
-                    data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
+                    data: topNewDeals.data,
                     maxBarThickness: 10
-                },
-                {
-                    label: "Sales",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    borderSkipped: 'bottom',
-                    borderRadius: {
-                        topLeft: 2,
-                        topRight: 2,
-                        bottomLeft: 0,
-                        bottomRight: 0
-                    },
-                    backgroundColor: "rgba(124, 58, 237, 0.75)",
-                    borderColor: "rgba(124, 58, 237, 1)",
-                    data: [200, 300, 200, 420, 400, 200, 300, 430, 400, 300],
-                    maxBarThickness: 10
-                },
+                }
             ],
         },
         options: {
@@ -998,7 +969,7 @@
     new Chart(surveys_ctx, {
         type: "bar",
         data: {
-            labels: ["Ahmad", "Mohamad", "Zain", "Islam", "Yasser", "Ali", "Khaled", "Mona", "Nada", "Sarah"],
+            labels: topSurveys.labels,
             datasets: [{
                     label: "Surveys",
                     tension: 0.8,
@@ -1012,7 +983,7 @@
                     },
                     backgroundColor: 'rgba(56, 189, 248, 0.75)',
                     borderColor: 'rgba(56, 189, 248, 1)',
-                    data: [450, 200, 100, 220, 500, 100, 400, 230, 500, 200],
+                    data: topSurveys.data,
                     maxBarThickness: 24
                 }
             ],

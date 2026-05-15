@@ -43,6 +43,21 @@ class AdminService
         return $this->admin_repository->yearlyIncome();
     }
 
+    public function getTopNewDealsByRepresentative()
+    {
+        return $this->admin_repository->topNewDealsByRepresentative();
+    }
+
+    public function getTopReordersByRepresentative()
+    {
+        return $this->admin_repository->topReordersByRepresentative();
+    }
+
+    public function getTopSurveyAnswersByRepresentative()
+    {
+        return $this->admin_repository->topSurveyAnswersByRepresentative();
+    }
+
     public function get_all() 
     {
         return $this->admin_repository->getAll();    
