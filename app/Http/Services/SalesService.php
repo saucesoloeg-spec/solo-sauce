@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Domains\Odoo\Services\OdooAuthService;
 use App\Http\Repositories\CustomerRepository;
 use App\Http\Repositories\SalesRepository;
+use Illuminate\Support\Facades\Log;
 
 class SalesService
 {
@@ -216,6 +217,33 @@ class SalesService
         $result = $this->sales_repository->createSchedule($data);
 
         if($result) {
+            // After creating schedule, attempt to notify the assigned salesman via FCM
+            try {
+                $sales = $this->sales_repository->getById($data['sales_id']);
+
+                if($sales && isset($sales->fcm_token) && $sales->fcm_token) {
+                    $title = config('firebase.fcm.default.title');
+                    $body  = "New visit scheduled on " . ($data['visit_date'] ?? $data['visit_at'] ?? '');
+
+                    $payload = [
+                        'notification' => [
+                            'title' => $title,
+                            'body'  => $body,
+                        ],
+                        'data' => [
+                            'type'        => 'schedule_created',
+                            'schedule_id' => $result->id,
+                            'customer_id' => $data['customer_id'] ?? null,
+                            'visit_date'  => $data['visit_date'] ?? $data['visit_at'] ?? null,
+                        ],
+                        'to' => $sales->fcm_token,
+                    ];
+
+                    $this->sendFirebaseNotification($payload);
+                }
+            } catch (\Exception $e) {
+                Log::error('FCM notification failed: ' . $e->getMessage());
+            }
             return [
                 'response_code'    => 200,
                 'response_message' => 'Visit date Schedule successfully',
@@ -228,5 +256,174 @@ class SalesService
             'response_message' => 'Create Visit date Schedule Failed',
             'response_data'    => []
         ];
+    }
+
+    private function sendFirebaseNotification(array $payload)
+    {
+        // If configured to use HTTP v1, delegate to v1 method
+        if (config('firebase.fcm.use_v1')) {
+            return $this->sendFirebaseV1Notification($payload);
+        }
+
+        $serverKey = config('firebase.fcm.server_key');
+        $url       = config('firebase.fcm.send_url');
+
+        if (!$serverKey) {
+            Log::warning('FIREBASE_SERVER_KEY not configured, skipping push.');
+            return false;
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: key=' . $serverKey,
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+        $result = curl_exec($ch);
+        if ($result === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new \Exception('FCM curl error: ' . $error);
+        }
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            throw new \Exception('FCM request failed with status ' . $httpCode . ' response: ' . $result);
+        }
+
+        return json_decode($result, true);
+    }
+
+    private function sendFirebaseV1Notification(array $payload)
+    {
+        $serviceAccountPath = config('firebase.fcm.service_account_path');
+        $projectId = config('firebase.fcm.project_id');
+
+        if (!$serviceAccountPath || !file_exists($serviceAccountPath)) {
+            Log::warning('Firebase service account JSON not found: ' . $serviceAccountPath);
+            throw new \Exception('Firebase service account JSON not found.');
+        }
+
+        if (!$projectId) {
+            Log::warning('FIREBASE_PROJECT_ID not configured.');
+            throw new \Exception('FIREBASE_PROJECT_ID not configured.');
+        }
+
+        $accessToken = $this->getAccessTokenFromServiceAccount($serviceAccountPath);
+
+        $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+
+        // convert legacy-like payload to v1 format
+        $message = [
+            'message' => [
+                'token' => $payload['to'] ?? null,
+                'notification' => $payload['notification'] ?? null,
+                'data' => array_map('strval', $payload['data'] ?? []),
+            ]
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
+
+        $result = curl_exec($ch);
+        if ($result === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new \Exception('FCM v1 curl error: ' . $error);
+        }
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            throw new \Exception('FCM v1 request failed with status ' . $httpCode . ' response: ' . $result);
+        }
+
+        return json_decode($result, true);
+    }
+
+    private function getAccessTokenFromServiceAccount(string $serviceAccountPath)
+    {
+        $json = json_decode(file_get_contents($serviceAccountPath), true);
+        if (!$json) {
+            throw new \Exception('Invalid service account JSON');
+        }
+
+        $now = time();
+        $jwtHeader = ['alg' => 'RS256', 'typ' => 'JWT'];
+        $scope = 'https://www.googleapis.com/auth/cloud-platform';
+
+        $jwtClaim = [
+            'iss' => $json['client_email'],
+            'scope' => $scope,
+            'aud' => 'https://oauth2.googleapis.com/token',
+            'exp' => $now + 3600,
+            'iat' => $now,
+        ];
+
+        $base64url = function ($data) {
+            return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+        };
+
+        $unsignedJwt = $base64url(json_encode($jwtHeader)) . '.' . $base64url(json_encode($jwtClaim));
+
+        $privateKey = openssl_pkey_get_private($json['private_key']);
+        if (!$privateKey) {
+            throw new \Exception('Invalid private key in service account JSON');
+        }
+
+        $signature = null;
+        openssl_sign($unsignedJwt, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+        openssl_free_key($privateKey);
+
+        $signedJwt = $unsignedJwt . '.' . $base64url($signature);
+
+        // Exchange JWT for access token
+        $post = http_build_query([
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $signedJwt,
+        ]);
+
+        $ch = curl_init('https://oauth2.googleapis.com/token');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+
+        $result = curl_exec($ch);
+        if ($result === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new \Exception('OAuth token request failed: ' . $error);
+        }
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            throw new \Exception('OAuth token request failed with status ' . $httpCode . ' response: ' . $result);
+        }
+
+        $data = json_decode($result, true);
+        if (!isset($data['access_token'])) {
+            throw new \Exception('No access_token in OAuth response: ' . $result);
+        }
+
+        return $data['access_token'];
     }
 }

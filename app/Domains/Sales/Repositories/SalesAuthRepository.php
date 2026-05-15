@@ -29,6 +29,12 @@ class SalesAuthRepository
         $sales = $this->sales_model->where('email', $request->email)->first();
 
         if($sales && Hash::check($request->password, $sales->password)) {
+            if ($request->filled('fcm_token')) {
+                $sales->update([
+                    'fcm_token' => $request->fcm_token,
+                ]);
+            }
+
             $token        = $sales->createToken('salesToken')->plainTextToken;
             $sales->token = $token;
             
