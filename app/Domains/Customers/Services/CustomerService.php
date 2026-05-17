@@ -135,4 +135,25 @@ class CustomerService
             'response_data'    => $customer
         ];
     }
+
+    public function checkTodayVisit($sales_id, $customer_id)
+    {
+        $visit = $this->customer_repository->getTodayVisit($sales_id, $customer_id);
+
+        return [
+            'response_code'    => 200,
+            'response_message' => 'Visit check retrieved successfully',
+            'response_data'    => [
+                'has_visit' => $visit ? true : false,
+                'visit'     => $visit ? [
+                    'id'        => $visit->id,
+                    'visit_at'  => $visit->visit_at,
+                    'status'    => $visit->status,
+                    'notes'     => $visit->notes,
+                    'order_id'  => $visit->order_id,
+                    'survey'    => $visit->survey,
+                ] : null
+            ]
+        ];
+    }
 }

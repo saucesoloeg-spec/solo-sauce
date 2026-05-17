@@ -51,4 +51,17 @@ class CustomerRepository
         ]);
     }
 
+    public function getTodayVisit($sales_id, $customer_id)
+    {
+        $today = now()->toDateString();
+        
+        return $this->customer_model
+            ->join('sales_customers', 'customers.id', '=', 'sales_customers.customer_id')
+            ->where('sales_customers.sales_id', $sales_id)
+            ->where('sales_customers.customer_id', $customer_id)
+            ->whereDate('sales_customers.visit_at', $today)
+            ->select('sales_customers.*')
+            ->first();
+    }
+
 }
