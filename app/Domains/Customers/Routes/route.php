@@ -22,4 +22,5 @@ Route::middleware('auth:sales')->group(function () {
     Route::get('/{customer}', [CustomerController::class, 'show']);
     Route::put('/{customer}', [CustomerController::class, 'update']);
     Route::delete('/delete/{customer}', [CustomerController::class, 'destroy']);
+    Route::get('/has_visit/{customer}', [CustomerController::class, 'hasVisit']);
 });

@@ -111,4 +111,27 @@ class CustomerController extends Controller
             'response_data'    => null
         ], 500);
     }
+
+    /**
+     * Check if the authenticated salesman has visited the customer today.
+     *
+     * @param  Customer  $customer
+     * @return \Illuminate\Http\Response
+     */
+    public function hasVisit(Customer $customer)
+    {
+        $salesman = auth()->guard('sales')->user();
+        
+        if (!$salesman) {
+            return response()->json([
+                'response_code'    => 401,
+                'response_message' => 'Unauthorized',
+                'response_data'    => null
+            ], 401);
+        }
+
+        $response = $this->customer_service->checkTodayVisit($salesman->id, $customer->id);
+
+        return response()->json($response, $response['response_code']);
+    }
 }
