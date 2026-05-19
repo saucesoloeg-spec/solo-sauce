@@ -3,13 +3,16 @@
 namespace App\Domains\Customers\Services;
 
 use App\Domains\Customers\Repositories\CustomerRepository;
+use App\Domains\Odoo\Services\OdooAuthService;
 
 class CustomerService
 {
+    protected $odoo_service;
     protected $customer_repository;
 
-    public function __construct(CustomerRepository $customer_repository)
+    public function __construct(CustomerRepository $customer_repository, OdooAuthService $odoo_service)
     {
+        $this->odoo_service        = $odoo_service;
         $this->customer_repository = $customer_repository;
     }
 
@@ -97,8 +100,15 @@ class CustomerService
     {
         $sales            = auth()->user();
         $data['sales_id'] = $sales->id;
-
-        $customer = $this->customer_repository->create($data);
+        $send_odoo = $this->odoo_service->sendCustomerToOdoo($data);
+        
+        if($send_odoo['response_code'] == 201) {
+            $data['id'] = $send_odoo['response_data']['data']['id'];
+            $customer   = $this->customer_repository->create($data);
+        }
+        else {
+            $customer = null;
+        }
 
         if($customer) {
             return [

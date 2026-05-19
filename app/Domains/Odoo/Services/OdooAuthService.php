@@ -232,6 +232,58 @@ class OdooAuthService
         return $result;
     }
 
+    public function sendCustomerToOdoo($customer)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = env('ODOO_API_URL').'/customers';
+
+        $odoo_customer = [
+            "name"       => $customer['name'],
+            "phone"      => $customer['phone'],
+            "mobile"     => $customer['phone'],
+            "email"      => $customer['email'],
+            "address"    => $customer['address'],
+            "zip_code"   => $customer['zip_code'] ?? "12345",
+            "country_id" => $customer['country_id'] ?? 65, // Egypt country id in Odoo
+            "state_id"   => $customer['state_id'] ?? null,
+            "city_id"    => $customer['city_id'] ?? null,
+            "latitude"   => (float)$customer['latitude'] ?? 0,
+            "longitude"  => (float)$customer['longitude'] ?? 0
+        ];
+        
+        $response = curl_init($url);
+        curl_setopt($response, CURLOPT_POST, true);
+        curl_setopt($response, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json',
+            'content-type: application/json',
+            'Authorization: Bearer ' . $token,
+        ));
+        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode($odoo_customer));
+        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+        try {
+            $result = json_decode(curl_exec($response), true);
+            if(isset($result['error'])) {
+                return [
+                    'response_code'    => 400,
+                    'response_message' => 'Failed to send customer to Odoo: ' . $result['error']['detail']['message'],
+                    'response_data'    => null
+                ];
+            }
+            return [
+                'response_code'    => 201,
+                'response_message' => 'Customer sent to Odoo successfully',
+                'response_data'    => $result
+            ];
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to send customer to Odoo: ' . $th->getMessage());
+        }
+
+        curl_close($response);
+
+        return $result;
+    }
+
     public function getCustomerById($id)
     {
         $token = $this->getAccessToken()['access_token'];
@@ -316,8 +368,9 @@ class OdooAuthService
         
         try {
             $result = json_decode(curl_exec($response), true);
+            
             if(isset($result['error'])) {
-                throw new \Exception('Failed to send order to Odoo: ' . $result['error']['detail']);
+                throw new \Exception('Failed to send order to Odoo: ' . $result['error']['detail']['message']);
             }
         } catch (\Throwable $th) {
             throw new \Exception('Failed to send order to Odoo: ' . $th->getMessage());
