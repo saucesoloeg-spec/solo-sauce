@@ -35,6 +35,7 @@ class CustomerRepository
     public function create(array $data)
     {
         return $this->customer_model->create([
+            'id'              => $data['id'],
             'sales_id'        => $data['sales_id'] ?? null,
             'name'            => $data['name'],
             'email'           => $data['email'],
@@ -46,8 +47,8 @@ class CustomerRepository
             'city_odoo_id'    => $data['city_id'],
             'state_odoo_id'   => $data['state_id'],
             'country_odoo_id' => $data['country_id'],
-            'latitude'        => $data['latitude'] ?? null,
-            'longitude'       => $data['longitude'] ?? null,
+            'latitude'        => (float)$data['latitude'] ?? null,
+            'longitude'       => (float)$data['longitude'] ?? null,
         ]);
     }
 

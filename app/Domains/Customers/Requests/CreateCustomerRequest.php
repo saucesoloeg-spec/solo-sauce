@@ -31,7 +31,7 @@ class CreateCustomerRequest extends FormRequest
             'commercial_name' => 'nullable|string|max:255',
             'taxtation_name'  => 'nullable|string|max:255',
             'email'           => ['nullable','email', $customer_id ? Rule::unique('customers', 'email')->ignore($customer_id) : 'unique:customers,email'],
-            'phone'           => 'required|string|max:20',
+            'phone'           => 'required|string|max:20|unique:customers,phone,' . $customer_id,
             'via'             => 'required|in:phone,whatsapp|max:255',
             'address'         => 'required|string|max:255',
             'city'            => 'required|string|max:255',
