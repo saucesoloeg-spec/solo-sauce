@@ -60,7 +60,18 @@ class CustomerService
 
     public function getCustomer($id)
     {
-        $customer = $this->customer_repository->find($id);
+        $customer   = $this->customer_repository->find($id);
+        $statistics =  $this->customer_repository->getCustomerStatistics($id);
+
+        if($customer) {
+            $customer->statistics = $statistics;
+
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Customer retrieved successfully',
+                'response_data'    => $customer
+            ];
+        }
 
         if($customer) {
             return [
