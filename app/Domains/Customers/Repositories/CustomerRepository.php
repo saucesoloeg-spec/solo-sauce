@@ -3,6 +3,7 @@
 namespace App\Domains\Customers\Repositories;
 
 use App\Models\Customer;
+use Illuminate\Support\Facades\DB;
 
 class CustomerRepository
 {
@@ -29,7 +30,34 @@ class CustomerRepository
 
     public function find($id)
     {
-        return $this->customer_model->find($id);
+        return $this->customer_model
+            ->with(['orders' => function ($query) {
+                $query->where('created_at', '>=', now()->subDays(30));
+            }])
+            ->find($id);
+    }
+
+    public function getCustomerStatistics($customer_id)
+    {
+        $customer = $this->customer_model->withCount([
+                'orders' => function ($query) {
+                    $query->where('created_at', '>=', now()->subMonths(12));
+                },
+                // Count distinct surveys by sales_customer_id (one survey per visit)
+                'answers as surveys_count' => function ($query) {
+                    $query->where('created_at', '>=', now()->subMonths(12))
+                          ->select(DB::raw('COUNT(DISTINCT sales_customer_id)'));
+                }
+            ])->find($customer_id);
+
+        if (!$customer) {
+            return null;
+        }
+
+        return [
+            'total_orders'  => $customer->orders_count,
+            'total_surveys' => $customer->surveys_count,
+        ];
     }
 
     public function create(array $data)
