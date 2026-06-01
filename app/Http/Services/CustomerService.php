@@ -36,7 +36,7 @@ class CustomerService
     {
         $customer = $this->customer_repository->getById($id); 
         $orders   = $customer->orders()
-                             ->paginate(3); 
+                             ->paginate(10); 
         
         if($customer) {
             return [

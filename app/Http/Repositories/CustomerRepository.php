@@ -20,7 +20,7 @@ class CustomerRepository
 
     public function getById($id) 
     {
-        return $this->model->find($id)->first();    
+        return $this->model->find($id);    
     }
 
 }

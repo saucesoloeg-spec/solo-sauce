@@ -282,7 +282,7 @@
 @section('JavaScript')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Select all filter buttons
+        // Select all filter buttons (optional; these are currently commented out in the markup)
         const filterAll      = document.getElementById('filter-all');
         const filterVerified = document.getElementById('filter-verified');
         const filterPending  = document.getElementById('filter-pending');
@@ -351,15 +351,19 @@
             updateTable(); // Update the table display
         }
 
-        // Add event listeners to the filter buttons
-        filterAll.addEventListener('change', () => filterTable('all'));
-        filterVerified.addEventListener('change', () => filterTable('verified'));
-        filterPending.addEventListener('change', () => filterTable('pending'));
+        // Add event listeners to the filter buttons only when they exist
+        if (filterAll && filterVerified && filterPending) {
+            filterAll.addEventListener('change', () => filterTable('all'));
+            filterVerified.addEventListener('change', () => filterTable('verified'));
+            filterPending.addEventListener('change', () => filterTable('pending'));
+        }
 
         // Add event listener to the search input
-        searchInput.addEventListener('input', function () {
-            searchTable();
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                searchTable();
+            });
+        }
 
         // Event listener for the "Previous" button
         prevButton.addEventListener('click', () => {
