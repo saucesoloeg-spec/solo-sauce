@@ -15,7 +15,7 @@ class OrderRepository
 
     public function getAll() 
     {
-        return $this->model->all();    
+        return $this->model->with(['customer', 'sales', 'products'])->get();    
     }
 
     public function getById($id) 
