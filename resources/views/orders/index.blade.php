@@ -190,9 +190,9 @@
                                             <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
                                         </div>
                                         <div class="d-flex flex-column justify-content-left ms-1">
-                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $order->customer->name }}</h6>
-                                            <p class="text-sm text-secondary mb-0">{{ $order->customer->email }}</p>
-                                            <p class="text-sm text-secondary mb-0">{{ $order->customer->phone }}</p>
+                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $order->customer->name ?? $order->customer_name }}</h6>
+                                            <p class="text-sm text-secondary mb-0">{{ $order->customer->email ?? "-" }}</p>
+                                            <p class="text-sm text-secondary mb-0">{{ $order->customer->phone ?? $order->customer_phone }}</p>
                                         </div>
                                     </div>
                                 </td>
