@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::middleware('auth:sales')->group(function () {
+Route::middleware('auth:admin,sales')->group(function () {
     Route::post('/', [ProductController::class, 'index']);
     Route::get('/{product_id}', [ProductController::class, 'show']);
 });
