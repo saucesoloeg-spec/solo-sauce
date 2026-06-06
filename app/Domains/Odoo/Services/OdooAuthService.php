@@ -372,7 +372,7 @@ class OdooAuthService
             if(isset($result['error'])) {
                 return [
                     'success' => false,
-                    'message' => 'Failed to send order to Odoo: ' . $result['error']['detail']['message']
+                    'message' => $result['error']['detail']['message']
                 ];
             }
         } catch (\Throwable $th) {
