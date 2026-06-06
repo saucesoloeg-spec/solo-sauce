@@ -266,7 +266,7 @@ class OdooAuthService
             if(isset($result['error'])) {
                 return [
                     'response_code'    => 400,
-                    'response_message' => 'Failed to send customer to Odoo: ' . $result['error']['detail']['message'],
+                    'response_message' => $result['error']['detail']['message'],
                     'response_data'    => null
                 ];
             }
@@ -370,7 +370,10 @@ class OdooAuthService
             $result = json_decode(curl_exec($response), true);
             
             if(isset($result['error'])) {
-                throw new \Exception('Failed to send order to Odoo: ' . $result['error']['detail']['message']);
+                return [
+                    'success' => false,
+                    'message' => 'Failed to send order to Odoo: ' . $result['error']['detail']['message']
+                ];
             }
         } catch (\Throwable $th) {
             throw new \Exception('Failed to send order to Odoo: ' . $th->getMessage());

@@ -131,7 +131,7 @@ class CustomerService
 
         return [
             'response_code'    => 400,
-            'response_message' => 'Failed to create customer',
+            'response_message' => 'Failed to create customer, '. $send_odoo['response_message'] ?? 'Unknown error',
             'response_data'    => null
         ];
     }

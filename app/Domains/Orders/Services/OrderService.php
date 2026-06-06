@@ -49,7 +49,7 @@ class OrderService
             
             return [
                 'response_code'    => 500,
-                'response_message' => 'Failed to send order to Odoo',
+                'response_message' => 'Failed to send order to Odoo, '. $send_order['message'] ?? 'Unknown error',
                 'response_data'    => null
             ];
         }
