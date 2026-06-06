@@ -241,7 +241,7 @@ class OdooAuthService
             "name"       => $customer['name'],
             "phone"      => $customer['phone'],
             "mobile"     => $customer['phone'],
-            "email"      => $customer['email'],
+            "email"      => $customer['email'] ?? null,
             "address"    => $customer['address'],
             "zip_code"   => $customer['zip_code'] ?? "12345",
             "country_id" => $customer['country_id'] ?? 65, // Egypt country id in Odoo

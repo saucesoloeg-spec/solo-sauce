@@ -24,7 +24,7 @@ class StoreOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'customer_id'           => 'required|integer',
+            'customer_id'           => 'required|integer|exists:customers,id',
             'customer_name'         => 'required|string|max:255',
             'customer_phone'        => 'required|string|max:50',
             'delivery_date'         => 'required|date|after_or_equal:today',
