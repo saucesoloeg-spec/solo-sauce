@@ -56,9 +56,9 @@ class SalesService
         }
 
         return [
-            'response_code'    => 404,
+            'response_code'    => 400,
             'response_message' => 'No dashboard data found.',
-            'response_data'    => null
+            'response_data'    => $response
         ];
     }
 

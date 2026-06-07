@@ -66,7 +66,7 @@ class CustomerRepository
             'id'              => $data['id'],
             'sales_id'        => $data['sales_id'] ?? null,
             'name'            => $data['name'],
-            'email'           => $data['email'],
+            'email'           => $data['email'] ?? null,
             'phone'           => $data['phone'],
             'via'             => $data['via'],
             'address'         => $data['address'],

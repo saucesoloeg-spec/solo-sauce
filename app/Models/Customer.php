@@ -27,6 +27,14 @@ class Customer extends Model
         'longitude',
     ];
 
+    protected $appends = [
+        'new_customer',
+    ];
+
+    protected $casts = [
+        'new_customer' => 'boolean',
+    ];
+
     public function sales() 
     {
         return $this->belongsTo(Sales::class, 'sales_id');
@@ -45,6 +53,15 @@ class Customer extends Model
     public function answers()
     {
         return $this->hasMany(SurveyAnswer::class);
+    }
+
+    public function getNewCustomerAttribute()
+    {
+        if ($this->relationLoaded('orders')) {
+            return $this->orders->isEmpty();
+        }
+
+        return !$this->orders()->exists();
     }
 
 }
