@@ -56,7 +56,7 @@ class SalesService
         }
 
         return [
-            'response_code'    => 400,
+            'response_code'    => 200,
             'response_message' => 'No dashboard data found.',
             'response_data'    => $response
         ];
