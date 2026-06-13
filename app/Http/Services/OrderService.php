@@ -20,14 +20,14 @@ class OrderService
         if($orders->isNotEmpty()) {
             return [
                 'response_code'    => 200,
-                'response_message' => 'Customers retrieved successfully.',
+                'response_message' => 'Orders retrieved successfully.',
                 'response_data'    => $orders
             ];
         }
 
         return [
             'response_code'    => 404,
-            'response_message' => 'No customers found.',
+            'response_message' => 'No orders found.',
             'response_data'    => null
         ];
     }
@@ -39,14 +39,71 @@ class OrderService
         if($order) {
             return [
                 'response_code'    => 200,
-                'response_message' => 'Customer retrieved successfully.',
+                'response_message' => 'Order retrieved successfully.',
                 'response_data'    => $order
             ];
         }
 
         return [
             'response_code'    => 404,
-            'response_message' => 'Customer not found.',
+            'response_message' => 'Order not found.',
+            'response_data'    => null
+        ];
+    }
+
+    public function getUnassignedOrders() 
+    {
+        $orders = $this->order_repository->getUnassignedOrders();  
+        
+        if($orders->isNotEmpty()) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Unassigned orders retrieved successfully.',
+                'response_data'    => $orders
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'No unassigned orders found.',
+            'response_data'    => null
+        ];
+    }
+
+    public function getAssignedOrders()
+    {
+        $orders = $this->order_repository->getAssignedOrders();
+
+        if ($orders->isNotEmpty()) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Assigned orders retrieved successfully.',
+                'response_data'    => $orders
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'No assigned orders found.',
+            'response_data'    => null
+        ];
+    }
+
+    public function assignDriver($orderId, $driverId)
+    {
+        $order = $this->order_repository->assignDriver($orderId, $driverId);
+
+        if ($order) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Driver assigned successfully.',
+                'response_data'    => $order
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Order not found or could not be updated.',
             'response_data'    => null
         ];
     }

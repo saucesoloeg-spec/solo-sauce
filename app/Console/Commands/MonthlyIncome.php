@@ -34,7 +34,7 @@ class MonthlyIncome extends Command
         $startDate = $lastMonth->copy()->startOfMonth();
         $endDate   = $lastMonth->copy()->endOfMonth();
 
-        $total_visits     = SalesCustomer::class::whereBetween('created_at', [$startDate, $endDate])->get();
+        $total_visits     = SalesCustomer::whereBetween('created_at', [$startDate, $endDate])->get();
         $completed_visits = $total_visits->where('status', 'completed')->count();
         $open_visits      = $total_visits->where('status', 'pending')->count();
         $delayed_visits   = $total_visits->where('status', 'delayed')->count();

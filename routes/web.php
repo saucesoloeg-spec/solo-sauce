@@ -57,8 +57,13 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
     Route::put('/sales/{id}', [SalesController::class, 'update'])->name('sales.update');
 
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.get');
-    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::middleware(['role:admin|super_admin'])->group(function () {
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.get');
+    });
+
+    Route::middleware(['role:admin|super_admin|manager'])->group(function () {
+        Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    });
 
     Route::get('/schedules', [SalesController::class, 'schedule'])->name('schedules.get');
     Route::get('/schedules/create', [SalesController::class, 'createSchedule'])->name('schedules.create');
@@ -68,6 +73,11 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::post('/api/sales/update_visit_date', [SalesController::class, 'updateVisitDate']);
     Route::post('/api/sales/delete_schedule', [SalesController::class, 'deleteSchedule']);
 
+});
+
+Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {
+    Route::get('/manager/orders', [OrderController::class, 'managerIndex'])->name('manager.orders.get');
+    Route::post('/manager/orders/{id}/assign-driver', [OrderController::class, 'assignDriver'])->name('manager.orders.assign.driver');
 });
     
 Route::middleware([AdminMiddleware::class, 'role:super_admin'])->group(function () {

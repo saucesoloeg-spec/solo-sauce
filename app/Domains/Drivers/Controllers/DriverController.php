@@ -2,85 +2,23 @@
 
 namespace App\Domains\Drivers\Controllers;
 
-use App\Models\sales;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Domains\Drivers\Request\GetDriverHomeRequest;
+use App\Domains\Drivers\Services\DriverService;
 
 class DriverController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    protected $driver_service;
+
+    public function __construct(DriverService $driver_service)
     {
-        //
+        $this->driver_service = $driver_service;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function home(GetDriverHomeRequest $request)
     {
-        //
-    }
+        $response = $this->driver_service->home($request->validated());
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\sales  $sales
-     * @return \Illuminate\Http\Response
-     */
-    public function show(sales $sales)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\sales  $sales
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(sales $sales)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\sales  $sales
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, sales $sales)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\sales  $sales
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(sales $sales)
-    {
-        //
+        return response()->json($response, $response['response_code']);
     }
 }

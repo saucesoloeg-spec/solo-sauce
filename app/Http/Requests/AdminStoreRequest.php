@@ -32,7 +32,7 @@ class AdminStoreRequest extends FormRequest
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
             ],
             'password_confirmation' => 'required|same:password',
-            'role'                  => 'required|in:super_admin,admin',
+            'role'                  => 'required|in:super_admin,admin,manager',
         ];
     }
 }
