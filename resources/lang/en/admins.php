@@ -10,6 +10,7 @@ return [
     'delete_admin'             => 'Delete Admin',
     'super_admin'              => 'Super Admin',
     'admin'                    => 'Admin',
+    'manager'                  => 'Manager',
     'all'                      => 'All',
     'confirm_deletion'         => 'Confirm Deletion',
     'confirm_deletion_message' => 'Are you sure you want to delete this admin?',

@@ -18,6 +18,7 @@ return [
     'confirmed_deals'                         => 'Confirmed Deals',
     'admins'                                  => 'Admins',
     'messages'                                => 'Messages',
+    'manage_orders'                           => 'Manage Orders',
     'reorders'                                => 'Reorders',
     'new_deals'                               => 'New Deals',
     'surveys'                                 => 'Surveys',

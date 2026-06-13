@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\OrderService;
+use App\Models\Driver;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -24,6 +25,41 @@ class OrderController extends Controller
         $response = $this->order_service->getAll();
 
         return view('orders.index', ['orders' => $response['response_data']]);
+    }
+
+    public function managerIndex()
+    {
+        $unassignedResp = $this->order_service->getUnassignedOrders();
+        $assignedResp = $this->order_service->getAssignedOrders();
+        $drivers  = Driver::select('id', 'name', 'phone', 'email')->get();
+
+        $unassigned = $unassignedResp['response_data'] ?? collect();
+        $assigned = $assignedResp['response_data'] ?? collect();
+
+        $orders = $unassigned->merge($assigned)
+            ->sortByDesc(function ($order) {
+                return $order->delivery_date ? strtotime($order->delivery_date) : strtotime($order->created_at);
+            })->values();
+
+        return view('orders.manager', [
+            'orders'  => $orders,
+            'drivers' => $drivers,
+        ]);
+    }
+
+    public function assignDriver(Request $request, $id)
+    {
+        $request->validate([
+            'driver_id' => 'required|exists:drivers,id',
+        ]);
+
+        $response = $this->order_service->assignDriver($id, $request->input('driver_id'));
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.orders.get')->with('success', __('orders.driver_assigned_success'));
+        }
+
+        return redirect()->route('manager.orders.get')->with('error', __('orders.driver_assignment_failed'));
     }
 
     /**

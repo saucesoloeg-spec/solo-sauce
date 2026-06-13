@@ -65,12 +65,16 @@ class SalesService
     public function getAll($customer_id = null) 
     {
         $customer = null;
+        $cityOdooId = null;
 
-        if($customer_id) {
+        if ($customer_id) {
             $customer = $this->customer_repository->find($customer_id);
+            if ($customer) {
+                $cityOdooId = $customer->city_odoo_id;
+            }
         }
 
-        $sales = $this->sales_repository->getAllSales($customer?->city_odoo_id);  
+        $sales = $this->sales_repository->getAllSales($cityOdooId);
         
         if($sales->isNotEmpty()) {
             return [

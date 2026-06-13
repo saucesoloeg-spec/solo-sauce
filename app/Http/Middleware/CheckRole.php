@@ -18,7 +18,9 @@ class CheckRole
     public function handle(Request $request, Closure $next, $role): Response
     {
         $user = Auth::guard('admin')->user();
-        if (!$user || $user->role !== $role) {
+        $allowedRoles = preg_split('/[|,]/', $role);
+
+        if (!$user || !in_array($user->role, $allowedRoles)) {
             abort(403, 'Unauthorized action.');
         }
 

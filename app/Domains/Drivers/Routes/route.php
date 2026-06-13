@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Domains\Drivers\Controllers\DriverAuthController;
+use App\Domains\Drivers\Controllers\DriverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,5 +24,5 @@ Route::middleware('auth:drivers')->group(function () {
         return $request->user();
     });
 
-    
+    Route::get('/home', [DriverController::class, 'home']);
 });
