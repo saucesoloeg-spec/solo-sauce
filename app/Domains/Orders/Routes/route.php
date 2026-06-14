@@ -18,5 +18,8 @@ use App\Domains\Orders\Controllers\OrderController;
 Route::middleware('auth:sales')->group(function () {
     Route::get('/', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
+});
+
+Route::middleware('auth:sales,drivers')->group(function () {
     Route::get('/{id}', [OrderController::class, 'show'])->name('orders.show');
 });
