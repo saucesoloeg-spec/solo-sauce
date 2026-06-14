@@ -37,4 +37,29 @@ class DriverService
             'response_data'    => [],
         ];
     }
+
+    public function dashboard(array $filters = [])
+    {
+        $driver = auth('drivers')->user();
+        $today  = date('Y-m-d');
+
+        $from = !empty($filters['from']) ? date('Y-m-d', strtotime($filters['from'])) : $today;
+        $to = !empty($filters['to']) ? date('Y-m-d', strtotime($filters['to'])) : $today;
+
+        $dashboardData = $this->driver_repository->getDashboardDataForDriver($driver->id, $from, $to);
+
+        if (!empty($dashboardData)) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Dashboard data retrieved successfully.',
+                'response_data'    => $dashboardData,
+            ];
+        }
+
+        return [
+            'response_code'    => 200,
+            'response_message' => 'No dashboard data found.',
+            'response_data'    => [],
+        ];
+    }
 }

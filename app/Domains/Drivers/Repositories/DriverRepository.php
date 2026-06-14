@@ -24,4 +24,33 @@ class DriverRepository
             ->orderBy('delivery_date')
             ->get();
     }
+
+    public function getDashboardDataForDriver(int $driverId, string $from, string $to)
+    {
+        $totalOrders = $this->order
+            ->where('driver_id', $driverId)
+            ->whereDate('delivery_date', '>=', $from)
+            ->whereDate('delivery_date', '<=', $to)
+            ->count();
+
+        $completedOrders = $this->order
+            ->where('driver_id', $driverId)
+            ->whereDate('delivery_date', '>=', $from)
+            ->whereDate('delivery_date', '<=', $to)
+            ->whereIn('delivery_status', ['delivered', 'completed'])
+            ->count();
+
+        $canceledOrders = $this->order
+            ->where('driver_id', $driverId)
+            ->whereDate('delivery_date', '>=', $from)
+            ->whereDate('delivery_date', '<=', $to)
+            ->whereIn('delivery_status', ['canceled', 'cancelled'])
+            ->count();
+
+        return [
+            'total_orders'     => $totalOrders,
+            'completed_orders' => $completedOrders,
+            'canceled_orders'  => $canceledOrders,
+        ];
+    }
 }

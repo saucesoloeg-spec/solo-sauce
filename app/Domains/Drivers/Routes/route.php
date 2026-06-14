@@ -25,4 +25,5 @@ Route::middleware('auth:drivers')->group(function () {
     });
 
     Route::get('/home', [DriverController::class, 'home']);
+    Route::get('/dashboard', [DriverController::class, 'dashboard']);
 });
