@@ -66,9 +66,9 @@ class AuthRepository
     public function login($data)
     {
         $type = $data['type'] ?? null;
-        $user = $this->sales_model->where('uuid', $data['uuid'])->first();
+        $user = $this->sales_model->where('email', $data['email'])->first();
         if(!$user) {
-            $user = $this->driver_model->where('uuid', $data['uuid'])->first();
+            $user = $this->driver_model->where('email', $data['email'])->first();
             $type = 'driver';
         } 
         else {
