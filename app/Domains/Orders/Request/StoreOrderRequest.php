@@ -29,6 +29,7 @@ class StoreOrderRequest extends FormRequest
             'customer_phone'        => 'required|string|max:50',
             'delivery_date'         => 'required|date|after_or_equal:today',
             'amount_total'          => 'required|numeric',
+            'tax'                   => 'required|boolean',
             'payment_method'        => 'required|string|in:cash,credit_card,bank_transfer',
             'payment_status'        => 'required|string',
             'delivery_status'       => 'nullable|string',

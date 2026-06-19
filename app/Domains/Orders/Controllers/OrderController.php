@@ -2,6 +2,7 @@
 
 namespace App\Domains\Orders\Controllers;
 
+use App\Domains\Drivers\Request\GetDriverHomeRequest;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -9,6 +10,8 @@ use App\Domains\Orders\Services\OrderService;
 use App\Domains\Odoo\Services\OdooAuthService;
 use App\Domains\Orders\Request\GetOrdersRequest;
 use App\Domains\Orders\Request\StoreOrderRequest;
+use App\Domains\Orders\Request\UpdateOrderStatusRequest;
+use App\Domains\Orders\Request\OrderProductDeliveryRequest;
 
 class OrderController extends Controller
 {
@@ -99,9 +102,25 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Order $order)
+    public function update(UpdateOrderStatusRequest $request)
     {
-        //
+        $response = $this->order_service->updateOrderStatus($request->validated());
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    public function updateDelivery(OrderProductDeliveryRequest $request)
+    {
+        $response = $this->order_service->updateOrderDelivery($request->validated());
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    public function allProducts(GetDriverHomeRequest $request)
+    {
+        $products = $this->order_service->getAllProducts($request->validated());
+
+        return response()->json($products, $products['response_code']);
     }
 
     /**

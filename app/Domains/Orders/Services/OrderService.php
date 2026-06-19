@@ -66,4 +66,61 @@ class OrderService
         return $this->order_repository->getOrderById($id);
     }
 
+    public function updateOrderStatus($data)
+    {
+        $updated = $this->order_repository->updateOrderStatus($data);
+
+        if ($updated) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Order status updated successfully',
+                'response_data'    => null
+            ];
+        }
+
+        return [
+            'response_code'    => 500,
+            'response_message' => 'Failed to update order status',
+            'response_data'    => null
+        ];
+    }
+
+    public function updateOrderDelivery($data)
+    {
+        $updated = $this->order_repository->updateOrderDelivery($data);
+
+        if ($updated['success'] === true) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Order delivery updated successfully',
+                'response_data'    => null
+            ];
+        }
+
+        return [
+            'response_code'    => 500,
+            'response_message' => $updated['message'] ?? 'Failed to update order delivery',
+            'response_data'    => null
+        ];
+    }
+
+    public function getAllProducts($request)
+    {
+        $inventory = $this->order_repository->getAllProducts($request);
+        
+        if ($inventory) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Products fetched successfully',
+                'response_data'    => $inventory
+            ];
+        }
+
+        return [
+            'response_code'    => 500,
+            'response_message' => 'Failed to fetch products',
+            'response_data'    => null
+        ];
+    }
+
 }
