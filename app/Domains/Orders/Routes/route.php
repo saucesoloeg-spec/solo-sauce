@@ -20,6 +20,12 @@ Route::middleware('auth:sales')->group(function () {
     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
 });
 
+Route::middleware('auth:drivers')->group(function () {
+    Route::post('/update-delivery', [OrderController::class, 'updateDelivery'])->name('orders.updateDelivery');
+    Route::get('/all-products', [OrderController::class, 'allProducts'])->name('orders.allProducts');
+});
+
 Route::middleware('auth:sales,drivers')->group(function () {
     Route::get('/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/update-status', [OrderController::class, 'update'])->name('orders.update');
 });

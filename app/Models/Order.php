@@ -19,6 +19,7 @@ class Order extends Model
         'customer_phone',
         'delivery_date',
         'amount_total',
+        'tax',
         'amount_tax',
         'state',
         'payment_status',
@@ -61,5 +62,10 @@ class Order extends Model
     public function statusHistory()
     {
         return $this->hasMany(OrderStatusHistory::class)->orderBy('created_at');
+    }
+
+    public function delivered()
+    {
+        return $this->hasMany(OrderProductDelivery::class);
     }
 }
