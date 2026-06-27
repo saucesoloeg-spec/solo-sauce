@@ -7,6 +7,7 @@ return [
     'companies'                               => 'الشركات',
     'customers'                               => 'العملاء',
     'sales'                                   => 'المبيعات',
+    'drivers'                                 => 'السائقين',
     'representatives'                         => 'المندوبين',
     'schedule'                                => 'جدول الزيارات',
     'customize_representatives'               => 'تخصيص المندوبين',

@@ -43,8 +43,8 @@ class DriverService
         $driver = auth('drivers')->user();
         $today  = date('Y-m-d');
 
-        $from = !empty($filters['from']) ? date('Y-m-d', strtotime($filters['from'])) : $today;
-        $to = !empty($filters['to']) ? date('Y-m-d', strtotime($filters['to'])) : $today;
+        $from   = !empty($filters['from']) ? date('Y-m-d', strtotime($filters['from'])) : $today;
+        $to     = !empty($filters['to']) ? date('Y-m-d', strtotime($filters['to'])) : $today;
 
         $dashboardData = $this->driver_repository->getDashboardDataForDriver($driver->id, $from, $to);
 
@@ -62,4 +62,32 @@ class DriverService
             'response_data'    => [],
         ];
     }
+
+    public function profile(array $filters = [])
+    {
+        $driver     = auth('drivers')->user();
+        $driverInfo = $this->driver_repository->getDriverInfo($driver->id);
+
+        $today      = date('Y-m-d');
+        $from       = !empty($filters['from']) ? date('Y-m-d', strtotime($filters['from'])) : date('Y-m-01', strtotime($today));
+        $to         = !empty($filters['to']) ? date('Y-m-d', strtotime($filters['to'])) : $today;
+
+        $total_income = $this->driver_repository->getTotalIncomeForDriver($driver->id, $from, $to);
+        $driverInfo->total_income = $total_income;
+        
+        if ($driverInfo) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Driver profile retrieved successfully.',
+                'response_data'    => $driverInfo,
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Driver profile not found.',
+            'response_data'    => [],
+        ];
+    }
+    
 }

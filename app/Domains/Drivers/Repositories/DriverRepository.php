@@ -2,15 +2,26 @@
 
 namespace App\Domains\Drivers\Repositories;
 
+use App\Models\Driver;
 use App\Models\Order;
 
 class DriverRepository
 {
+    protected $driver;
     protected $order;
 
-    public function __construct(Order $order)
+    public function __construct(Order $order, Driver $driver)
     {
-        $this->order = $order;
+        $this->order  = $order;
+        $this->driver = $driver;
+    }
+
+    public function getDriverInfo(int $driverId)
+    {
+        return $this->driver
+            ->where('id', $driverId)
+            ->with(['vehicle'])
+            ->first();
     }
 
     public function getUpcomingOrdersForDriver(int $driverId, string $from, string $to)
@@ -52,5 +63,15 @@ class DriverRepository
             'completed_orders' => $completedOrders,
             'canceled_orders'  => $canceledOrders,
         ];
+    }
+
+    public function getTotalIncomeForDriver(int $driverId, string $from, string $to)
+    {
+        return $this->order
+            ->where('driver_id', $driverId)
+            ->whereDate('delivery_date', '>=', $from)
+            ->whereDate('delivery_date', '<=', $to)
+            ->whereIn('delivery_status', ['delivered', 'completed'])
+            ->sum('amount_total');
     }
 }

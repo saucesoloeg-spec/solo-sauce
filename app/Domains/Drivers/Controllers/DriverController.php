@@ -28,4 +28,11 @@ class DriverController extends Controller
 
         return response()->json($response, $response['response_code']);
     }
+
+    public function profile(GetDriverHomeRequest $request)
+    {
+        $response = $this->driver_service->profile($request->validated());
+
+        return response()->json($response, $response['response_code']);
+    }
 }

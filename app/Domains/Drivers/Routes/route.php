@@ -20,9 +20,7 @@ Route::post('/register', [DriverAuthController::class, 'register']);
 Route::post('/login', [DriverAuthController::class, 'login']);
 
 Route::middleware('auth:drivers')->group(function () {
-    Route::get('/driver_profile', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('/profile', [DriverController::class, 'profile']);
 
     Route::get('/home', [DriverController::class, 'home']);
     Route::get('/dashboard', [DriverController::class, 'dashboard']);
