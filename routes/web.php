@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DriverController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SalesController;
@@ -78,6 +79,11 @@ Route::middleware([AdminMiddleware::class])->group(function () {
 Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {
     Route::get('/manager/orders', [OrderController::class, 'managerIndex'])->name('manager.orders.get');
     Route::post('/manager/orders/{id}/assign-driver', [OrderController::class, 'assignDriver'])->name('manager.orders.assign.driver');
+    Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.get');
+    Route::get('/drivers/create', [DriverController::class, 'create'])->name('drivers.create');
+    Route::post('/drivers', [DriverController::class, 'store'])->name('drivers.store');
+    Route::get('/drivers/{id}', [DriverController::class, 'show'])->name('drivers.show');
+    Route::put('/drivers/{id}', [DriverController::class, 'update'])->name('drivers.update');
 });
     
 Route::middleware([AdminMiddleware::class, 'role:super_admin'])->group(function () {

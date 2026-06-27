@@ -23,6 +23,7 @@ class Driver extends Authenticatable
         'name',
         'email',
         'phone',
+        'address',
         'password',
     ];
 
@@ -48,5 +49,10 @@ class Driver extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function vehicle()
+    {
+        return $this->hasOne(Vehicle::class);
     }
 }
