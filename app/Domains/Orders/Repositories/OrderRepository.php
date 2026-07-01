@@ -217,7 +217,7 @@ class OrderRepository
         $to   = isset($data['to']) ? date("Y-m-d", strtotime($data['to'])) : now();
 
         $orders = $this->model->where('driver_id', $driver->id)
-                              ->whereIn('delivery_status', ['pending', 'accepted', 'delivering', 'delivered'])
+                              ->whereIn('delivery_status', ['Assigned', 'accepted', 'delivering', 'delivered'])
                               ->whereDate('delivery_date', '>=', $from)
                               ->whereDate('delivery_date', '<=', $to)
                               ->with(['products', 'delivered'])
