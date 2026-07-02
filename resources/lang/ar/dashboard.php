@@ -8,6 +8,7 @@ return [
     'customers'                               => 'العملاء',
     'sales'                                   => 'المبيعات',
     'drivers'                                 => 'السائقين',
+    'vehicles'                                => 'المركبات',
     'representatives'                         => 'المندوبين',
     'schedule'                                => 'جدول الزيارات',
     'customize_representatives'               => 'تخصيص المندوبين',

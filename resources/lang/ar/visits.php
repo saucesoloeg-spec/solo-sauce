@@ -6,6 +6,8 @@ return [
     'add_schedule'                 => 'إنشاء جدول زيارة',
     'confirm_deletion'             => 'تأكيد الحذف',
     'delete_schedule_confirmation' => 'هل أنت متأكد من رغبتك في حذف هذا الجدول؟ لا يمكن التراجع عن هذا الإجراء.',
+    'delete_schedule'             => 'حذف الجدول',
+    'edit_visit_date'             => 'تعديل موعد الزيارة',
     'salesman'                   => 'المندوب',
     'customer'                   => 'العميل',
     'visit_at'                   => 'موعد الزيارة',

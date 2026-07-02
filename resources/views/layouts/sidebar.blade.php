@@ -48,6 +48,16 @@
                         <span class="nav-link-text ms-1">{{ __('dashboard.drivers') }}</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('vehicles.get') }}">
+                        <div class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 24 24">
+                                <path d="M3 13h18v-4H3v4zm0 7h18v-4H3v4zm0-11h18V5H3v4z"/>
+                            </svg>
+                        </div>
+                        <span class="nav-link-text ms-1">{{ __('dashboard.vehicles') }}</span>
+                    </a>
+                </li>
             @else
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('customers.get') }}">

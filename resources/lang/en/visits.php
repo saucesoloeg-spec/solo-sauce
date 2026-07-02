@@ -6,6 +6,8 @@ return [
     'add_schedule'                 => 'Add Visit Schedule',
     'confirm_deletion'             => 'Confirm Deletion',
     'delete_schedule_confirmation' => 'Are you sure you want to delete this visit schedule? This action cannot be undone.',
+    'delete_schedule'             => 'Delete Schedule',
+    'edit_visit_date'             => 'Edit Visit Date',
     'salesman'                   => 'Sales Representative',
     'customer'                   => 'Customer',
     'visit_at'                   => 'Visit Date',

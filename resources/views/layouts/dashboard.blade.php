@@ -200,21 +200,40 @@
                     }
 
                     if (index === pathSegments.length - 1) {
-                        // Check if the company name is available
+                        // Check if a page-specific name is available for the last segment.
+                        const pageDataElement = document.getElementById('page-data');
+                        const pageName = pageDataElement ? pageDataElement.getAttribute('data-page-name') : null;
                         const companyNameElement = document.getElementById('page-data');
                         const companyName = companyNameElement ? companyNameElement.getAttribute('data-company-name') : null;
-
-                        const displayName = companyName && displaySegment === '1' ? companyName : displaySegment;
+                        const displayName = pageName && /^\d+$/.test(displaySegment)
+                            ? pageName
+                            : (companyName && displaySegment === '1' ? companyName : displaySegment);
 
                         breadcrumbHTML += `<li class="breadcrumb-item text-sm text-dark active" aria-current="page">${displayName}</li>`;
-                        title = displayName; // Set title to the company name or last segment
+                        title = displayName; // Set title to the page name or last segment
                     } else {
                         breadcrumbHTML += `<li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">${displaySegment}</a></li>`;
                     }
                 });
 
-                document.getElementById('breadcrumb').innerHTML = breadcrumbHTML;
-                document.getElementById('breadcrumb-title').innerText = title;
+                const breadcrumbElement = document.getElementById('breadcrumb');
+                const breadcrumbTitleElement = document.getElementById('breadcrumb-title');
+
+                if (breadcrumbElement) {
+                    breadcrumbElement.innerHTML = breadcrumbHTML;
+                    breadcrumbElement.style.opacity = '1';
+                    breadcrumbElement.style.visibility = 'visible';
+                }
+                if (breadcrumbTitleElement) {
+                    breadcrumbTitleElement.innerText = title;
+                    breadcrumbTitleElement.style.opacity = '1';
+                    breadcrumbTitleElement.style.visibility = 'visible';
+                }
+                const breadcrumbWrapper = document.getElementById('breadcrumb-wrapper');
+                if (breadcrumbWrapper) {
+                    breadcrumbWrapper.style.opacity = '1';
+                    breadcrumbWrapper.style.visibility = 'visible';
+                }
             });
 
 
