@@ -17,18 +17,10 @@ class VehicleService
     {
         $vehicles = $this->vehicle_repository->getAll();
 
-        if ($vehicles->isNotEmpty()) {
-            return [
-                'response_code'    => 200,
-                'response_message' => 'Vehicles retrieved successfully.',
-                'response_data'    => $vehicles,
-            ];
-        }
-
         return [
-            'response_code'    => 404,
-            'response_message' => 'No vehicles found.',
-            'response_data'    => null,
+            'response_code'    => 200,
+            'response_message' => $vehicles->isNotEmpty() ? 'Vehicles retrieved successfully.' : 'No vehicles found.',
+            'response_data'    => $vehicles,
         ];
     }
 

@@ -21,9 +21,10 @@ class VehicleController extends Controller
     {
         $response = $this->vehicle_service->getAll();
         $drivers = Driver::select('id', 'name', 'phone', 'email')->get();
+        $vehicles = collect($response['response_data']);
 
         return view('vehicles.index', [
-            'vehicles' => $response['response_data'],
+            'vehicles' => $vehicles,
             'drivers'  => $drivers,
         ]);
     }
