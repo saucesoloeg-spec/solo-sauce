@@ -6,6 +6,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SalesController;
+use App\Http\Controllers\VehicleController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\Sales;
 use Illuminate\Support\Facades\Route;
@@ -79,11 +80,21 @@ Route::middleware([AdminMiddleware::class])->group(function () {
 Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {
     Route::get('/manager/orders', [OrderController::class, 'managerIndex'])->name('manager.orders.get');
     Route::post('/manager/orders/{id}/assign-driver', [OrderController::class, 'assignDriver'])->name('manager.orders.assign.driver');
+
     Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.get');
     Route::get('/drivers/create', [DriverController::class, 'create'])->name('drivers.create');
     Route::post('/drivers', [DriverController::class, 'store'])->name('drivers.store');
     Route::get('/drivers/{id}', [DriverController::class, 'show'])->name('drivers.show');
     Route::put('/drivers/{id}', [DriverController::class, 'update'])->name('drivers.update');
+
+    Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.get');
+    Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('vehicles.create');
+    Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
+    Route::get('/vehicles/{id}', [VehicleController::class, 'show'])->name('vehicles.show');
+    Route::put('/vehicles/{id}', [VehicleController::class, 'update'])->name('vehicles.update');
+    Route::delete('/vehicles/{id}', [VehicleController::class, 'destroy'])->name('vehicles.delete');
+    Route::post('/vehicles/{id}/assign-driver', [VehicleController::class, 'assignDriver'])->name('vehicles.assign.driver');
+    Route::post('/vehicles/{id}/unassign-driver', [VehicleController::class, 'unassignDriver'])->name('vehicles.unassign.driver');
 });
     
 Route::middleware([AdminMiddleware::class, 'role:super_admin'])->group(function () {

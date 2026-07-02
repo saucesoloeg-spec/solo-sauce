@@ -19,9 +19,9 @@ class CreateVehiclesTable extends Migration
             $table->string('model', 100);
             $table->string('color', 50);
             $table->string('license_plate', 20)->unique();
-            $table->unsignedBigInteger('driver_id');
+            $table->unsignedBigInteger('driver_id')->nullable();
 
-            $table->foreign('driver_id')->references('id')->on('drivers');
+            $table->foreign('driver_id')->references('id')->on('drivers')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -2,12 +2,12 @@
 <nav class="navbar navbar-main navbar-expand-lg mx-5 px-0 shadow-none rounded" id="navbarBlur" navbar-scroll="true">
     <div class="container-fluid py-1 px-2">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb bg-transparent mb-1 pb-0 pt-1 px-0 {{ app()->getLocale() == 'en' ? 'me-sm-6 me-5' : '' }}" id="breadcrumb">
+            <ol class="breadcrumb bg-transparent mb-1 pb-0 pt-1 px-0 {{ app()->getLocale() == 'en' ? 'me-sm-6 me-5' : '' }}" id="breadcrumb" style="opacity: 0; visibility: hidden; transition: opacity .2s ease;">
                 <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Dashboard</a></li>
                 <li class="breadcrumb-item text-sm text-dark active" aria-current="page" id="breadcrumb-current">Dashboard</li>
             </ol>
-            <h6 class="font-weight-bold mb-0" id="breadcrumb-title">Dashboard</h6>
-            <div id="breadcrumb-wrapper">
+            <h6 class="font-weight-bold mb-0" id="breadcrumb-title" style="opacity: 0; visibility: hidden; transition: opacity .2s ease;">Dashboard</h6>
+            <div id="breadcrumb-wrapper" style="opacity: 0; visibility: hidden; transition: opacity .2s ease;">
                 @yield('breadcrumbData')
             </div>
         </nav>
