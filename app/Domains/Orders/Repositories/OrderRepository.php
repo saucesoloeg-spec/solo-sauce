@@ -9,6 +9,7 @@ use App\Console\Constants\SystemConstants;
 use App\Models\OrderStatusHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\UploadedFile;
 
 class OrderRepository
 {
@@ -178,6 +179,13 @@ class OrderRepository
                 ];
             }
 
+            if($order->delivered()->exists()) {
+                return [
+                    'message' => 'Order has already been delivered',
+                    'success' => false
+                ];
+            }
+
             foreach ($data['products'] as $product) {
                 $orderProduct = $order->products()->where('product_id', $product['product_id'])->first();
 
@@ -195,6 +203,17 @@ class OrderRepository
                 }
             }
 
+            if (isset($data['signature'])) {
+                $signaturePath = $this->storeSignature($data['signature']);
+
+                if ($signaturePath) {
+                    $order->signature = $signaturePath;
+                }
+            }
+
+            $order->delivery_status = 'delivered';
+            $order->save();
+
             return [
                 'message' => 'Order delivery updated successfully',
                 'success' => true
@@ -207,6 +226,41 @@ class OrderRepository
             ];
         }
 
+    }
+
+    protected function storeSignature($signature)
+    {
+        if (!$signature instanceof UploadedFile) {
+            return null;
+        }
+
+        $directory = 'signatures';
+        $fileName = Str::random(40) . '.' . $signature->getClientOriginalExtension();
+
+        try {
+            return $signature->storeAs($directory, $fileName, 'public');
+        } catch (\Exception $exception) {
+            Log::warning('Falling back to manual signature storage: ' . $exception->getMessage());
+
+            $targetDirectory = storage_path('app/public/' . $directory);
+
+            if (!is_dir($targetDirectory)) {
+                @mkdir($targetDirectory, 0777, true);
+            }
+
+            $targetPath = $targetDirectory . '/' . $fileName;
+            $contents = file_get_contents($signature->getRealPath());
+
+            if ($contents === false) {
+                return null;
+            }
+
+            if (file_put_contents($targetPath, $contents) === false) {
+                return null;
+            }
+
+            return $directory . '/' . $fileName;
+        }
     }
 
     public function getAllProducts($data)

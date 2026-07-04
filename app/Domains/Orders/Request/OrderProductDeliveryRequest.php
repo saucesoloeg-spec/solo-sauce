@@ -28,6 +28,7 @@ class OrderProductDeliveryRequest extends FormRequest
             'products'              => 'required|array',
             'products.*.product_id' => 'required|integer|exists:order_products,product_id',
             'products.*.quantity'   => 'required|integer|min:1',
+            'signature'             => 'required|image|mimes:jpeg,png,svg|max:2048',
         ];
     }
 }
