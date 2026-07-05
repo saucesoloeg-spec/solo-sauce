@@ -16,6 +16,7 @@ class GetDriverHomeRequest extends FormRequest
         return [
             'from' => 'nullable|date',
             'to'   => 'nullable|date|after_or_equal:from',
+            'status' => 'nullable|string|in:pending,accepted,delivering,delivered,completed,canceled,cancelled',
         ];
     }
 }

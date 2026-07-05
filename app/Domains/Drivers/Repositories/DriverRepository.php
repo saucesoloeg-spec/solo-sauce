@@ -24,14 +24,18 @@ class DriverRepository
             ->first();
     }
 
-    public function getUpcomingOrdersForDriver(int $driverId, string $from, string $to)
+    public function getUpcomingOrdersForDriver(int $driverId, string $from, string $to, ?string $status = null)
     {
-        return $this->order
+        $orders = $this->order
             ->where('driver_id', $driverId)
             ->whereDate('delivery_date', '>=', $from)
-            ->whereDate('delivery_date', '<=', $to)
-            ->whereNotIn('delivery_status', ['delivered', 'completed', 'canceled', 'cancelled'])
-            ->with(['customer', 'products', 'sales'])
+            ->whereDate('delivery_date', '<=', $to);
+
+        if ($status) {
+            $orders->where('delivery_status', $status);
+        }
+
+        return $orders->with(['customer', 'products', 'sales', 'delivered'])
             ->orderBy('delivery_date')
             ->get();
     }
