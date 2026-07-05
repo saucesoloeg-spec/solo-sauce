@@ -220,20 +220,29 @@
                     </div>
 
                     <div class="form-section">
+                        @php
+                            $deliveryQuantities = $order->delivered()->exists()
+                                ? $order->delivered->groupBy('product_id')->map(fn($items) => $items->sum('quantity'))->toArray()
+                                : [];
+                            $showDeliveredColumn = !empty($deliveryQuantities);
+                        @endphp
                         <h6 class="font-weight-semibold text-md mb-3">{{ __('orders.order_products') }}</h6>
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                            <table class="table table-bordered align-middle">
                                 <thead>
-                                    <tr>
+                                    <tr class="text-center">
                                         <th>#</th>
                                         <th>{{ __('orders.product') }}</th>
                                         <th>{{ __('orders.price') }}</th>
                                         <th>{{ __('orders.quantity') }}</th>
+                                        @if($showDeliveredColumn)
+                                            <th>{{ __('orders.acutual_delivered') }}</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody id="order-products-body">
                                     <tr>
-                                        <td colspan="4" class="text-center">Loading product information...</td>
+                                        <td colspan="{{ $showDeliveredColumn ? '5' : '4' }}" class="text-center">Loading product information...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -375,6 +384,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'quantity'   => $product->quantity,
         ];
     }));
+    const deliveredQuantities = @json($deliveryQuantities);
+    const showDeliveredColumn = @json($showDeliveredColumn);
 
     const orderProductsBody = document.getElementById('order-products-body');
 
@@ -383,14 +394,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const productName = productData.name || 'Unknown Product';
         const productCode = productData.code ? ` (${productData.code})` : '';
         const listPrice = typeof productData.list_price !== 'undefined' ? productData.list_price : '-';
+        const deliveredQuantity = showDeliveredColumn && typeof deliveredQuantities[productData.product_id] !== 'undefined'
+            ? deliveredQuantities[productData.product_id]
+            : '-';
 
         return `
-            <tr>
+            <tr class="text-center align-middle">
                 <td>${index}</td>
                 <td>
-                    <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
                         <img src="${imageUrl}" alt="${productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 8px;" />
-                        <div>
+                        <div style="text-align: left;">
                             <div style="font-weight: 600;">${productName}${productCode}</div>
                             <div style="font-size: 13px; color: #6c757d;">ID: ${productData.id || 'N/A'}</div>
                         </div>
@@ -398,6 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
                 <td>${listPrice}</td>
                 <td>${productData.quantity}</td>
+                ${showDeliveredColumn ? `<td>${deliveredQuantity}</td>` : ''}
             </tr>
         `;
     };
@@ -426,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!orderProducts || !orderProducts.length) {
             orderProductsBody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="text-center">No products found for this order.</td>
+                    <td colspan="${showDeliveredColumn ? 5 : 4}" class="text-center">No products found for this order.</td>
                 </tr>
             `;
             return;
@@ -438,12 +453,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return createProductRow(index + 1, {
                     ...productData,
                     quantity: item.quantity,
+                    product_id: item.product_id,
                 });
             } catch (error) {
                 return `
                     <tr>
                         <td>${index + 1}</td>
-                        <td colspan="3" class="text-danger">Unable to load product ${item.product_id}: ${error.message}</td>
+                        <td colspan="${showDeliveredColumn ? 4 : 3}" class="text-danger">Unable to load product ${item.product_id}: ${error.message}</td>
                     </tr>
                 `;
             }

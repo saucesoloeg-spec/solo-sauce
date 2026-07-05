@@ -49,4 +49,8 @@ return [
     'back_to_orders'           => 'Back to Orders',
     'manage_orders'            => 'Manage Orders',
     'manage_orders_description' => 'Here you can manage all orders, including their details, status, and associated customer information.',
+    'product'                  => 'Product',
+    'price'                    => 'Price',
+    'quantity'                 => 'Quantity',
+    'acutual_delivered'        => 'Actual Delivered',
 ];

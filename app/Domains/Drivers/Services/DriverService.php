@@ -21,7 +21,7 @@ class DriverService
         $from = !empty($filters['from']) ? date('Y-m-d', strtotime($filters['from'])) : $today;
         $to = !empty($filters['to']) ? date('Y-m-d', strtotime($filters['to'])) : $today;
 
-        $orders = $this->driver_repository->getUpcomingOrdersForDriver($driver->id, $from, $to);
+        $orders = $this->driver_repository->getUpcomingOrdersForDriver($driver->id, $from, $to, $filters['status'] ?? null);
 
         if ($orders->isNotEmpty()) {
             return [
