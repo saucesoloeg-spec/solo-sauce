@@ -400,8 +400,9 @@ class OdooAuthService
 
         try {
             $result = json_decode(curl_exec($response), true);
-            if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['detail']);
+            
+            if(!$result['success'] && isset($result['error'])) {
+                throw new \Exception('Failed to fetch order from Odoo: ' . $result['error']['detail']['message']);
             }
         } catch (\Throwable $th) {
             throw new \Exception('Failed to fetch order from Odoo: ' . $th->getMessage());
