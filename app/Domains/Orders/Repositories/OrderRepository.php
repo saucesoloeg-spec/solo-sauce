@@ -5,23 +5,25 @@ namespace App\Domains\Orders\Repositories;
 use App\Models\Order;
 use Illuminate\Support\Str;
 use App\Models\SalesCustomer;
-use App\Console\Constants\SystemConstants;
-use App\Models\OrderStatusHistory;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\UploadedFile;
+use App\Models\OrderStatusHistory;
+use Illuminate\Support\Facades\Log;
+use App\Console\Constants\SystemConstants;
+use App\Domains\Odoo\Services\OdooAuthService;
 
 class OrderRepository
 {
     protected $model;
     protected $sales_customer_model;
     protected $order_status_history;
+    protected $odoo_service;
 
-    public function __construct(Order $model, SalesCustomer $sales_customer_model, OrderStatusHistory $order_status_history)
+    public function __construct(Order $model, SalesCustomer $sales_customer_model, OrderStatusHistory $order_status_history, OdooAuthService $odoo_service)
     {
         $this->model = $model;
         $this->sales_customer_model = $sales_customer_model;
         $this->order_status_history = $order_status_history;
+        $this->odoo_service = $odoo_service;
     }
 
     public function saveOrder(array $data)
@@ -203,6 +205,10 @@ class OrderRepository
                 }
             }
 
+            if (isset($data['notes'])) {
+                $order->delivery_notes = $data['notes'];
+            }
+
             if (isset($data['signature'])) {
                 $signaturePath = $this->storeSignature($data['signature']);
 
@@ -280,10 +286,17 @@ class OrderRepository
         $products = [];
         foreach ($orders as $order) {
             foreach ($order->products as $product) {
+                $odoo_product = $this->odoo_service->getProductByIdFromOdoo($product->product_id);
+                
                 $products[] = [
-                    'order_id'   => $order->id,
-                    'product_id' => $product->product_id,
-                    'quantity'   => $product->quantity - $order->delivered()->where('product_id', $product->product_id)->sum('quantity'),
+                    'order_id'      => $order->id,
+                    'product_id'    => $product->product_id,
+                    'product_name'  => $odoo_product['data']['name'] ?? 'Unknown Product',
+                    'image_url'     => $odoo_product['data']['image_url'] ?? null,
+                    'category_id'   => $odoo_product['data']['category_id'] ?? null,
+                    'category_name' => $odoo_product['data']['category_name'] ?? null,
+                    'list_price'    => $odoo_product['data']['list_price'] ?? 0,
+                    'quantity'      => $product->quantity - $order->delivered()->where('product_id', $product->product_id)->sum('quantity'),
                 ];
             }
         }
