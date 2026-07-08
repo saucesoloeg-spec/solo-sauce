@@ -25,7 +25,8 @@ class Order extends Model
         'payment_status',
         'driver_id',
         'delivery_status',
-        'notes'
+        'notes',
+        'delivery_notes',
     ];
 
     protected $appends = ['order_type'];
