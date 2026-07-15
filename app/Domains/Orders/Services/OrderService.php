@@ -18,35 +18,21 @@ class OrderService
 
     public function saveOrder($data)
     {
-        $order = $this->order_repository->saveOrder($data);
+        $payload = [
+            'customer_id'      => (int)$data['customer_id'], // cast it as integer
+            'date_order'       => date('Y-m-d H:i:s'), // current date and time
+            'amount_total'     => (float)$data['amount_total'], // cast it as
+            'notes'            => $data['notes'],
+            'payment_method'   => $data['payment_method'],
+            'delivery_date'    => (string)$data['delivery_date'],
+            'order_lines'      => $data['products'] ?? [],
+        ];
 
-        if ($order) {
-            $payload = [
-                'customer_id'      => (int)$order->customer_id, // cast it as integer
-                'date_order'       => (string)$order->created_at,
-                'notes'            => $order->notes,
-                'payment_method'   => $order->payment_method,
-                'delivery_date'    => (string)$order->delivery_date,
-                'order_lines'      => $order->products->map(function($product) {
-                    return [
-                        'product_id' => $product->product_id,
-                        'quantity'   => $product->quantity,
-                        'discount'   => $data['discount'] ?? 0,
-                    ];
-                })->toArray(),
-            ];
-            $send_order = $this->odoo_service->sendOrderToOdoo($payload);
-
-            $order->update(['odoo_id' => $send_order['data']['id'] ?? null]);
-            
-            if(isset($send_order['success']) && $send_order['success'] === true) {
-                return [
-                    'response_code'    => 201,
-                    'response_message' => 'Order created successfully',
-                    'response_data'    => $order
-                ];
-            }
-            
+        $send_order = $this->odoo_service->sendOrderToOdoo($payload);
+        
+        if(isset($send_order['success']) && $send_order['success'] === true) {
+                $order = $this->order_repository->saveOrder($data, $send_order['data']['id'] ?? null);
+        } else {
             return [
                 'response_code'    => 500,
                 'response_message' => 'Failed to send order to Odoo, '. $send_order['message'] ?? 'Unknown error',
@@ -54,9 +40,17 @@ class OrderService
             ];
         }
 
+        if(isset($send_order['success']) && $send_order['success'] === true) {
+            return [
+                'response_code'    => 201,
+                'response_message' => 'Order created successfully',
+                'response_data'    => $order
+            ];
+        }
+        
         return [
             'response_code'    => 500,
-            'response_message' => 'Failed to create order',
+            'response_message' => 'Failed to send order to Odoo, '. $send_order['message'] ?? 'Unknown error',
             'response_data'    => null
         ];
     }

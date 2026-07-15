@@ -21,6 +21,31 @@ class StoreOrderRequest extends FormRequest
      *
      * @return array
      */
+    protected function prepareForValidation()
+    {
+        $products = $this->input('products', []);
+
+        if (!is_array($products)) {
+            return;
+        }
+
+        $normalizedProducts = array_map(function ($product) {
+            if (!is_array($product)) {
+                return $product;
+            }
+
+            return [
+                'product_id' => isset($product['product_id']) ? (int) $product['product_id'] : null,
+                'quantity'   => isset($product['quantity']) ? (int) $product['quantity'] : null,
+                'discount'   => isset($product['discount']) ? (float) $product['discount'] : null,
+            ];
+        }, $products);
+
+        $this->merge([
+            'products' => $normalizedProducts,
+        ]);
+    }
+
     public function rules()
     {
         return [
