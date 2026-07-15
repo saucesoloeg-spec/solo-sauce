@@ -85,9 +85,9 @@ class SalesService
         }
 
         return [
-            'response_code'    => 404,
-            'response_message' => 'No customers found.',
-            'response_data'    => null
+            'response_code'    => 200,
+            'response_message' => 'No sales found for the selected customer.',
+            'response_data'    => []
         ];
     }
 
