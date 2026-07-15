@@ -222,9 +222,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!customerId) return;
 
         const res  = await fetch(`/api/sales/all?customer_id=${customerId}`);
-        const data = await res.json();
+        const data = await res.json().catch(() => []);
+        const salesmen = Array.isArray(data) ? data : (data?.response_data ?? []);
 
-        populateSelect(salesman, data);
+        if (salesmen.length === 0) {
+            salesman.innerHTML = '<option value="">No Representatives Available for this customer</option>';
+            salesman.disabled = false;
+            return;
+        }
+
+        populateSelect(salesman, salesmen);
     });
 
 });

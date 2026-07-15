@@ -22,7 +22,7 @@ class SalesRepository
         if($city_id)
             return $this->model->where('city_odoo_id', $city_id)->get();
 
-        return $this->model->all();    
+        return collect();    
     }
 
     public function getAllBySalesId($id, $filters = []) 
