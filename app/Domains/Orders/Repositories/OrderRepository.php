@@ -26,7 +26,7 @@ class OrderRepository
         $this->odoo_service = $odoo_service;
     }
 
-    public function saveOrder(array $data)
+    public function saveOrder(array $data, $odoo_id = null)
     {
         try {
             $orderData = [
@@ -44,6 +44,7 @@ class OrderRepository
                 'driver_id'        => $data['driver_id'] ?? null,
                 'delivery_status'  => $data['delivery_status'] ?? 'pending',
                 'notes'            => $data['notes'] ?? null,
+                'odoo_id'          => $odoo_id,
             ];
 
             $order = $this->model->create($orderData);
