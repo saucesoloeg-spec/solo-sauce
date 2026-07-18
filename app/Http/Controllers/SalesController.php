@@ -115,7 +115,19 @@ class SalesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $response = $this->sales_service->deleteSales($id);
+
+        if($response['response_code'] == 200) {
+            return response()->json([
+                'success' => true,
+                'message' => $response['response_message'],
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => $response['response_message'],
+        ], $response['response_code']);
     }
 
     /*

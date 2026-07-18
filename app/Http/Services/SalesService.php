@@ -123,6 +123,25 @@ class SalesService
         ];
     }
 
+    public function deleteSales($id)
+    {
+        $deleted = $this->sales_repository->delete($id);
+
+        if($deleted) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Sales deleted successfully.',
+                'response_data'    => null
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Sales not found.',
+            'response_data'    => null
+        ];
+    }
+
     public function updateSales($id, $data)
     {
         // Only update password if provided
