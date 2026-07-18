@@ -58,6 +58,7 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
     Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
     Route::put('/sales/{id}', [SalesController::class, 'update'])->name('sales.update');
+    Route::delete('/sales/{id}', [SalesController::class, 'destroy'])->name('sales.destroy');
 
     Route::middleware(['role:admin|super_admin'])->group(function () {
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.get');

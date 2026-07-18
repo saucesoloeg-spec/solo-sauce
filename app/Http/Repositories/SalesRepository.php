@@ -41,6 +41,11 @@ class SalesRepository
         return $this->model->find($id);
     }
 
+    public function delete($id)
+    {
+        return $this->model->where('id', $id)->delete();
+    }
+
     public function update($id, $data)
     {
         return $this->model->where('id', $id)->update($data);

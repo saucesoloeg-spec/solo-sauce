@@ -488,65 +488,65 @@
     const cancelDeleteButton  = document.getElementById('cancel-delete');
     const loader              = document.getElementById('loader');
 
-    // Store the company ID to delete
-    let companyIdToDelete = null;
+    // Store the sales ID to delete
+    let salesIdToDelete = null;
 
     // Add event listener to the delete buttons
     document.querySelectorAll('.delete').forEach(tag => {
         tag.addEventListener('click', function () {
-            // Get the company ID
-            companyIdToDelete = this.closest('tr').dataset.companyId;
-
-            // Show the modal
+            salesIdToDelete = this.closest('tr').dataset.salesId;
             deleteModal.style.display = 'flex';
         });
     });
 
     // Handle the confirm button click
     confirmDeleteButton.addEventListener('click', function () {
-        if (companyIdToDelete) {
-            // Show loader and hide the confirm button
-            confirmDeleteButton.style.display = 'none';
-            loader.style.display = 'inline-block';
-
-            // Send POST request to delete the company
-            fetch('/api/companies/delete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ company_id: companyIdToDelete })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // On success, remove the row from the table
-                    const row = document.getElementById(`row-${companyIdToDelete}`);
-                    row.remove();
-                } else {
-                    // Handle failure case
-                    alert('Failed to delete company');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            })
-            .finally(() => {
-                // Hide the modal and reset loader and confirm button
-                deleteModal.style.display = 'none';
-                loader.style.display = 'none';
-                confirmDeleteButton.style.display = 'inline-block';
-                companyIdToDelete = null;
-            });
+        if (!salesIdToDelete) {
+            return;
         }
+
+        confirmDeleteButton.style.display = 'none';
+        loader.style.display = 'inline-block';
+
+        fetch(`/sales/${salesIdToDelete}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+        })
+        .then(async response => {
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                throw new Error(data?.message || 'Failed to delete sales');
+            }
+
+            return data;
+        })
+        .then(() => {
+            const row = document.getElementById(`row-${salesIdToDelete}`);
+            if (row) {
+                row.remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        })
+        .finally(() => {
+            deleteModal.style.display = 'none';
+            loader.style.display = 'none';
+            confirmDeleteButton.style.display = 'inline-block';
+            salesIdToDelete = null;
+        });
     });
 
     // Handle the cancel button click
     cancelDeleteButton.addEventListener('click', function () {
-        // Hide the modal and reset the ID
         deleteModal.style.display = 'none';
-        companyIdToDelete = null;
+        salesIdToDelete = null;
     });
 </script>
 @stop
