@@ -27,6 +27,7 @@ return [
     'create_admin_description' => 'استخدم النموذج أدناه لإنشاء مسؤول جديد. تأكد من إدخال بريد إلكتروني صالح وكلمة مرور قوية.',
     'select_role'              => 'تحديد الدور',
     'password'                 => 'كلمة المرور',
-    'confirm_password'         => 'تأكيد كلمة المرور'
+    'confirm_password'         => 'تأكيد كلمة المرور',
+    'inventory'                => 'المخزن'
 
 ];

@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SalesController;
@@ -65,7 +66,7 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     });
 
     Route::middleware(['role:admin|super_admin|manager'])->group(function () {
-        Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+        Route::get('/orders/{id}', [OrderController::class, 'show'])->name('dashboard.orders.show');
     });
 
     Route::get('/schedules', [SalesController::class, 'schedule'])->name('schedules.get');
@@ -76,6 +77,11 @@ Route::middleware([AdminMiddleware::class])->group(function () {
     Route::post('/api/sales/update_visit_date', [SalesController::class, 'updateVisitDate']);
     Route::post('/api/sales/delete_schedule', [SalesController::class, 'deleteSchedule']);
 
+});
+
+Route::middleware([AdminMiddleware::class, 'role:inventory'])->group(function () {
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/inventory/vehicles/{vehicle}', [InventoryController::class, 'show'])->name('inventory.vehicles.show');
 });
 
 Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {

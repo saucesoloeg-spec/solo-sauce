@@ -101,6 +101,7 @@
                                 <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>{{ __('admins.super_admin') }}</option>
                                 <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>{{ __('admins.admin') }}</option>
                                 <option value="manager" {{ old('role') === 'manager' ? 'selected' : '' }}>{{ __('admins.manager') }}</option>
+                                <option value="inventory" {{ old('role') === 'inventory' ? 'selected' : '' }}>{{ __('admins.inventory') }}</option>
                             </select>
                             @error('role')
                                 <small id="role-error" class="error-text">{{ $message }}</small>
