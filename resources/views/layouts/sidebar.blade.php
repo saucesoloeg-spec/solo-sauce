@@ -58,6 +58,17 @@
                         <span class="nav-link-text ms-1">{{ __('dashboard.vehicles') }}</span>
                     </a>
                 </li>
+            @elseif ($role === 'inventory')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('inventory.index') }}">
+                        <div class="icon icon-shape icon-sm px-0 text-center d-flex align-items-center justify-content-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 24 24">
+                                <path d="M3 3h18v4H3zm0 5h18v13H3z"/>
+                            </svg>
+                        </div>
+                        <span class="nav-link-text ms-1">{{ __('dashboard.inventory') }}</span>
+                    </a>
+                </li>
             @else
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('customers.get') }}">

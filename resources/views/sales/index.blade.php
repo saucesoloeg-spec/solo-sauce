@@ -161,6 +161,11 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @if(!isset($sales) || $sales != null && count($sales) === 0)
+                                <tr>
+                                    <td colspan="5" class="text-center text-secondary text-sm font-weight-semibold mb-0">{{ __('sales.no_sales_found') }}</td>
+                                </tr>
+                            @else
                             @foreach($sales as $key => $sales)
                             <tr data-status="{{ $sales->email_verified_at ? 'verified' : 'pending' }}" data-sales-id="{{ $sales->id }}" id="row-{{$sales->id}}">
                                 <td>
@@ -201,6 +206,7 @@
                                 </td>
                             </tr>
                             @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>

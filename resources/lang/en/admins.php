@@ -11,6 +11,7 @@ return [
     'super_admin'              => 'Super Admin',
     'admin'                    => 'Admin',
     'manager'                  => 'Manager',
+    'inventory'                => 'Inventory',
     'all'                      => 'All',
     'confirm_deletion'         => 'Confirm Deletion',
     'confirm_deletion_message' => 'Are you sure you want to delete this admin?',
