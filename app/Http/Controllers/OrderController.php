@@ -62,6 +62,30 @@ class OrderController extends Controller
         return redirect()->route('manager.orders.get')->with('error', __('orders.driver_assignment_failed'));
     }
 
+    public function cancelOrder($id)
+    {
+        $managerName = auth()->user()->name ?? 'Unknown Manager';
+        $response = $this->order_service->cancelOrderByManager($id, $managerName);
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.orders.get')->with('success', __('orders.order_cancelled_success'));
+        }
+
+        return redirect()->route('manager.orders.get')->with('error', __('orders.order_cancel_failed'));
+    }
+
+    public function reactivateOrder($id)
+    {
+        $managerName = auth()->user()->name ?? 'Unknown Manager';
+        $response = $this->order_service->reactivateOrderByManager($id, $managerName);
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.orders.get')->with('success', __('orders.order_reactivated_success'));
+        }
+
+        return redirect()->route('manager.orders.get')->with('error', __('orders.order_reactivate_failed'));
+    }
+
     /**
      * Show the form for creating a new resource.
      *

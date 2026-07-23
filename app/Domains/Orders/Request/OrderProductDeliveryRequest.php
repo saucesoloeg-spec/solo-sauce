@@ -30,6 +30,7 @@ class OrderProductDeliveryRequest extends FormRequest
             'products.*.quantity'   => 'required|integer|min:1',
             'notes'                 => 'nullable|string|max:255',
             'signature'             => 'required|image|mimes:jpeg,png,svg|max:2048',
+            'payment_method'        => 'nullable|string|in:cash,credit_card,bank_transfer',
         ];
     }
 }

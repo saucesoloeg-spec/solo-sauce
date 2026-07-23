@@ -59,4 +59,61 @@ class OrderRepository
         return $order;
     }
 
+    public function cancelByManager($orderId, $managerName)
+    {
+        $order = $this->model->find($orderId);
+
+        if (!$order) {
+            return null;
+        }
+
+        $noteLine = 'Cancelled by fleet manager: ' . $managerName;
+        $order->notes = $this->appendNote($order->notes, $noteLine);
+        $order->state = 'cancelled';
+        $order->save();
+
+        try {
+            OrderStatusHistory::create([
+                'order_id' => $order->id,
+                'status'   => 'cancelled'
+            ]);
+        } catch (\Exception $e) {
+            // Keep cancel operation successful even if history creation fails.
+        }
+
+        return $order;
+    }
+
+    public function reactivateByManager($orderId, $managerName)
+    {
+        $order = $this->model->find($orderId);
+
+        if (!$order) {
+            return null;
+        }
+
+        $noteLine = 'Reactivated by fleet manager: ' . $managerName;
+        $order->notes = $this->appendNote($order->notes, $noteLine);
+        $order->state = 'pending';
+        $order->save();
+
+        try {
+            OrderStatusHistory::create([
+                'order_id' => $order->id,
+                'status'   => 'pending'
+            ]);
+        } catch (\Exception $e) {
+            // Keep reactivation operation successful even if history creation fails.
+        }
+
+        return $order;
+    }
+
+    private function appendNote($existingNotes, $line)
+    {
+        $existing = trim((string) $existingNotes);
+
+        return $existing !== '' ? $existing . PHP_EOL . $line : $line;
+    }
+
 }

@@ -69,11 +69,14 @@ class DriverService
         $driverInfo = $this->driver_repository->getDriverInfo($driver->id);
 
         $today      = date('Y-m-d');
-        $from       = !empty($filters['from']) ? date('Y-m-d', strtotime($filters['from'])) : date('Y-m-01', strtotime($today));
-        $to         = !empty($filters['to']) ? date('Y-m-d', strtotime($filters['to'])) : $today;
+        $from       = !empty($filters['from']) ? date('Y-m-d', strtotime($filters['from'])) : date('Y-m-d 00:00:00');
+        $to         = !empty($filters['to']) ? date('Y-m-d', strtotime($filters['to'])) : date('Y-m-d 23:59:59');
 
         $total_income = $this->driver_repository->getTotalIncomeForDriver($driver->id, $from, $to);
+        $total_cash = $this->driver_repository->getTotalcashForDriver($driver->id, $from, $to);
+        
         $driverInfo->total_income = $total_income;
+        $driverInfo->total_cash = $total_cash;
         
         if ($driverInfo) {
             return [

@@ -108,4 +108,42 @@ class OrderService
         ];
     }
 
+    public function cancelOrderByManager($orderId, $managerName)
+    {
+        $order = $this->order_repository->cancelByManager($orderId, $managerName);
+
+        if ($order) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Order cancelled successfully.',
+                'response_data'    => $order
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Order not found or could not be cancelled.',
+            'response_data'    => null
+        ];
+    }
+
+    public function reactivateOrderByManager($orderId, $managerName)
+    {
+        $order = $this->order_repository->reactivateByManager($orderId, $managerName);
+
+        if ($order) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Order reactivated successfully.',
+                'response_data'    => $order
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Order not found or could not be reactivated.',
+            'response_data'    => null
+        ];
+    }
+
 }

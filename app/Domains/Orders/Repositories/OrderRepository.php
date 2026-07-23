@@ -210,6 +210,10 @@ class OrderRepository
                 $order->delivery_notes = $data['notes'];
             }
 
+            if (isset($data['payment_method'])) {
+                $order->payment_method = $data['payment_method'];
+            }
+
             if (isset($data['signature'])) {
                 $signaturePath = $this->storeSignature($data['signature']);
 
