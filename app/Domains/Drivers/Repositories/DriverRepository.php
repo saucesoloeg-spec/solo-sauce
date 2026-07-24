@@ -78,4 +78,15 @@ class DriverRepository
             ->whereIn('delivery_status', ['delivered', 'completed'])
             ->sum('amount_total');
     }
+
+    public function getTotalCashForDriver(int $driverId, string $from, string $to)
+    {
+        return $this->order
+            ->where('driver_id', $driverId)
+            ->whereDate('delivery_date', '>=', $from)
+            ->whereDate('delivery_date', '<=', $to)
+            ->whereIn('delivery_status', ['delivered', 'completed'])
+            ->where('payment_method', 'cash')
+            ->sum('amount_total');
+    }
 }
