@@ -110,4 +110,30 @@ class VehicleController extends Controller
 
         return redirect()->route('vehicles.get')->with('error', __('vehicles.driver_unassignment_failed'));
     }
+
+    public function assignDeputy(Request $request, $id)
+    {
+        $request->validate([
+            'deputy_id' => 'required|exists:deputies,id',
+        ]);
+
+        $response = $this->vehicle_service->assignDeputy($id, $request->input('deputy_id'));
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.deputies.get')->with('success', __('deputies.vehicle_deputy_assigned_success'));
+        }
+
+        return redirect()->route('manager.deputies.get')->with('error', __('deputies.vehicle_deputy_assignment_failed'));
+    }
+
+    public function unassignDeputy($id)
+    {
+        $response = $this->vehicle_service->unassignDeputy($id);
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.deputies.get')->with('success', __('deputies.vehicle_deputy_unassigned_success'));
+        }
+
+        return redirect()->route('manager.deputies.get')->with('error', __('deputies.vehicle_deputy_unassignment_failed'));
+    }
 }

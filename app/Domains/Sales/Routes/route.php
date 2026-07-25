@@ -26,6 +26,7 @@ Route::middleware('auth:sales')->group(function () {
     });
 
     Route::get('/dashboard', [SalesController::class, 'index']);
+    Route::post('/test-firebase-notification', [SalesController::class, 'testFirebaseNotification']);
 
     Route::post('/logout', [SalesAuthController::class, 'logout']);
     Route::get('/schedule', [SalesController::class, 'schedule']);

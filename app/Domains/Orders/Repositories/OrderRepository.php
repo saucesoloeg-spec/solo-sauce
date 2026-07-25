@@ -42,6 +42,7 @@ class OrderRepository
                 'state'            => $data['state'] ?? 'pending',
                 'payment_status'   => $data['payment_status'],
                 'driver_id'        => $data['driver_id'] ?? null,
+                'deputy_id'        => $data['deputy_id'] ?? null,
                 'delivery_status'  => $data['delivery_status'] ?? 'pending',
                 'notes'            => $data['notes'] ?? null,
                 'odoo_id'          => $odoo_id,

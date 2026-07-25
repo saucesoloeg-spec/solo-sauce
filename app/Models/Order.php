@@ -24,6 +24,8 @@ class Order extends Model
         'state',
         'payment_status',
         'driver_id',
+        'driver_order_rank',
+        'deputy_id',
         'delivery_status',
         'notes',
         'delivery_notes',
@@ -43,6 +45,11 @@ class Order extends Model
     public function driver()
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    public function deputy()
+    {
+        return $this->belongsTo(Deputy::class);
     }
 
     public function sales()

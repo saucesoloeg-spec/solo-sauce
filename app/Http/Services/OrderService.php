@@ -89,14 +89,33 @@ class OrderService
         ];
     }
 
-    public function assignDriver($orderId, $driverId)
+    public function assignDriver($orderId, $driverId, $driverOrderRank = null)
     {
-        $order = $this->order_repository->assignDriver($orderId, $driverId);
+        $order = $this->order_repository->assignDriver($orderId, $driverId, $driverOrderRank);
 
         if ($order) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Driver assigned successfully.',
+                'response_data'    => $order
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Order not found or could not be updated.',
+            'response_data'    => null
+        ];
+    }
+
+    public function assignDeputy($orderId, $deputyId)
+    {
+        $order = $this->order_repository->assignDeputy($orderId, $deputyId);
+
+        if ($order) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Deputy assigned successfully.',
                 'response_data'    => $order
             ];
         }

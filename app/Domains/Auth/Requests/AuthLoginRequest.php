@@ -33,6 +33,7 @@ class AuthLoginRequest extends FormRequest
                 }
             }],
             'password' => 'required|string',
+            'fcm_token' => 'nullable|string|max:512',
         ];
     }
 }

@@ -76,6 +76,12 @@ class AuthRepository
         }
 
         if($user && password_verify($data['password'], $user->password)) {
+            if (!empty($data['fcm_token'])) {
+                $user->update([
+                    'fcm_token' => $data['fcm_token'],
+                ]);
+            }
+
             // Generate token
             $token       = $user->createToken($type.'AuthToken')->plainTextToken;
             $user->token = $token; // Add token to user object for response

@@ -29,6 +29,12 @@ class DriverAuthRepository
         $driver = $this->driver_model->where('email', $request->email)->first();
 
         if($driver && Hash::check($request->password, $driver->password)) {
+            if ($request->filled('fcm_token')) {
+                $driver->update([
+                    'fcm_token' => $request->fcm_token,
+                ]);
+            }
+
             $token        = $driver->createToken('driverToken')->plainTextToken;
             $driver->token = $token;
             

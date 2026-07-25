@@ -80,6 +80,9 @@
                                             $isCancelled = in_array($stateStatus, ['canceled', 'cancelled']);
                                         @endphp
                                         <span class="badge badge-sm {{ $badgeClass }}">{{ ucfirst((string) $statusSource) }}</span>
+                                        @if (!empty($order->driver_id) && !empty($order->driver_order_rank))
+                                            <p class="text-xs text-secondary mb-0 mt-1">{{ __('orders.driver_rank_short') }}: {{ $order->driver_order_rank }}</p>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         @php
@@ -126,7 +129,7 @@
                                                             </button>
                                                         </form>
                                                     @else
-                                                        <form action="{{ route('manager.orders.cancel', ['id' => $order->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('orders.confirm_cancel_order') }}')">
+                                                        <form action="{{ route('manager.orders.cancel', ['id' => $order->id]) }}" method="POST" class="d-inline" data-confirm-message="{{ __('orders.confirm_cancel_order') }}" onsubmit="return confirm(this.dataset.confirmMessage)">
                                                             @csrf
                                                             <button type="submit" class="text-danger font-weight-bold text-xs cursor-pointer border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-title="{{ __('orders.cancel_order') }}">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -174,6 +177,11 @@
                                 <option value="{{ $driver->id }}">{{ $driver->name }} - {{ $driver->phone ?? $driver->email }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="driver_order_rank" class="form-label">{{ __('orders.driver_rank') }}</label>
+                        <input type="number" min="1" step="1" name="driver_order_rank" id="driver_order_rank" class="form-control" placeholder="{{ __('orders.driver_rank_placeholder') }}">
+                        <small class="text-muted">{{ __('orders.driver_rank_help') }}</small>
                     </div>
                     <input type="hidden" name="order_id" id="modal_order_id" value="">
                 </div>
