@@ -15,12 +15,12 @@ class VehicleRepository
 
     public function getAll()
     {
-        return $this->model->with('driver')->get();
+        return $this->model->with(['driver', 'deputy'])->get();
     }
 
     public function getById($id)
     {
-        return $this->model->with('driver')->find($id);
+        return $this->model->with(['driver', 'deputy'])->find($id);
     }
 
     public function create($data)
@@ -61,6 +61,34 @@ class VehicleRepository
         }
 
         $vehicle->driver_id = null;
+        $vehicle->save();
+
+        return $vehicle;
+    }
+
+    public function assignDeputy($vehicleId, $deputyId)
+    {
+        $vehicle = $this->model->find($vehicleId);
+
+        if (!$vehicle) {
+            return null;
+        }
+
+        $vehicle->deputy_id = $deputyId;
+        $vehicle->save();
+
+        return $vehicle;
+    }
+
+    public function unassignDeputy($vehicleId)
+    {
+        $vehicle = $this->model->find($vehicleId);
+
+        if (!$vehicle) {
+            return null;
+        }
+
+        $vehicle->deputy_id = null;
         $vehicle->save();
 
         return $vehicle;

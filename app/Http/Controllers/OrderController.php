@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\OrderService;
+use App\Models\Deputy;
 use App\Models\Driver;
 use Illuminate\Http\Request;
 
@@ -32,6 +33,7 @@ class OrderController extends Controller
         $unassignedResp = $this->order_service->getUnassignedOrders();
         $assignedResp = $this->order_service->getAssignedOrders();
         $drivers  = Driver::select('id', 'name', 'phone', 'email')->get();
+        $deputies = Deputy::select('id', 'name', 'phone', 'email')->get();
 
         $unassigned = $unassignedResp['response_data'] ?? collect();
         $assigned = $assignedResp['response_data'] ?? collect();
@@ -44,6 +46,7 @@ class OrderController extends Controller
         return view('orders.manager', [
             'orders'  => $orders,
             'drivers' => $drivers,
+            'deputies' => $deputies,
         ]);
     }
 
@@ -51,15 +54,35 @@ class OrderController extends Controller
     {
         $request->validate([
             'driver_id' => 'required|exists:drivers,id',
+            'driver_order_rank' => 'nullable|integer|min:1',
         ]);
 
-        $response = $this->order_service->assignDriver($id, $request->input('driver_id'));
+        $response = $this->order_service->assignDriver(
+            $id,
+            $request->input('driver_id'),
+            $request->input('driver_order_rank')
+        );
 
         if ($response['response_code'] === 200) {
             return redirect()->route('manager.orders.get')->with('success', __('orders.driver_assigned_success'));
         }
 
         return redirect()->route('manager.orders.get')->with('error', __('orders.driver_assignment_failed'));
+    }
+
+    public function assignDeputy(Request $request, $id)
+    {
+        $request->validate([
+            'deputy_id' => 'required|exists:deputies,id',
+        ]);
+
+        $response = $this->order_service->assignDeputy($id, $request->input('deputy_id'));
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.deputies.get')->with('success', __('deputies.order_deputy_assigned_success'));
+        }
+
+        return redirect()->route('manager.deputies.get')->with('error', __('deputies.order_deputy_assignment_failed'));
     }
 
     public function cancelOrder($id)

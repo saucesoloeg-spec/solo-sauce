@@ -101,6 +101,23 @@ class SalesController extends Controller
     }
 
     /**
+     * Send a test Firebase notification to the logged-in salesman.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function testFirebaseNotification(Request $request)
+    {
+        $sales = auth('sales')->user();
+        $response = $this->sales_service->sendFirebaseTestNotification(
+            $sales,
+            $request->only(['title', 'body'])
+        );
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\sales  $sales

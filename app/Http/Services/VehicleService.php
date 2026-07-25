@@ -137,4 +137,42 @@ class VehicleService
             'response_data'    => null,
         ];
     }
+
+    public function assignDeputy($vehicleId, $deputyId)
+    {
+        $vehicle = $this->vehicle_repository->assignDeputy($vehicleId, $deputyId);
+
+        if ($vehicle) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Deputy assigned to vehicle successfully.',
+                'response_data'    => $vehicle,
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Vehicle not found.',
+            'response_data'    => null,
+        ];
+    }
+
+    public function unassignDeputy($vehicleId)
+    {
+        $vehicle = $this->vehicle_repository->unassignDeputy($vehicleId);
+
+        if ($vehicle) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Deputy unassigned from vehicle successfully.',
+                'response_data'    => $vehicle,
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Vehicle not found.',
+            'response_data'    => null,
+        ];
+    }
 }

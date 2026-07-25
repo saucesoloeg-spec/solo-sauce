@@ -57,6 +57,7 @@ class StoreOrderRequest extends FormRequest
             'tax'                   => 'required|boolean',
             'payment_method'        => 'required|string|in:cash,credit_card,bank_transfer',
             'payment_status'        => 'required|string',
+            'deputy_id'             => 'nullable|integer|exists:deputies,id',
             'delivery_status'       => 'nullable|string',
             'notes'                 => 'nullable|string',
             'products'              => 'required|array',

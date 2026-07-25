@@ -36,6 +36,8 @@ class DriverRepository
         }
 
         return $orders->with(['customer', 'products', 'sales', 'delivered'])
+            ->orderByRaw('CASE WHEN driver_order_rank IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('driver_order_rank')
             ->orderBy('delivery_date')
             ->get();
     }

@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\DeputyController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\VehicleController;
@@ -87,8 +88,12 @@ Route::middleware([AdminMiddleware::class, 'role:inventory'])->group(function ()
 Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {
     Route::get('/manager/orders', [OrderController::class, 'managerIndex'])->name('manager.orders.get');
     Route::post('/manager/orders/{id}/assign-driver', [OrderController::class, 'assignDriver'])->name('manager.orders.assign.driver');
+    Route::post('/manager/orders/{id}/assign-deputy', [OrderController::class, 'assignDeputy'])->name('manager.orders.assign.deputy');
     Route::post('/manager/orders/{id}/cancel', [OrderController::class, 'cancelOrder'])->name('manager.orders.cancel');
     Route::post('/manager/orders/{id}/reactivate', [OrderController::class, 'reactivateOrder'])->name('manager.orders.reactivate');
+
+    Route::get('/manager/deputies', [DeputyController::class, 'index'])->name('manager.deputies.get');
+    Route::post('/manager/deputies', [DeputyController::class, 'store'])->name('manager.deputies.store');
 
     Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.get');
     Route::get('/drivers/create', [DriverController::class, 'create'])->name('drivers.create');
@@ -103,6 +108,8 @@ Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {
     Route::put('/vehicles/{id}', [VehicleController::class, 'update'])->name('vehicles.update');
     Route::delete('/vehicles/{id}', [VehicleController::class, 'destroy'])->name('vehicles.delete');
     Route::post('/vehicles/{id}/assign-driver', [VehicleController::class, 'assignDriver'])->name('vehicles.assign.driver');
+    Route::post('/manager/vehicles/{id}/assign-deputy', [VehicleController::class, 'assignDeputy'])->name('manager.vehicles.assign.deputy');
+    Route::post('/manager/vehicles/{id}/unassign-deputy', [VehicleController::class, 'unassignDeputy'])->name('manager.vehicles.unassign.deputy');
     Route::post('/vehicles/{id}/unassign-driver', [VehicleController::class, 'unassignDriver'])->name('vehicles.unassign.driver');
 });
     

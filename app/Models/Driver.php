@@ -25,6 +25,7 @@ class Driver extends Authenticatable
         'phone',
         'address',
         'password',
+        'fcm_token',
     ];
 
     /**

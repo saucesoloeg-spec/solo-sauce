@@ -8,6 +8,7 @@ return [
     'customers'                               => 'Customers',
     'sales'                                   => 'Sales',
     'drivers'                                 => 'Drivers',
+    'deputies'                                => 'Deputies',
     'vehicles'                                => 'Vehicles',
     'representatives'                         => 'Representatives',
     'schedule'                                => 'Visits Schedule',

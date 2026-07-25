@@ -19,6 +19,7 @@ class StoreVehicleRequest extends FormRequest
             'color'         => 'required|string|max:50',
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate',
             'driver_id'     => 'nullable|exists:drivers,id',
+            'deputy_id'     => 'nullable|exists:deputies,id',
         ];
     }
 

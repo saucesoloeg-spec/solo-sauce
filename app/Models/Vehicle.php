@@ -16,11 +16,17 @@ class Vehicle extends Model
         'color',
         'license_plate',
         'driver_id',
+        'deputy_id',
     ];
 
     public function driver()
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    public function deputy()
+    {
+        return $this->belongsTo(Deputy::class);
     }
     
 }
