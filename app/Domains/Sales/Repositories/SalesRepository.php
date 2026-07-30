@@ -39,12 +39,12 @@ class SalesRepository
 
     public function getAll() 
     {
-        return $this->sales_customer_model->where->with('sales', 'customer')->get();    
+        return $this->sales_customer_model->with('sales', 'customer')->get();
     }
 
     public function getSchedule($id, $filters = []) 
     {
-        $query = $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', date("Y-m-d"))->whereNotIn('status', ['cancelled', 'completed'])->with(['order', 'customer']);
+        $query = $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', date("Y-m-d"))->with(['order', 'customer']); //->whereNotIn('status', ['cancelled', 'completed'])
         
         if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
             $query->whereDate('visit_at', '>=', date("Y-m-d", strtotime($filters['from'])))
