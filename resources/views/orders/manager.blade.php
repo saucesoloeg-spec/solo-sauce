@@ -96,7 +96,7 @@
                                             <div class="d-flex align-items-center" style="gap: 0.5rem;">
                                                 <span class="d-inline-flex align-items-center justify-content-center" style="width: 28px;">
                                                     @if (!$isCancelled)
-                                                        <a href="{{ route('orders.show', ['id' => $order->id]) }}" class="text-secondary font-weight-bold text-xs view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('orders.view_order') }}">
+                                                        <a href="{{ route('dashboard.orders.show', ['id' => $order->id]) }}" class="text-secondary font-weight-bold text-xs view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('orders.view_order') }}">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                                                 <circle cx="12" cy="12" r="3"></circle>

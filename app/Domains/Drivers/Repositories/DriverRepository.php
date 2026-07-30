@@ -31,6 +31,10 @@ class DriverRepository
             ->whereDate('delivery_date', '>=', $from)
             ->whereDate('delivery_date', '<=', $to);
 
+        if($to >= date('Y-m-d')) {
+            $orders->whereNotIn('delivery_status', ['cancelled', 'delivered', 'completed']);
+        }
+
         if ($status) {
             $orders->where('delivery_status', $status);
         }
