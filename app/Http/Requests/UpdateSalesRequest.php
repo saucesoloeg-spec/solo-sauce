@@ -31,6 +31,10 @@ class UpdateSalesRequest extends FormRequest
             'address' => 'nullable|string',
             'zone' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
+            'country_odoo_id' => 'required|integer',
+            'state_odoo_id' => 'required|integer',
+            'allowed_city_ids' => 'required|array|min:1',
+            'allowed_city_ids.*' => 'required|integer',
             'password' => 'nullable|string|min:8|confirmed',
         ];
     }

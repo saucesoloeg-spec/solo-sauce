@@ -61,6 +61,11 @@ class Sales extends Authenticatable
             ->withTimestamps();
     }
 
+    public function allowedCities()
+    {
+        return $this->hasMany(SalesAllowedCity::class, 'sales_id', 'id');
+    }
+
     public function appointments()
     {
         return $this->hasMany(SalesCustomer::class, 'sales_id', 'id');

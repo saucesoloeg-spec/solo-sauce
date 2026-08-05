@@ -22,15 +22,24 @@ class OdooAuthService
             'Content-Type: application/json',
             'Authorization: Bearer ' . $token,
         ));
+        $allowedCityIds = $request['allowed_city_ids'] ?? [];
+        if (empty($allowedCityIds) && isset($request['city_odoo_id'])) {
+            $allowedCityIds = [$request['city_odoo_id']];
+        }
+
+        if (empty($allowedCityIds)) {
+            $allowedCityIds = [5];
+        }
+
         curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
             'name'             => $request['name'] ?? "Solo Sauce",
             'email'            => $request['email'] ?? env('ODOO_EMAIL'),
             'password'         => env('ODOO_PASSWORD'),
             'phone'            => $request['phone'] ?? "01234567890",
             'role'             => 'salesperson',
-            'allowed_city_ids' => [
-                $request['city_odoo_id'] ?? 5
-            ], // Egypt city id in Odoo
+            'allowed_city_ids' => array_values(array_unique(array_filter($allowedCityIds, function ($cityId) {
+                return !is_null($cityId) && $cityId !== '';
+            }))),
         ]));  
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
@@ -64,8 +73,19 @@ class OdooAuthService
             'Content-Type: application/json',
             'Authorization: Bearer ' . $token,
         ));
+        $allowedCityIds = $request['allowed_city_ids'] ?? [];
+        if (empty($allowedCityIds) && isset($request['city_odoo_id'])) {
+            $allowedCityIds = [$request['city_odoo_id']];
+        }
+
+        if (empty($allowedCityIds)) {
+            $allowedCityIds = [5];
+        }
+
         curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
-            'allowed_city_ids' => [$request['city_odoo_id']] ?? 5, // Egypt city id in Odoo
+            'allowed_city_ids' => array_values(array_unique(array_filter($allowedCityIds, function ($cityId) {
+                return !is_null($cityId) && $cityId !== '';
+            }))),
         ]));
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         

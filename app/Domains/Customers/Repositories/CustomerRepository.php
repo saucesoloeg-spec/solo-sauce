@@ -17,9 +17,17 @@ class CustomerRepository
     public function getAssignedCustomers($sales_id)
     {
         return $this->customer_model->leftJoin('sales_customers', 'customers.id', '=', 'sales_customers.customer_id')
-            ->where('sales_customers.sales_id', $sales_id)
-            ->orWhere('customers.sales_id', $sales_id)
+            ->where(function ($query) use ($sales_id) {
+                $query->where('sales_customers.sales_id', $sales_id)
+                    ->orWhere('customers.sales_id', $sales_id)
+                    ->orWhereIn('customers.city_odoo_id', function ($subQuery) use ($sales_id) {
+                        $subQuery->select('city_odoo_id')
+                            ->from('sales_allowed_cities')
+                            ->where('sales_id', $sales_id);
+                    });
+            })
             ->select('customers.*')
+            ->distinct()
             ->get();
     }
 
