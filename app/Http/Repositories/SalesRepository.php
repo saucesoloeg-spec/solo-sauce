@@ -3,6 +3,7 @@
 namespace App\Http\Repositories;
 
 use App\Models\Sales;
+use App\Models\SalesAllowedCity;
 use App\Models\SalesCustomer;
 
 class SalesRepository
@@ -54,6 +55,24 @@ class SalesRepository
     public function create($data)
     {
         return $this->model->create($data);
+    }
+
+    public function syncAllowedCities($salesId, array $cityIds)
+    {
+        SalesAllowedCity::where('sales_id', $salesId)->delete();
+
+        $cityIds = array_values(array_unique(array_filter($cityIds, function ($cityId) {
+            return !is_null($cityId) && $cityId !== '';
+        })));
+
+        foreach ($cityIds as $cityId) {
+            SalesAllowedCity::create([
+                'sales_id' => $salesId,
+                'city_odoo_id' => (int) $cityId,
+            ]);
+        }
+
+        return true;
     }
 
     public function createSchedule($data) 

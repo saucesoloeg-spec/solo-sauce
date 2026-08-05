@@ -24,17 +24,18 @@ class StoreSalesRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'            => 'required|string|max:255',
-            'email'           => 'required|email|max:255|unique:sales,email',
-            'phone'           => 'required|string|max:20|unique:sales,phone',
-            'national_number' => 'nullable|string|max:14|unique:sales,national_number',
-            'address'         => 'nullable|string',
-            'zone'            => 'nullable|string|max:255',
-            'city'            => 'nullable|string|max:255',
-            'country_odoo_id' => 'required|integer',
-            'state_odoo_id'   => 'required|integer',
-            'city_odoo_id'    => 'required|integer',
-            'password'        => 'required|string|min:8|confirmed',
+            'name'               => 'required|string|max:255',
+            'email'              => 'required|email|max:255|unique:sales,email',
+            'phone'              => 'required|string|max:20|unique:sales,phone',
+            'national_number'    => 'nullable|string|max:14|unique:sales,national_number',
+            'address'            => 'nullable|string',
+            'zone'               => 'nullable|string|max:255',
+            'city'               => 'nullable|string|max:255',
+            'country_odoo_id'    => 'required|integer',
+            'state_odoo_id'      => 'required|integer',
+            'allowed_city_ids'   => 'required|array|min:1',
+            'allowed_city_ids.*' => 'required|integer',
+            'password'           => 'required|string|min:8|confirmed',
         ];
     }
 
@@ -53,6 +54,7 @@ class StoreSalesRequest extends FormRequest
             'password.required' => 'The password field is required.',
             'password.min' => 'The password must be at least 8 characters.',
             'password.confirmed' => 'The password confirmation does not match.',
+            'allowed_city_ids.required' => 'Please select at least one city for this salesman.',
         ];
     }
 }

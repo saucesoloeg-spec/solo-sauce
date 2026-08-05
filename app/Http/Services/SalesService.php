@@ -170,40 +170,42 @@ class SalesService
 
     public function createSales($data)
     {
-        // Generate UUID
+        $allowedCityIds = $data['allowed_city_ids'] ?? [];
         $data['uuid']     = \Illuminate\Support\Str::uuid();
         $data['password'] = bcrypt($data['password']);
 
-        $authResponse = $this->odoo_service->createOdooAccount($data);
+        if (!empty($allowedCityIds)) {
+            $data['city_odoo_id'] = (int) $allowedCityIds[0];
+        }
+
+        $authResponse = $this->odoo_service->createOdooAccount(array_merge($data, [
+            'allowed_city_ids' => $allowedCityIds,
+        ]));
 
         if($authResponse['success'] == true) {
             $data['odoo_id'] = $authResponse['data']['user']['id'];
             $sales  = $this->sales_repository->create($data);
 
-            // $updated = $this->odoo_service->updateOdooAccount([
-            //     'odoo_id'      => $data['odoo_id'],
-            //     'city_odoo_id' => $data['city_odoo_id']
-            // ]);
-            // dd($updated);
+            if($sales && $sales->id) {
+                $this->sales_repository->syncAllowedCities($sales->id, $allowedCityIds);
 
-            if($sales && $sales->id) {// && $updated['success'] == true
                 return [
                     'response_code'    => 201,
-                    'response_message' => $updated['error']['detail'] ?? 'Sales created successfully.',
+                    'response_message' => 'Sales created successfully.',
                     'response_data'    => $sales
                 ];
             }
 
             return [
                 'response_code'    => 400,
-                'response_message' => 'Failed to create sales in Odoo.',
+                'response_message' => 'Failed to create sales in local database.',
                 'response_data'    => null
             ];
         }
 
         return [
             'response_code'    => 400,
-            'response_message' => 'Failed to create sales.',
+            'response_message' => $authResponse['error']['detail'] ?? 'Failed to create sales.',
             'response_data'    => null
         ];
     }

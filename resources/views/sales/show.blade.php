@@ -191,17 +191,50 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="state" class="form-label">{{ __('sales.state') }}</label>
-                                <input type="text" class="form-control @error('state') is-invalid @enderror" id="state" name="state" value="{{ old('state', $sales->state) }}">
-                                @error('state')
+                                <label for="country" class="form-label">{{ __('sales.country') }}</label>
+                                <select id="country" name="country_odoo_id" class="form-select">
+                                    <option value="">Select Country</option>
+                                    @foreach($countries as $country)
+                                        <option value="{{ $country['id'] }}" {{ old('country_odoo_id', $selectedCountryId) == $country['id'] ? 'selected' : '' }}>
+                                            {{ $country['name'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('country_odoo_id')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group">
-                                <label for="city" class="form-label">{{ __('sales.city') }}</label>
-                                <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city', $sales->city) }}">
-                                @error('city')
+                                <label for="state" class="form-label">{{ __('sales.state') }}</label>
+                                <select id="state" name="state_odoo_id" class="form-select" {{ empty($states) ? 'disabled' : '' }}>
+                                    <option value="">Select State</option>
+                                    @foreach($states as $stateOption)
+                                        <option value="{{ $stateOption['id'] }}" {{ old('state_odoo_id', $selectedStateId) == $stateOption['id'] ? 'selected' : '' }}>
+                                            {{ $stateOption['name'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('state_odoo_id')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cityDropdownToggle" class="form-label">{{ __('sales.city') }}</label>
+                                <div class="dropdown">
+                                    <button type="button" id="cityDropdownToggle" class="form-select text-start d-flex justify-content-between align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" {{ empty($cities) ? 'disabled' : '' }}>
+                                        <span id="cityDropdownLabel">Select City</span>
+                                        <span class="ms-2">▼</span>
+                                    </button>
+                                    <div class="dropdown-menu p-2" style="min-width: 260px; max-height: 280px; overflow-y: auto;">
+                                        <div id="cityDropdownOptions" class="d-grid gap-2"></div>
+                                    </div>
+                                </div>
+                                <div id="selectedCitiesContainer" class="d-flex flex-wrap gap-2 mt-2"></div>
+                                <div id="selectedCitiesHiddenInputs"></div>
+                                <small class="text-muted">Choose one or more cities for this salesman.</small>
+                                @error('allowed_city_ids')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -248,4 +281,175 @@
         </div>
     </div>
 </div>
+@stop
+
+@section('JavaScript')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const country = document.getElementById('country');
+    const state = document.getElementById('state');
+    const cityDropdownToggle = document.getElementById('cityDropdownToggle');
+    const cityDropdownLabel = document.getElementById('cityDropdownLabel');
+    const cityDropdownOptions = document.getElementById('cityDropdownOptions');
+    const selectedCitiesContainer = document.getElementById('selectedCitiesContainer');
+    const selectedCitiesHiddenInputs = document.getElementById('selectedCitiesHiddenInputs');
+    const initialSelectedCityIds = @json($selectedCityIds);
+    let selectedCities = [];
+
+    const resetState = () => {
+        state.innerHTML = '<option value="">Select State</option>';
+        state.disabled = true;
+    };
+
+    const resetCityDropdown = () => {
+        cityDropdownOptions.innerHTML = '';
+        selectedCitiesContainer.innerHTML = '';
+        selectedCitiesHiddenInputs.innerHTML = '';
+        selectedCities = [];
+        cityDropdownLabel.textContent = 'Select City';
+        cityDropdownToggle.disabled = true;
+    };
+
+    const populateStateOptions = (data) => {
+        state.innerHTML = '<option value="">Select State</option>';
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name;
+            state.appendChild(option);
+        });
+        state.disabled = false;
+    };
+
+    const renderSelectedCities = () => {
+        selectedCitiesContainer.innerHTML = '';
+        selectedCitiesHiddenInputs.innerHTML = '';
+
+        if (selectedCities.length === 0) {
+            cityDropdownLabel.textContent = 'Select City';
+            return;
+        }
+
+        cityDropdownLabel.textContent = `${selectedCities.length} city${selectedCities.length > 1 ? 'ies' : 'y'} selected`;
+
+        selectedCities.forEach(city => {
+            const chip = document.createElement('span');
+            chip.className = 'badge rounded-pill bg-primary-subtle text-primary-emphasis d-inline-flex align-items-center gap-2';
+
+            const text = document.createElement('span');
+            text.textContent = city.name;
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn-close btn-close-sm';
+            button.setAttribute('aria-label', `Remove ${city.name}`);
+            button.addEventListener('click', () => {
+                selectedCities = selectedCities.filter(item => item.id !== city.id);
+                const checkbox = document.getElementById(`city-option-${city.id}`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+                renderSelectedCities();
+            });
+
+            chip.appendChild(text);
+            chip.appendChild(button);
+            selectedCitiesContainer.appendChild(chip);
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'allowed_city_ids[]';
+            hiddenInput.value = city.id;
+            selectedCitiesHiddenInputs.appendChild(hiddenInput);
+        });
+    };
+
+    const populateCityOptions = (data, preselectedIds = []) => {
+        cityDropdownOptions.innerHTML = '';
+        selectedCities = [];
+
+        if (!data.length) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'text-muted small';
+            emptyState.textContent = 'No cities available for this state.';
+            cityDropdownOptions.appendChild(emptyState);
+            cityDropdownToggle.disabled = true;
+            renderSelectedCities();
+            return;
+        }
+
+        data.forEach(item => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-check';
+
+            const checkbox = document.createElement('input');
+            checkbox.className = 'form-check-input';
+            checkbox.type = 'checkbox';
+            checkbox.value = item.id;
+            checkbox.id = `city-option-${item.id}`;
+            const isSelected = preselectedIds.includes(Number(item.id));
+            if (isSelected) {
+                checkbox.checked = true;
+                selectedCities.push({ id: Number(item.id), name: item.name });
+            }
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    if (!selectedCities.some(city => city.id === Number(item.id))) {
+                        selectedCities.push({ id: Number(item.id), name: item.name });
+                    }
+                } else {
+                    selectedCities = selectedCities.filter(city => city.id !== Number(item.id));
+                }
+                renderSelectedCities();
+            });
+
+            const label = document.createElement('label');
+            label.className = 'form-check-label w-100';
+            label.setAttribute('for', checkbox.id);
+            label.textContent = item.name;
+
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(label);
+            cityDropdownOptions.appendChild(wrapper);
+        });
+
+        cityDropdownToggle.disabled = false;
+        renderSelectedCities();
+    };
+
+    const initializeCitySelection = () => {
+        const cityData = @json($cities);
+        if (cityData && cityData.length) {
+            populateCityOptions(cityData, initialSelectedCityIds);
+        } else {
+            resetCityDropdown();
+        }
+    };
+
+    country.addEventListener('change', async () => {
+        const countryId = country.value;
+        resetState();
+        resetCityDropdown();
+
+        if (!countryId) return;
+
+        const res = await fetch(`/api/odoo/states/${countryId}`);
+        const data = await res.json();
+        populateStateOptions(data['response_data']['states']);
+    });
+
+    state.addEventListener('change', async () => {
+        const stateId = state.value;
+        resetCityDropdown();
+
+        if (!stateId) return;
+
+        const res = await fetch(`/api/odoo/cities/${stateId}`);
+        const data = await res.json();
+        populateCityOptions(data['response_data']['cities']);
+    });
+
+    initializeCitySelection();
+});
+</script>
 @stop

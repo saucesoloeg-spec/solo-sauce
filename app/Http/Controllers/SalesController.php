@@ -75,7 +75,38 @@ class SalesController extends Controller
             return redirect()->route('sales.get')->with('error', $response['response_message']);
         }
 
-        return view('sales.show', ['sales' => $response['response_data']]);
+        $sales = $response['response_data'];
+        $countries = $this->odoo_service->getCountries();
+        $countriesData = $countries['data']['countries'] ?? [];
+
+        $selectedCountryId = $sales->country_odoo_id;
+        $selectedStateId = $sales->state_odoo_id;
+        $selectedCityIds = $sales->allowedCities()->pluck('city_odoo_id')->map(function ($cityId) {
+            return (int) $cityId;
+        })->all();
+
+        $states = [];
+        $cities = [];
+
+        if ($selectedCountryId) {
+            $statesResponse = $this->odoo_service->getStates($selectedCountryId);
+            $states = $statesResponse['response_data']['states'] ?? [];
+        }
+
+        if ($selectedStateId) {
+            $citiesResponse = $this->odoo_service->getCities($selectedStateId);
+            $cities = $citiesResponse['response_data']['cities'] ?? [];
+        }
+
+        return view('sales.show', [
+            'sales' => $sales,
+            'countries' => $countriesData,
+            'states' => $states,
+            'cities' => $cities,
+            'selectedCountryId' => $selectedCountryId,
+            'selectedStateId' => $selectedStateId,
+            'selectedCityIds' => $selectedCityIds,
+        ]);
     }
 
     /**
