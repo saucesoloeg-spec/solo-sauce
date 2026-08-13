@@ -79,11 +79,9 @@ class SalesController extends Controller
         $countries = $this->odoo_service->getCountries();
         $countriesData = $countries['data']['countries'] ?? [];
 
-        $selectedCountryId = $sales->country_odoo_id;
-        $selectedStateId = $sales->state_odoo_id;
-        $selectedCityIds = $sales->allowedCities()->pluck('city_odoo_id')->map(function ($cityId) {
-            return (int) $cityId;
-        })->all();
+        $selectedCountryId = (int) old('country_odoo_id', $sales->country_odoo_id);
+        $selectedStateId = (int) old('state_odoo_id', $sales->state_odoo_id);
+        $selectedCityIds = array_map('intval', old('allowed_city_ids', $sales->allowedCities()->pluck('city_odoo_id')->all()));
 
         $states = [];
         $cities = [];
@@ -135,7 +133,7 @@ class SalesController extends Controller
             return redirect()->route('sales.show', ['id' => $id])->with('success', 'Sales updated successfully.');
         }
 
-        return redirect()->back()->with('error', $response['response_message']);
+        return redirect()->back()->withInput()->with('error', $response['response_message']);
     }
 
     /**

@@ -147,16 +147,52 @@ class SalesService
 
     public function updateSales($id, $data)
     {
+        $allowedCityIds = $data['allowed_city_ids'] ?? [];
+
+        if (!empty($allowedCityIds)) {
+            $data['city_odoo_id'] = (int) $allowedCityIds[0];
+        }
+
         // Only update password if provided
-        if(!$data['password']) {
+        if (empty($data['password'])) {
             unset($data['password']);
         } else {
             $data['password'] = bcrypt($data['password']);
         }
 
-        $updated = $this->sales_repository->update($id, $data);
+        // This field is persisted in sales_allowed_cities, not in sales table.
+        unset($data['allowed_city_ids']);
 
-        if($updated) {
+        $sales = $this->sales_repository->getById($id);
+        if (!$sales) {
+            return [
+                'response_code'    => 404,
+                'response_message' => 'Sales not found.',
+                'response_data'    => null
+            ];
+        }
+
+        if (!empty($sales->odoo_id)) {
+            try {
+                $this->odoo_service->updateOdooAccount([
+                    'odoo_id' => $sales->odoo_id,
+                    'allowed_city_ids' => $allowedCityIds,
+                    'city_odoo_id' => $data['city_odoo_id'] ?? null,
+                ]);
+            } catch (\Exception $e) {
+                return [
+                    'response_code'    => 400,
+                    'response_message' => $e->getMessage(),
+                    'response_data'    => null
+                ];
+            }
+        }
+
+        $updated = $this->sales_repository->update($id, $data);
+        $this->sales_repository->syncAllowedCities($id, $allowedCityIds);
+
+        if($updated !== false) {
+
             return [
                 'response_code'    => 200,
                 'response_message' => 'Sales updated successfully.',
