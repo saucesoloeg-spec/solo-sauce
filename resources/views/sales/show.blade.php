@@ -105,7 +105,11 @@
 
 @section('content')
 <div class="row">
-    <div id="page-data" data-company-name="{{ $sales->name }}" style="display: none;"></div>
+        <div id="page-data"
+            data-company-name="{{ $sales->name }}"
+            data-selected-city-ids='@json(array_map('intval', old('allowed_city_ids', $selectedCityIds)))'
+            data-cities='@json($cities)'
+            style="display: none;"></div>
     <div class="col-12">
         <div class="card border shadow-xs mb-4">
             <div class="card-header border-bottom pb-3">
@@ -286,6 +290,7 @@
 @section('JavaScript')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const pageData = document.getElementById('page-data');
     const country = document.getElementById('country');
     const state = document.getElementById('state');
     const cityDropdownToggle = document.getElementById('cityDropdownToggle');
@@ -293,7 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cityDropdownOptions = document.getElementById('cityDropdownOptions');
     const selectedCitiesContainer = document.getElementById('selectedCitiesContainer');
     const selectedCitiesHiddenInputs = document.getElementById('selectedCitiesHiddenInputs');
-    const initialSelectedCityIds = @json($selectedCityIds);
+    const initialSelectedCityIds = JSON.parse(pageData?.dataset?.selectedCityIds || '[]').map(Number);
+    const cityData = JSON.parse(pageData?.dataset?.cities || '[]');
     let selectedCities = [];
 
     const resetState = () => {
@@ -418,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const initializeCitySelection = () => {
-        const cityData = @json($cities);
         if (cityData && cityData.length) {
             populateCityOptions(cityData, initialSelectedCityIds);
         } else {
