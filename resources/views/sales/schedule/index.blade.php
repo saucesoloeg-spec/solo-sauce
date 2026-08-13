@@ -284,66 +284,6 @@
                                 </td>
                             </tr>
                             @endforelse
-                            <tr data-schedule-id="{{ $schedule->id }}" id="row-{{$schedule->id}}">
-                                <td>
-                                    <div class="d-flex px-2 py-1">
-                                        <div class="d-flex align-items-center">
-                                            <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
-                                        </div>
-                                        <div class="d-flex flex-column justify-content-center ms-1">
-                                            <h6 class="mb-0 text-sm font-weight-semibold" data-sales-id="{{ $schedule->sales->id }}">{{ $schedule->sales->name }}</h6>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $schedule->customer->name }}</p>
-                                </td>
-                                <td class="text-center" data-date="{{ date('Y-m-d', strtotime($schedule->visit_at)) }}">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $schedule->visit_at ? \Carbon\Carbon::parse($schedule->visit_at)->format('Y-m-d') : 'Not Set' }}</p>
-                                </td>
-                                <td class="align-middle text-center text-sm">
-                                    @if($schedule->status == 'pending')
-                                    <span class="badge badge-sm border border-secondary text-secondary bg-secondary reservation">
-                                        {{ __('visits.pending') }}
-                                    </span>
-                                    @elseif($schedule->status == 'completed')
-                                    <span class="badge badge-sm border border-success text-success bg-success reservation">
-                                        {{ __('visits.delivered') }}
-                                    </span>
-                                    @elseif($schedule->status == 'canceled')
-                                    <span class="badge badge-sm border border-danger text-danger bg-danger reservation">
-                                        {{ __('visits.canceled') }}
-                                    </span>
-                                    @endif
-                                </td>
-                                <td class="align-middle text-center">
-                                    <span class="text-secondary text-sm font-weight-normal">{{ $schedule->created_at->format('Y-m-d') }}</span>
-                                </td>
-                                <td class="align-middle">
-                                    @if($schedule->status == 'pending')
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 edit cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('visits.edit_visit_date') }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 3L3 11.207V13h1.793L13 4.793 11.207 3zM14 4.5 11.5 2 12.5 1 15 3.5 14 4.5z"/>
-                                        </svg>
-                                    </a>
-                                    @else
-                                    <span class="text-secondary font-weight-bold text-xs m-2" style="visibility: hidden;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 3L3 11.207V13h1.793L13 4.793 11.207 3zM14 4.5 11.5 2 12.5 1 15 3.5 14 4.5z"/>
-                                        </svg>
-                                    </span>
-                                    @endif
-                                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs m-2 delete cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('visits.delete_schedule') }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                            <line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
-                                        </svg>
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                            @endif
                         </tbody>
                     </table>
                 </div>
