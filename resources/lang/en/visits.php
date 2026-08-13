@@ -35,6 +35,8 @@ return [
     'previous'                   => 'Previous',
     'next'                       => 'Next',
     'search_by_salesman'         => 'Search by Sales Representative',
+    'no_schedules_found'         => 'No schedules found',
+    'no_schedules_found_description' => 'There are no schedules to display at the moment.',
     'add_schedule_description'   => 'Fill in the information below to create a new sales representative visit schedule',
     'basic_information'          => 'Basic Information',
     'back_to_schedules'          => 'Back to Schedules',

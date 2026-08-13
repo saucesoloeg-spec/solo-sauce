@@ -22,8 +22,9 @@ class CustomerController extends Controller
     public function index()
     {
         $response = $this->customer_service->getAll();
+        $customers = $response['response_data'] ?? [];
 
-        return view('customers.index', ['customers' => $response['response_data']]);
+        return view('customers.index', ['customers' => $customers]);
     }
 
     /**

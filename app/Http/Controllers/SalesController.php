@@ -169,8 +169,12 @@ class SalesController extends Controller
     public function schedule()
     {
         $response = $this->sales_service->getSchedule();
+        $responseData = $response['response_data'] ?? ['schedules' => [], 'sales' => []];
 
-        return view('sales.schedule.index', ['schedules' => $response['response_data']['schedules'], 'sales' => $response['response_data']['sales']]);
+        return view('sales.schedule.index', [
+            'schedules' => $responseData['schedules'] ?? [],
+            'sales' => $responseData['sales'] ?? []
+        ]);
     }
 
     /**
@@ -180,11 +184,12 @@ class SalesController extends Controller
      */
     public function createSchedule()
     {
-        $response  = $this->sales_service->getScheduleInfo();
-        
+        $response = $this->sales_service->getScheduleInfo();
+        $responseData = $response['response_data'] ?? ['sales' => [], 'customers' => []];
+
         return view('sales.schedule.create', [
-            'sales'     => $response['response_data']['sales'],
-            'customers' => $response['response_data']['customers']
+            'sales'     => $responseData['sales'] ?? [],
+            'customers' => $responseData['customers'] ?? []
         ]);
     }
 

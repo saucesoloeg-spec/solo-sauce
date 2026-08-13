@@ -20,6 +20,7 @@ return [
     'phone'                       => 'Phone No.',
     'registered_at'               => 'Registered At',
     'search_by_name'              => 'Search by name',
+    'no_sales_found'              => 'No sales representatives found.',
     'page'                        => 'Page',
     'of'                          => 'of',
     'create_sales_representative' => 'Create New Sale Representative',

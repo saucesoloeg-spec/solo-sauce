@@ -24,8 +24,9 @@ class OrderController extends Controller
     public function index()
     {
         $response = $this->order_service->getAll();
+        $orders = $response['response_data'] ?? [];
 
-        return view('orders.index', ['orders' => $response['response_data']]);
+        return view('orders.index', ['orders' => $orders]);
     }
 
     public function managerIndex()

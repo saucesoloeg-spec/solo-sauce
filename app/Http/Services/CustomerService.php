@@ -15,9 +15,9 @@ class CustomerService
 
     public function getAll() 
     {
-        $customers = $this->customer_repository->getAll();  
-        
-        if($customers->isNotEmpty()) {
+        $customers = $this->customer_repository->getAll();
+
+        if($customers && $customers->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Customers retrieved successfully.',
@@ -28,7 +28,7 @@ class CustomerService
         return [
             'response_code'    => 404,
             'response_message' => 'No customers found.',
-            'response_data'    => null
+            'response_data'    => []
         ];
     }
 

@@ -141,7 +141,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($customers as $key => $customer)
+                            @forelse($customers ?? [] as $key => $customer)
                             <tr data-status="{{ $customer->sales_id ? 'verified' : 'pending' }}" data-customer-id="{{ $customer->id }}" id="row-{{$customer->id}}">
                                 <td>
                                     <div class="d-flex px-2 py-1">
@@ -208,7 +208,13 @@
                                     </a>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-secondary">
+                                    {{ __('customers.no_customers_found') ?? 'No customers found.' }}
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
