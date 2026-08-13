@@ -18,6 +18,7 @@ return [
     'city'                        => 'المدينة',
     'registered_at'               => 'مسجل في',
     'search_by_name'              => 'البحث بالاسم',
+    'no_customers_found'          => 'لا يوجد عملاء.',
     'customer_details'            => 'تفاصيل العميل',
     'name'                        => 'الاسم',
     'email'                       => 'البريد الإلكتروني',

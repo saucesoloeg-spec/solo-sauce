@@ -179,7 +179,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($orders as $key => $order)
+                            @forelse($orders ?? [] as $key => $order)
                             <tr data-status="{{ $order->state }}" data-order-id="{{ $order->id }}" id="row-{{$order->id}}">
                                 <td class="text-center">
                                     <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->code }}</p>
@@ -270,7 +270,13 @@
                                     </a>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="10" class="text-center py-4 text-secondary">
+                                    {{ __('orders.no_orders_found') }}
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

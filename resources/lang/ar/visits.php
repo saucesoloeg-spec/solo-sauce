@@ -35,6 +35,8 @@ return [
     'previous'                   => 'السابق',
     'next'                       => 'التالي',
     'search_by_salesman'         => 'البحث بالمندوب',
+    'no_schedules_found'         => 'لا توجد جداول زيارات',
+    'no_schedules_found_description' => 'لا توجد جداول للعرض في الوقت الحالي.',
     'add_schedule_description'   => 'املأ المعلومات أدناه لإنشاء جدول زيارة جديد للمندوب',
     'basic_information'          => 'المعلومات الأساسية',
     'back_to_schedules'          => 'العودة إلى الجداول',

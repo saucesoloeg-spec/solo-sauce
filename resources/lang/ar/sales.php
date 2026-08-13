@@ -20,6 +20,7 @@ return [
     'phone'                       => 'رقم الهاتف',
     'registered_at'               => 'مُسجل في',
     'search_by_name'              => 'البحث بالاسم',
+    'no_sales_found'              => 'لا يوجد مندوبين.',
     'page'                        => 'صفحة',
     'of'                          => 'من',
     'create_sales_representative' => 'إنشاء مندوب جديد',

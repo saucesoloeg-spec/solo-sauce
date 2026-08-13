@@ -47,8 +47,8 @@ class SalesService
     {
         $schedules = $this->sales_repository->getSchedule();
         $all_sales = $this->sales_repository->getAll();
-        
-        if($schedules->isNotEmpty()) {
+
+        if($schedules && $schedules->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Schedule retrieved successfully.',
@@ -62,7 +62,10 @@ class SalesService
         return [
             'response_code'    => 404,
             'response_message' => 'No schedule found.',
-            'response_data'    => null
+            'response_data'    => [
+                'schedules' => [],
+                'sales'     => $all_sales ?? []
+            ]
         ];
     }
 

@@ -15,9 +15,9 @@ class OrderService
 
     public function getAll() 
     {
-        $orders = $this->order_repository->getAll();  
-        
-        if($orders->isNotEmpty()) {
+        $orders = $this->order_repository->getAll();
+
+        if($orders && $orders->isNotEmpty()) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Orders retrieved successfully.',
@@ -28,7 +28,7 @@ class OrderService
         return [
             'response_code'    => 404,
             'response_message' => 'No orders found.',
-            'response_data'    => null
+            'response_data'    => []
         ];
     }
 

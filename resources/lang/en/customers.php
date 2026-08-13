@@ -18,6 +18,7 @@ return [
     'city'                        => 'City',
     'registered_at'               => 'Registered At',
     'search_by_name'              => 'Search by Name',
+    'no_customers_found'          => 'No customers found.',
     'customer_details'            => 'Customer Details',
     'name'                        => 'Name',
     'email'                       => 'Email',
