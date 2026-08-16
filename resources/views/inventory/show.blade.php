@@ -10,7 +10,7 @@
                         <h6 class="font-weight-semibold text-lg mb-0">{{ __('dashboard.vehicle_inventory_details') }}</h6>
                         <p class="text-sm mb-0">{{ __('dashboard.todays_delivery_workload') }}</p>
                     </div>
-                    <a href="{{ route('inventory.index') }}" class="btn btn-sm btn-outline-secondary">{{ __('dashboard.back') }}</a>
+                    <a href="{{ route('inventory.index', ['from' => $from ?? null, 'to' => $to ?? null]) }}" class="btn btn-sm btn-outline-secondary">{{ __('dashboard.back') }}</a>
                 </div>
             </div>
             <div class="card-body p-4">

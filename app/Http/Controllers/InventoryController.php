@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domains\Odoo\Services\OdooAuthService;
 use App\Models\Vehicle;
+use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
@@ -15,39 +16,75 @@ class InventoryController extends Controller
         $this->odooAuthService = $odooAuthService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
         $today = today()->toDateString();
+        $from = $request->input('from');
+        $to = $request->input('to');
+
+        if (!$from && !$to) {
+            $from = $today;
+            $to = $today;
+        } elseif ($from && !$to) {
+            $to = $from;
+        } elseif (!$from && $to) {
+            $from = $to;
+        }
 
         $vehicles = Vehicle::query()
             ->with([
                 'driver' => function ($query) {
                     $query->withTrashed();
                 },
-                'driver.orders' => function ($query) use ($today) {
-                    $query->whereDate('delivery_date', $today)
+                'driver.orders' => function ($query) use ($from, $to) {
+                    $query->whereDate('delivery_date', '>=', $from)
+                        ->whereDate('delivery_date', '<=', $to)
                         ->with(['customer', 'products']);
                 },
             ])
             ->whereNotNull('driver_id')
             ->whereHas('driver')
-            ->whereHas('driver.orders', function ($query) use ($today) {
-                $query->whereDate('delivery_date', $today);
+            ->whereHas('driver.orders', function ($query) use ($from, $to) {
+                $query->whereDate('delivery_date', '>=', $from)
+                    ->whereDate('delivery_date', '<=', $to);
             })
             ->get();
 
-        return view('inventory.index', compact('vehicles'));
+        return view('inventory.index', compact('vehicles', 'from', 'to'));
     }
 
-    public function show(Vehicle $vehicle)
+    public function show(Request $request, Vehicle $vehicle)
     {
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
         $today = today()->toDateString();
+        $from = $request->input('from');
+        $to = $request->input('to');
+
+        if (!$from && !$to) {
+            $from = $today;
+            $to = $today;
+        } elseif ($from && !$to) {
+            $to = $from;
+        } elseif (!$from && $to) {
+            $from = $to;
+        }
+
         $vehicle->load([
             'driver' => function ($query) {
                 $query->withTrashed();
             },
-            'driver.orders' => function ($query) use ($today) {
-                $query->whereDate('delivery_date', $today)
+            'driver.orders' => function ($query) use ($from, $to) {
+                $query->whereDate('delivery_date', '>=', $from)
+                    ->whereDate('delivery_date', '<=', $to)
                     ->with(['customer', 'products']);
             },
         ]);
@@ -57,7 +94,7 @@ class InventoryController extends Controller
             : collect();
         $aggregatedProducts = $this->summarizeProductsForOrders($todayOrders);
 
-        return view('inventory.show', compact('vehicle', 'todayOrders', 'aggregatedProducts'));
+        return view('inventory.show', compact('vehicle', 'todayOrders', 'aggregatedProducts', 'from', 'to'));
     }
 
     public function summarizeProductsForOrders($orders): array
