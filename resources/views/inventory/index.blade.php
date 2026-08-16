@@ -13,6 +13,21 @@
                 </div>
             </div>
             <div class="card-body p-4">
+                <form method="GET" action="{{ route('inventory.index') }}" class="row g-3 align-items-end mb-4">
+                    <div class="col-md-4">
+                        <label for="from" class="form-label text-sm">From</label>
+                        <input type="date" id="from" name="from" class="form-control" value="{{ $from }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="to" class="form-label text-sm">To</label>
+                        <input type="date" id="to" name="to" class="form-control" value="{{ $to }}">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary mb-0">Filter</button>
+                        <a href="{{ route('inventory.index') }}" class="btn btn-outline-secondary mb-0">Reset</a>
+                    </div>
+                </form>
+
                 <div class="table-responsive">
                     <table class="table align-items-center mb-0">
                         <thead class="bg-gray-100">
@@ -32,7 +47,7 @@
                                     <td>{{ $vehicle->license_plate }}</td>
                                     <td>{{ $vehicle->driver?->orders->count() ?? 0 }}</td>
                                     <td>
-                                        <a href="{{ route('inventory.vehicles.show', $vehicle->id) }}" class="btn btn-sm btn-outline-primary">{{ __('dashboard.view') }}</a>
+                                        <a href="{{ route('inventory.vehicles.show', ['vehicle' => $vehicle->id, 'from' => $from, 'to' => $to]) }}" class="btn btn-sm btn-outline-primary">{{ __('dashboard.view') }}</a>
                                     </td>
                                 </tr>
                             @empty
