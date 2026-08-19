@@ -173,7 +173,7 @@
                         <h6 class="font-weight-semibold text-lg mb-0">{{ __('orders.order_details') }}</h6>
                         <p class="text-sm mb-0">{{ __('orders.order') }}: {{$order->code}} {{ __('orders.description') }}</p>
                     </div>
-                    <a href="{{ route('orders.get') }}" class="btn btn-back mt-3 mt-sm-0">{{ __('orders.back_to_orders') }}</a>
+                    <a href="{{ route((Auth::guard('admin')->user()->role ?? null) === 'manager' ? 'manager.orders.get' : 'orders.get') }}" class="btn btn-back mt-3 mt-sm-0">{{ __('orders.back_to_orders') }}</a>
                 </div>
             </div>
 
