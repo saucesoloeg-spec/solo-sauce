@@ -34,6 +34,21 @@
                     </div>
                 </div>
 
+                <form method="GET" action="{{ route('inventory.vehicles.show', ['vehicle' => $vehicle->id]) }}" class="row g-3 align-items-end mb-4">
+                    <div class="col-md-4">
+                        <label for="from" class="form-label text-sm">From</label>
+                        <input type="date" id="from" name="from" class="form-control" value="{{ $from }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="to" class="form-label text-sm">To</label>
+                        <input type="date" id="to" name="to" class="form-control" value="{{ $to }}">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary mb-0">Filter</button>
+                        <a href="{{ route('inventory.vehicles.show', ['vehicle' => $vehicle->id]) }}" class="btn btn-outline-secondary mb-0">Reset</a>
+                    </div>
+                </form>
+
                 <h6 class="font-weight-semibold text-md mb-3">{{ __('dashboard.today_orders') }}</h6>
                 <div class="table-responsive mb-5">
                     <table class="table align-items-center mb-0">
@@ -43,6 +58,8 @@
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.customer') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.delivery_status') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.products') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.prepared') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -52,15 +69,31 @@
                                     <td>{{ $order->customer?->name ?? $order->customer_name }}</td>
                                     <td>{{ ucfirst($order->delivery_status ?? 'pending') }}</td>
                                     <td>{{ $order->products->sum('quantity') }}</td>
+                                    <td>
+                                        @if($order->is_prepared)
+                                            <span class="badge bg-gradient-success">{{ __('dashboard.prepared') }}</span>
+                                        @else
+                                            <span class="badge bg-gradient-secondary">{{ __('dashboard.not_prepared') }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @unless($order->is_prepared)
+                                            <form method="POST" action="{{ route('inventory.orders.mark-prepared', ['order' => $order->id]) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success">{{ __('dashboard.mark_prepared') }}</button>
+                                            </form>
+                                        @endunless
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-4">{{ __('dashboard.no_sameday_orders') }}</td>
+                                    <td colspan="6" class="text-center py-4">{{ __('dashboard.no_sameday_orders') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+
 
                 <h6 class="font-weight-semibold text-md mb-3">{{ __('dashboard.aggregated_products') }}</h6>
                 <div class="table-responsive">
