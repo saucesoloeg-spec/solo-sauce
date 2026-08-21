@@ -83,6 +83,7 @@ Route::middleware([AdminMiddleware::class])->group(function () {
 Route::middleware([AdminMiddleware::class, 'role:inventory'])->group(function () {
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('/inventory/vehicles/{vehicle}', [InventoryController::class, 'show'])->name('inventory.vehicles.show');
+    Route::post('/inventory/orders/{order}/mark-prepared', [InventoryController::class, 'markPrepared'])->name('inventory.orders.mark-prepared');
 });
 
 Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {

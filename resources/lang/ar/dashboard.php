@@ -79,5 +79,9 @@ return [
     'action'                                  => 'الإجراء',
     'view'                                    => 'عرض',
     'no_vehicles_found'                       => 'لم يتم العثور على مركبات بتوصيلات في نفس اليوم.',
+    'prepared'                                => 'تم التجهيز',
+    'not_prepared'                            => 'لم يتم التجهيز',
+    'mark_prepared'                           => 'وضع علامة تم التجهيز',
+    'order_marked_prepared'                   => 'تم تحديد الطلب كمجهز.',
 
 ];

@@ -27,8 +27,13 @@ class Order extends Model
         'driver_order_rank',
         'deputy_id',
         'delivery_status',
+        'is_prepared',
         'notes',
         'delivery_notes',
+    ];
+
+    protected $casts = [
+        'is_prepared' => 'boolean',
     ];
 
     protected $appends = ['order_type'];

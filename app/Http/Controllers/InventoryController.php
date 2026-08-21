@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domains\Odoo\Services\OdooAuthService;
+use App\Models\Order;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 
@@ -92,9 +93,18 @@ class InventoryController extends Controller
         $todayOrders = $vehicle->driver && $vehicle->driver->relationLoaded('orders')
             ? $vehicle->driver->orders
             : collect();
-        $aggregatedProducts = $this->summarizeProductsForOrders($todayOrders);
+        $unpreparedOrders = $todayOrders->reject(fn ($order) => (bool) $order->is_prepared);
+        $aggregatedProducts = $this->summarizeProductsForOrders($unpreparedOrders);
 
         return view('inventory.show', compact('vehicle', 'todayOrders', 'aggregatedProducts', 'from', 'to'));
+    }
+
+    public function markPrepared(Request $request, Order $order)
+    {
+        $order->is_prepared = true;
+        $order->save();
+
+        return redirect()->back()->with('success', __('dashboard.order_marked_prepared'));
     }
 
     public function summarizeProductsForOrders($orders): array

@@ -78,6 +78,10 @@ return [
     'action'                                  => 'Action',
     'view'                                    => 'View',
     'no_vehicles_found'                       => 'No vehicles with same-day deliveries found.',
+    'prepared'                                => 'Prepared',
+    'not_prepared'                            => 'Not Prepared',
+    'mark_prepared'                           => 'Mark Prepared',
+    'order_marked_prepared'                   => 'Order marked as prepared.',
 
 ];
 
