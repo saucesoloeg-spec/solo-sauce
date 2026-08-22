@@ -112,6 +112,13 @@
             </div>
 
             <div class="card-body p-4">
+                <!-- Error Message -->
+                @if(session('error'))
+                    <div class="alert alert-error">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <!-- Error Messages -->
                 @if($errors->any())
                     <div class="alert alert-error">
