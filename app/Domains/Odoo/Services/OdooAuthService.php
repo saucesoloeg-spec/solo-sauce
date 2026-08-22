@@ -46,8 +46,15 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to create Odoo account: ' . $result['error']['detail']);
-            }            
+                \Log::error('Failed to create Odoo account: ' . $result['error']['detail']['message']);
+
+                return [
+                    'success' => false,
+                    'error'   => [
+                        'detail' => $result['error']['detail']['message'],
+                    ],
+                ];
+            }
 
             $this->odoo_auth_repository->create([
                 'email'         => $request['email'] ?? env('ODOO_EMAIL'),
@@ -56,12 +63,16 @@ class OdooAuthService
             return $result;
         } catch (\Throwable $th) {
             \Log::error('Failed to create Odoo account: ' . $th->getMessage());
-            throw new \Exception('Failed to create Odoo account: ' . $th->getMessage());
-        }
 
-        curl_close($response);
-        
-        return $result;
+            return [
+                'success' => false,
+                'error'   => [
+                    'detail' => $th->getMessage(),
+                ],
+            ];
+        } finally {
+            curl_close($response);
+        }
     }
 
     public function updateOdooAccount($request = [])
@@ -92,7 +103,12 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                throw new \Exception('Failed to update Odoo account: ' . $result['error']['detail']);
+                return [
+                    'success' => false,
+                    'error'   => [
+                        'detail' => $result['error']['detail'],
+                    ],
+                ];
             }
             
             return $result;
