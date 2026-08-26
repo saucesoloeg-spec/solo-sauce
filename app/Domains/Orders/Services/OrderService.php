@@ -19,13 +19,14 @@ class OrderService
     public function saveOrder($data)
     {
         $payload = [
-            'customer_id'      => (int)$data['customer_id'], // cast it as integer
-            'date_order'       => date('Y-m-d H:i:s'), // current date and time
-            'amount_total'     => (float)$data['amount_total'], // cast it as
-            'notes'            => $data['notes'] ?? '', // default to empty string if not provided
-            'payment_method'   => $data['payment_method'],
-            'delivery_date'    => (string)$data['delivery_date'],
-            'order_lines'      => $data['products'] ?? [],
+            'customer_id'    => (int)$data['customer_id'], // cast it as integer
+            'date_order'     => date('Y-m-d H:i:s'), // current date and time
+            'amount_total'   => (float)$data['amount_total'], // cast it as
+            'notes'          => $data['notes'] ?? '', // default to empty string if not provided
+            'payment_method' => $data['payment_method'],
+            'delivery_date'  => (string)$data['delivery_date'],
+            'is_taxed'       => (bool)($data['tax'] ?? false), // cast it as boolean
+            'order_lines'    => $data['products'] ?? [],
         ];
 
         $send_order = $this->odoo_service->sendOrderToOdoo($payload);
