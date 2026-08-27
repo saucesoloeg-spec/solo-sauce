@@ -71,6 +71,17 @@ class OrderController extends Controller
         return redirect()->route('manager.orders.get')->with('error', __('orders.driver_assignment_failed'));
     }
 
+    public function unassignDriver($id)
+    {
+        $response = $this->order_service->unassignDriver($id);
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.orders.get')->with('success', __('orders.driver_unassigned_success'));
+        }
+
+        return redirect()->route('manager.orders.get')->with('error', __('orders.driver_unassignment_failed'));
+    }
+
     public function assignDeputy(Request $request, $id)
     {
         $request->validate([
@@ -78,12 +89,26 @@ class OrderController extends Controller
         ]);
 
         $response = $this->order_service->assignDeputy($id, $request->input('deputy_id'));
+        $redirectRoute = $request->input('redirect_to') === 'orders'
+            ? 'manager.orders.get'
+            : 'manager.deputies.get';
 
         if ($response['response_code'] === 200) {
-            return redirect()->route('manager.deputies.get')->with('success', __('deputies.order_deputy_assigned_success'));
+            return redirect()->route($redirectRoute)->with('success', __('deputies.order_deputy_assigned_success'));
         }
 
-        return redirect()->route('manager.deputies.get')->with('error', __('deputies.order_deputy_assignment_failed'));
+        return redirect()->route($redirectRoute)->with('error', __('deputies.order_deputy_assignment_failed'));
+    }
+
+    public function unassignDeputy($id)
+    {
+        $response = $this->order_service->unassignDeputy($id);
+
+        if ($response['response_code'] === 200) {
+            return redirect()->route('manager.orders.get')->with('success', __('deputies.order_deputy_unassigned_success'));
+        }
+
+        return redirect()->route('manager.orders.get')->with('error', __('deputies.order_deputy_unassignment_failed'));
     }
 
     public function cancelOrder($id)

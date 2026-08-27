@@ -116,6 +116,32 @@ class OrderRepository
         return $order;
     }
 
+    public function unassignDriver($orderId)
+    {
+        $order = $this->model->find($orderId);
+
+        if (!$order) {
+            return null;
+        }
+
+        DB::transaction(function () use ($order) {
+            if ($order->driver_id !== null && $order->driver_order_rank !== null) {
+                $this->model
+                    ->where('driver_id', $order->driver_id)
+                    ->where('id', '!=', $order->id)
+                    ->where('driver_order_rank', '>', $order->driver_order_rank)
+                    ->decrement('driver_order_rank');
+            }
+
+            $order->driver_id = null;
+            $order->driver_order_rank = null;
+            $order->delivery_status = 'Pending';
+            $order->save();
+        });
+
+        return $order;
+    }
+
     public function assignDeputy($orderId, $deputyId)
     {
         $order = $this->model->find($orderId);
@@ -136,6 +162,20 @@ class OrderRepository
         } catch (\Exception $exception) {
             // Keep the assignment successful even if the history record fails.
         }
+
+        return $order;
+    }
+
+    public function unassignDeputy($orderId)
+    {
+        $order = $this->model->find($orderId);
+
+        if (!$order) {
+            return null;
+        }
+
+        $order->deputy_id = null;
+        $order->save();
 
         return $order;
     }
