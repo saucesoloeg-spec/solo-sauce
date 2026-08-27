@@ -108,6 +108,17 @@ class OrderService
         ];
     }
 
+    public function unassignDriver($orderId)
+    {
+        $order = $this->order_repository->unassignDriver($orderId);
+
+        return [
+            'response_code'    => $order ? 200 : 404,
+            'response_message' => $order ? 'Driver unassigned successfully.' : 'Order not found or could not be updated.',
+            'response_data'    => $order,
+        ];
+    }
+
     public function assignDeputy($orderId, $deputyId)
     {
         $order = $this->order_repository->assignDeputy($orderId, $deputyId);
@@ -124,6 +135,17 @@ class OrderService
             'response_code'    => 404,
             'response_message' => 'Order not found or could not be updated.',
             'response_data'    => null
+        ];
+    }
+
+    public function unassignDeputy($orderId)
+    {
+        $order = $this->order_repository->unassignDeputy($orderId);
+
+        return [
+            'response_code'    => $order ? 200 : 404,
+            'response_message' => $order ? 'Deputy unassigned successfully.' : 'Order not found or could not be updated.',
+            'response_data'    => $order,
         ];
     }
 

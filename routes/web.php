@@ -89,7 +89,9 @@ Route::middleware([AdminMiddleware::class, 'role:inventory'])->group(function ()
 Route::middleware([AdminMiddleware::class, 'role:manager'])->group(function () {
     Route::get('/manager/orders', [OrderController::class, 'managerIndex'])->name('manager.orders.get');
     Route::post('/manager/orders/{id}/assign-driver', [OrderController::class, 'assignDriver'])->name('manager.orders.assign.driver');
+    Route::post('/manager/orders/{id}/unassign-driver', [OrderController::class, 'unassignDriver'])->name('manager.orders.unassign.driver');
     Route::post('/manager/orders/{id}/assign-deputy', [OrderController::class, 'assignDeputy'])->name('manager.orders.assign.deputy');
+    Route::post('/manager/orders/{id}/unassign-deputy', [OrderController::class, 'unassignDeputy'])->name('manager.orders.unassign.deputy');
     Route::post('/manager/orders/{id}/cancel', [OrderController::class, 'cancelOrder'])->name('manager.orders.cancel');
     Route::post('/manager/orders/{id}/reactivate', [OrderController::class, 'reactivateOrder'])->name('manager.orders.reactivate');
 

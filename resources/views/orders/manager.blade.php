@@ -34,6 +34,8 @@
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.total_amount') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.delivery_date') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.order_status') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.driver') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.deputy') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2 text-center">{{ __('orders.notes') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.actions') }}</th>
                             </tr>
@@ -84,6 +86,12 @@
                                             <p class="text-xs text-secondary mb-0 mt-1">{{ __('orders.driver_rank_short') }}: {{ $order->driver_order_rank }}</p>
                                         @endif
                                     </td>
+                                    <td>
+                                        <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->driver->name ?? '-' }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->deputy->name ?? '-' }}</p>
+                                    </td>
                                     <td class="text-center">
                                         @php
                                             $wrappedNotes = $order->notes
@@ -115,6 +123,37 @@
                                                                 <circle cx="18.5" cy="18.5" r="2.5"></circle>
                                                             </svg>
                                                         </button>
+                                                    @elseif (!$isCancelled)
+                                                        <form action="{{ route('manager.orders.unassign.driver', ['id' => $order->id]) }}" method="POST" class="d-inline" data-confirm-message="{{ __('orders.confirm_unassign_driver') }}" onsubmit="return confirm(this.dataset.confirmMessage)">
+                                                            @csrf
+                                                            <button type="submit" class="text-danger font-weight-bold text-xs cursor-pointer border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-title="{{ __('orders.unassign_driver') }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M6 6l12 12"></path>
+                                                                    <path d="M18 6l-12 12"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </span>
+
+                                                <span class="d-inline-flex align-items-center justify-content-center" style="width: 28px;">
+                                                    @if (!$isCancelled && empty($order->deputy_id))
+                                                        <button type="button" class="text-secondary font-weight-bold text-xs assign-deputy-button cursor-pointer border-0 bg-transparent p-0" data-order-id="{{ $order->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('deputies.assign_deputy') }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                                                                <circle cx="12" cy="7" r="4"></circle>
+                                                            </svg>
+                                                        </button>
+                                                    @elseif (!$isCancelled)
+                                                        <form action="{{ route('manager.orders.unassign.deputy', ['id' => $order->id]) }}" method="POST" class="d-inline" data-confirm-message="{{ __('deputies.confirm_unassign_order') }}" onsubmit="return confirm(this.dataset.confirmMessage)">
+                                                            @csrf
+                                                            <button type="submit" class="text-danger font-weight-bold text-xs cursor-pointer border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-title="{{ __('deputies.unassign_deputy') }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M6 6l12 12"></path>
+                                                                    <path d="M18 6l-12 12"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </form>
                                                     @endif
                                                 </span>
 
@@ -148,7 +187,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                        <td colspan="7" class="text-center py-4">{{ __('orders.no_unassigned_orders') }}</td>
+                                    <td colspan="9" class="text-center py-4">{{ __('orders.no_unassigned_orders') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -193,15 +232,50 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="assignDeputyModal" tabindex="-1" aria-labelledby="assignDeputyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignDeputyModalLabel">{{ __('deputies.assign_order_deputy') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="assign-deputy-form" method="POST" data-base-action="{{ route('manager.orders.assign.deputy', ['id' => 0]) }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="deputy_id" class="form-label">{{ __('deputies.select_deputy') }}</label>
+                        <select name="deputy_id" id="deputy_id" class="form-select" required>
+                            <option value="">{{ __('deputies.select_deputy') }}</option>
+                            @foreach($deputies as $deputy)
+                                <option value="{{ $deputy->id }}">{{ $deputy->name }} - {{ $deputy->phone ?? $deputy->email }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <input type="hidden" name="order_id" id="deputy_modal_order_id" value="">
+                    <input type="hidden" name="redirect_to" value="orders">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('deputies.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('deputies.confirm') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @stop
 
 @section('JavaScript')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const assignButtons = document.querySelectorAll('.assign-driver-button');
+        const assignDeputyButtons = document.querySelectorAll('.assign-deputy-button');
         const assignForm = document.getElementById('assign-driver-form');
+        const assignDeputyForm = document.getElementById('assign-deputy-form');
         const modalOrderId = document.getElementById('modal_order_id');
+        const deputyModalOrderId = document.getElementById('deputy_modal_order_id');
         const assignModal = new bootstrap.Modal(document.getElementById('assignDriverModal'));
+        const assignDeputyModal = new bootstrap.Modal(document.getElementById('assignDeputyModal'));
 
         assignButtons.forEach(button => {
             button.addEventListener('click', function () {
@@ -210,6 +284,16 @@
                 assignForm.action = baseAction.replace('/0/', `/${orderId}/`);
                 modalOrderId.value = orderId;
                 assignModal.show();
+            });
+        });
+
+        assignDeputyButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const orderId = this.dataset.orderId;
+                const baseAction = assignDeputyForm.dataset.baseAction;
+                assignDeputyForm.action = baseAction.replace('/0/', `/${orderId}/`);
+                deputyModalOrderId.value = orderId;
+                assignDeputyModal.show();
             });
         });
     });
