@@ -19,10 +19,13 @@ class SalesRepository
 
     public function getAllSales($city_id = null) 
     {
-        if($city_id)
-            return $this->model->where('city_odoo_id', $city_id)->get();
+        $query = $this->model->query();
 
-        return collect();    
+        if ($city_id) {
+            $query->where('city_odoo_id', $city_id);
+        }
+
+        return $query->get();
     }
 
     public function getAllBySalesId($id, $filters = []) 
