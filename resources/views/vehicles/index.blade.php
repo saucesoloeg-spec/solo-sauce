@@ -74,7 +74,7 @@
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('vehicles.model') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('vehicles.color') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('vehicles.license_plate') }}</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('vehicles.driver') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('vehicles.deputy') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2" style="width: 220px;">{{ __('vehicles.actions') }}</th>
                             </tr>
                         </thead>
@@ -94,7 +94,7 @@
                                         <p class="text-sm text-dark font-weight-semibold mb-0">{{ $vehicle->license_plate }}</p>
                                     </td>
                                     <td>
-                                        <p class="text-sm text-dark font-weight-semibold mb-0">{{ $vehicle->driver->name ?? __('vehicles.unassigned') }}</p>
+                                        <p class="text-sm text-dark font-weight-semibold mb-0">{{ $vehicle->deputy->name ?? __('vehicles.unassigned') }}</p>
                                     </td>
                                     <td>
                                         <a href="{{ route('vehicles.show', ['id' => $vehicle->id]) }}" class="vehicle-action-button view" data-bs-toggle="tooltip" data-bs-title="{{ __('vehicles.view_vehicle') }}">
@@ -103,15 +103,15 @@
                                                 <circle cx="12" cy="12" r="3"></circle>
                                             </svg>
                                         </a>
-                                        @if(empty($vehicle->driver_id))
-                                            <button type="button" class="vehicle-action-button assign assign-driver-button" data-vehicle-id="{{ $vehicle->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('vehicles.assign_driver') }}">
+                                        @if(empty($vehicle->deputy_id))
+                                            <button type="button" class="vehicle-action-button assign assign-driver-button" data-vehicle-id="{{ $vehicle->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('vehicles.assign_deputy') }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="M12 5v14"></path>
                                                     <path d="M5 12h14"></path>
                                                 </svg>
                                             </button>
                                         @else
-                                            <button type="button" class="vehicle-action-button unassign unassign-driver-button" data-vehicle-id="{{ $vehicle->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('vehicles.unassign_driver') }}">
+                                            <button type="button" class="vehicle-action-button unassign unassign-driver-button" data-vehicle-id="{{ $vehicle->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('vehicles.unassign_deputy') }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="M6 6l12 12"></path>
                                                     <path d="M18 6l-12 12"></path>
@@ -166,16 +166,16 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="assignDriverModalLabel">{{ __('vehicles.assign_driver') }}</h5>
+                <h5 class="modal-title" id="assignDriverModalLabel">{{ __('vehicles.assign_deputy') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="assign-driver-form" method="POST" data-base-action="{{ route('vehicles.assign.driver', ['id' => 0]) }}">
+            <form id="assign-driver-form" method="POST" data-base-action="{{ route('manager.vehicles.assign.deputy', ['id' => 0]) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="driver_id" class="form-label">{{ __('vehicles.select_driver') }}</label>
-                        <select name="driver_id" id="driver_id" class="form-select" required>
-                            <option value="">{{ __('vehicles.select_driver') }}</option>
+                        <label for="driver_id" class="form-label">{{ __('vehicles.select_deputy') }}</label>
+                        <select name="deputy_id" id="driver_id" class="form-select" required>
+                            <option value="">{{ __('vehicles.select_deputy') }}</option>
                             @foreach($drivers as $driver)
                                 <option value="{{ $driver->id }}">{{ $driver->name }} - {{ $driver->phone ?? $driver->email }}</option>
                             @endforeach
@@ -195,13 +195,13 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="unassignDriverModalLabel">{{ __('vehicles.unassign_driver') }}</h5>
+                <h5 class="modal-title" id="unassignDriverModalLabel">{{ __('vehicles.unassign_deputy') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="unassign-driver-form" method="POST" data-base-action="{{ route('vehicles.unassign.driver', ['id' => 0]) }}">
+            <form id="unassign-driver-form" method="POST" data-base-action="{{ route('manager.vehicles.unassign.deputy', ['id' => 0]) }}">
                 @csrf
                 <div class="modal-body">
-                    <p>{{ __('vehicles.unassign_driver_confirmation') }}</p>
+                    <p>{{ __('vehicles.unassign_deputy_confirmation') }}</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('vehicles.cancel') }}</button>

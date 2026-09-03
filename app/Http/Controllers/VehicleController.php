@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Http\Services\VehicleService;
-use App\Models\Driver;
+use App\Models\Deputy;
 use Illuminate\Http\Request;
 
 class VehicleController extends Controller
@@ -20,20 +20,20 @@ class VehicleController extends Controller
     public function index()
     {
         $response = $this->vehicle_service->getAll();
-        $drivers = Driver::select('id', 'name', 'phone', 'email')->get();
+        $deputies = Deputy::select('id', 'name', 'phone', 'email')->get();
         $vehicles = collect($response['response_data']);
 
         return view('vehicles.index', [
             'vehicles' => $vehicles,
-            'drivers'  => $drivers,
+            'drivers'  => $deputies,
         ]);
     }
 
     public function create()
     {
-        $drivers = Driver::select('id', 'name', 'phone', 'email')->get();
+        $deputies = Deputy::select('id', 'name', 'phone', 'email')->get();
 
-        return view('vehicles.create', ['drivers' => $drivers]);
+        return view('vehicles.create', ['drivers' => $deputies]);
     }
 
     public function store(StoreVehicleRequest $request)
@@ -55,11 +55,11 @@ class VehicleController extends Controller
             return redirect()->route('vehicles.get')->with('error', __('vehicles.not_found'));
         }
 
-        $drivers = Driver::select('id', 'name', 'phone', 'email')->get();
+        $deputies = Deputy::select('id', 'name', 'phone', 'email')->get();
 
         return view('vehicles.show', [
             'vehicle' => $response['response_data'],
-            'drivers' => $drivers,
+            'drivers' => $deputies,
         ]);
     }
 

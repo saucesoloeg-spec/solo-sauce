@@ -33,7 +33,7 @@
                         <thead class="bg-gray-100">
                             <tr>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.vehicle') }}</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.driver') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.drivers') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.license_plate') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.today_orders') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 text-center">{{ __('dashboard.action') }}</th>

@@ -15,7 +15,7 @@ class ProductService
 
     public function getAllProducts($request)
     {
-        $products = $this->odoo_auth_service->getProductsFromOdoo($request);
+        $products = $this->odoo_auth_service->getAllProductsFromOdoo($request);
 
         if($products['success']) {
             return [
