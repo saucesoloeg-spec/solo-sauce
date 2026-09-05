@@ -45,11 +45,11 @@
                             <input type="text" id="license_plate" name="license_plate" class="form-control" value="{{ old('license_plate', $vehicle->license_plate) }}" required>
                         </div>
                         <div class="col-md-12 mb-3">
-                            <label class="form-label" for="driver_id">{{ __('vehicles.assign_driver') }}</label>
-                            <select id="driver_id" name="driver_id" class="form-select">
-                                <option value="">{{ __('vehicles.select_driver') }}</option>
+                            <label class="form-label" for="driver_id">{{ __('vehicles.assign_deputy') }}</label>
+                            <select id="driver_id" name="deputy_id" class="form-select">
+                                <option value="">{{ __('vehicles.select_deputy') }}</option>
                                 @foreach($drivers as $driver)
-                                    <option value="{{ $driver->id }}" {{ old('driver_id', $vehicle->driver_id) == $driver->id ? 'selected' : '' }}>{{ $driver->name }} - {{ $driver->phone ?? $driver->email }}</option>
+                                    <option value="{{ $driver->id }}" {{ old('deputy_id', $vehicle->deputy_id) == $driver->id ? 'selected' : '' }}>{{ $driver->name }} - {{ $driver->phone ?? $driver->email }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -62,10 +62,10 @@
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">{{ __('vehicles.delete') }}</button>
                         </form>
-                        @if($vehicle->driver_id)
-                            <form action="{{ route('vehicles.unassign.driver', ['id' => $vehicle->id]) }}" method="POST" class="m-0">
+                        @if($vehicle->deputy_id)
+                            <form action="{{ route('manager.vehicles.unassign.deputy', ['id' => $vehicle->id]) }}" method="POST" class="m-0">
                                 @csrf
-                                <button type="submit" class="btn btn-warning">{{ __('vehicles.unassign_driver') }}</button>
+                                <button type="submit" class="btn btn-warning">{{ __('vehicles.unassign_deputy') }}</button>
                             </form>
                         @endif
                     </div>

@@ -23,7 +23,7 @@
                         <p class="mb-1"><strong>{{ __('dashboard.license_plate') }}:</strong> {{ $vehicle->license_plate }}</p>
                     </div>
                     <div class="col-md-4">
-                        <h6 class="text-uppercase text-secondary mb-2">{{ __('dashboard.driver') }}</h6>
+                        <h6 class="text-uppercase text-secondary mb-2">{{ __('dashboard.drivers') }}</h6>
                         <p class="mb-1"><strong>{{ __('dashboard.name') }}:</strong> {{ $vehicle->driver?->name ?? __('dashboard.unassigned') }}</p>
                         <p class="mb-1"><strong>{{ __('dashboard.email') }}:</strong> {{ $vehicle->driver?->email ?? '-' }}</p>
                         <p class="mb-1"><strong>{{ __('dashboard.phone') }}:</strong> {{ $vehicle->driver?->phone ?? '-' }}</p>

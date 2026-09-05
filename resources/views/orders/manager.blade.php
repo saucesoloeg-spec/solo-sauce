@@ -34,8 +34,8 @@
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.total_amount') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.delivery_date') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.order_status') }}</th>
-                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.driver') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.deputy') }}</th>
+                                <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.driver') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2 text-center">{{ __('orders.notes') }}</th>
                                 <th class="text-secondary text-xs font-weight-semibold opacity-7 ps-2">{{ __('orders.actions') }}</th>
                             </tr>
@@ -82,15 +82,15 @@
                                             $isCancelled = in_array($stateStatus, ['canceled', 'cancelled']);
                                         @endphp
                                         <span class="badge badge-sm {{ $badgeClass }}">{{ ucfirst((string) $statusSource) }}</span>
-                                        @if (!empty($order->driver_id) && !empty($order->driver_order_rank))
-                                            <p class="text-xs text-secondary mb-0 mt-1">{{ __('orders.driver_rank_short') }}: {{ $order->driver_order_rank }}</p>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->driver->name ?? '-' }}</p>
                                     </td>
                                     <td>
                                         <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->deputy->name ?? '-' }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->driver->name ?? '-' }}</p>
+                                        @if (!empty($order->driver_id) && !empty($order->driver_order_rank))
+                                            <p class="text-xs text-secondary mb-0 mt-1">{{ __('orders.driver_rank_short') }}: {{ $order->driver_order_rank }}</p>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         @php
@@ -114,8 +114,29 @@
                                                 </span>
 
                                                 <span class="d-inline-flex align-items-center justify-content-center" style="width: 28px;">
+                                                    @if (!$isCancelled && empty($order->deputy_id))
+                                                        <button type="button" class="text-secondary font-weight-bold text-xs assign-driver-button cursor-pointer border-0 bg-transparent p-0" data-order-id="{{ $order->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('deputies.assign_deputy') }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                                                                <circle cx="12" cy="7" r="4"></circle>
+                                                            </svg>
+                                                        </button>
+                                                    @elseif (!$isCancelled)
+                                                        <form action="{{ route('manager.orders.unassign.deputy', ['id' => $order->id]) }}" method="POST" class="d-inline" data-confirm-message="{{ __('deputies.confirm_unassign_order') }}" onsubmit="return confirm(this.dataset.confirmMessage)">
+                                                            @csrf
+                                                            <button type="submit" class="text-danger font-weight-bold text-xs cursor-pointer border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-title="{{ __('deputies.unassign_deputy') }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M6 6l12 12"></path>
+                                                                    <path d="M18 6l-12 12"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </span>
+
+                                                <span class="d-inline-flex align-items-center justify-content-center" style="width: 28px;">
                                                     @if (!$isCancelled && empty($order->driver_id))
-                                                        <button type="button" class="text-secondary font-weight-bold text-xs assign-driver-button cursor-pointer border-0 bg-transparent p-0" data-order-id="{{ $order->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('orders.assign_driver') }}">
+                                                        <button type="button" class="text-secondary font-weight-bold text-xs assign-deputy-button cursor-pointer border-0 bg-transparent p-0" data-order-id="{{ $order->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('orders.assign_driver') }}">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                                 <rect x="1" y="3" width="15" height="13"></rect>
                                                                 <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
@@ -127,27 +148,6 @@
                                                         <form action="{{ route('manager.orders.unassign.driver', ['id' => $order->id]) }}" method="POST" class="d-inline" data-confirm-message="{{ __('orders.confirm_unassign_driver') }}" onsubmit="return confirm(this.dataset.confirmMessage)">
                                                             @csrf
                                                             <button type="submit" class="text-danger font-weight-bold text-xs cursor-pointer border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-title="{{ __('orders.unassign_driver') }}">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                                    <path d="M6 6l12 12"></path>
-                                                                    <path d="M18 6l-12 12"></path>
-                                                                </svg>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                </span>
-
-                                                <span class="d-inline-flex align-items-center justify-content-center" style="width: 28px;">
-                                                    @if (!$isCancelled && empty($order->deputy_id))
-                                                        <button type="button" class="text-secondary font-weight-bold text-xs assign-deputy-button cursor-pointer border-0 bg-transparent p-0" data-order-id="{{ $order->id }}" data-bs-toggle="tooltip" data-bs-title="{{ __('deputies.assign_deputy') }}">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                                <path d="M20 21a8 8 0 0 0-16 0"></path>
-                                                                <circle cx="12" cy="7" r="4"></circle>
-                                                            </svg>
-                                                        </button>
-                                                    @elseif (!$isCancelled)
-                                                        <form action="{{ route('manager.orders.unassign.deputy', ['id' => $order->id]) }}" method="POST" class="d-inline" data-confirm-message="{{ __('deputies.confirm_unassign_order') }}" onsubmit="return confirm(this.dataset.confirmMessage)">
-                                                            @csrf
-                                                            <button type="submit" class="text-danger font-weight-bold text-xs cursor-pointer border-0 bg-transparent p-0" data-bs-toggle="tooltip" data-bs-title="{{ __('deputies.unassign_deputy') }}">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                                     <path d="M6 6l12 12"></path>
                                                                     <path d="M18 6l-12 12"></path>
@@ -202,31 +202,26 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="assignDriverModalLabel">{{ __('orders.assign_driver') }}</h5>
+                <h5 class="modal-title" id="assignDriverModalLabel">{{ __('deputies.assign_order_deputy') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="assign-driver-form" method="POST" data-base-action="{{ route('manager.orders.assign.driver', ['id' => 0]) }}">
+            <form id="assign-driver-form" method="POST" data-base-action="{{ route('manager.orders.assign.deputy', ['id' => 0]) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="driver_id" class="form-label">{{ __('orders.select_driver') }}</label>
-                        <select name="driver_id" id="driver_id" class="form-select" required>
-                            <option value="">{{ __('orders.select_driver') }}</option>
-                            @foreach($drivers as $driver)
-                                <option value="{{ $driver->id }}">{{ $driver->name }} - {{ $driver->phone ?? $driver->email }}</option>
+                        <label for="driver_id" class="form-label">{{ __('deputies.select_deputy') }}</label>
+                        <select name="deputy_id" id="driver_id" class="form-select" required>
+                            <option value="">{{ __('deputies.select_deputy') }}</option>
+                            @foreach($deputies as $deputy)
+                                <option value="{{ $deputy->id }}">{{ $deputy->name }} - {{ $deputy->phone ?? $deputy->email }}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="driver_order_rank" class="form-label">{{ __('orders.driver_rank') }}</label>
-                        <input type="number" min="1" step="1" name="driver_order_rank" id="driver_order_rank" class="form-control" placeholder="{{ __('orders.driver_rank_placeholder') }}">
-                        <small class="text-muted">{{ __('orders.driver_rank_help') }}</small>
                     </div>
                     <input type="hidden" name="order_id" id="modal_order_id" value="">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('orders.cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('orders.assign_driver') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('deputies.confirm') }}</button>
                 </div>
             </form>
         </div>
@@ -237,27 +232,32 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="assignDeputyModalLabel">{{ __('deputies.assign_order_deputy') }}</h5>
+                <h5 class="modal-title" id="assignDeputyModalLabel">{{ __('orders.assign_driver') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="assign-deputy-form" method="POST" data-base-action="{{ route('manager.orders.assign.deputy', ['id' => 0]) }}">
+            <form id="assign-deputy-form" method="POST" data-base-action="{{ route('manager.orders.assign.driver', ['id' => 0]) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="deputy_id" class="form-label">{{ __('deputies.select_deputy') }}</label>
-                        <select name="deputy_id" id="deputy_id" class="form-select" required>
-                            <option value="">{{ __('deputies.select_deputy') }}</option>
-                            @foreach($deputies as $deputy)
-                                <option value="{{ $deputy->id }}">{{ $deputy->name }} - {{ $deputy->phone ?? $deputy->email }}</option>
+                        <label for="deputy_id" class="form-label">{{ __('orders.select_driver') }}</label>
+                        <select name="driver_id" id="deputy_id" class="form-select" required>
+                            <option value="">{{ __('orders.select_driver') }}</option>
+                            @foreach($drivers as $driver)
+                                <option value="{{ $driver->id }}">{{ $driver->name }} - {{ $driver->phone ?? $driver->email }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deputy_order_rank" class="form-label">{{ __('orders.driver_rank') }}</label>
+                        <input type="number" min="1" step="1" name="driver_order_rank" id="deputy_order_rank" class="form-control" placeholder="{{ __('orders.driver_rank_placeholder') }}">
+                        <small class="text-muted">{{ __('orders.driver_rank_help') }}</small>
                     </div>
                     <input type="hidden" name="order_id" id="deputy_modal_order_id" value="">
                     <input type="hidden" name="redirect_to" value="orders">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('deputies.cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('deputies.confirm') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('orders.assign_driver') }}</button>
                 </div>
             </form>
         </div>

@@ -211,6 +211,36 @@ class OdooAuthService
         return $result;
     }
 
+    public function getAllProductsFromOdoo($filters = [])
+    {
+        $filters = array_filter($filters, function ($value, $key) {
+            return $key !== 'page' && !is_null($value) && $value !== '';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        $page = 1;
+        $products = [];
+        $lastPage = 1;
+
+        do {
+            $pageResult = $this->getProductsFromOdoo(array_merge($filters, ['page' => $page]));
+
+            if (empty($pageResult['success'])) {
+                return $pageResult;
+            }
+
+            $products = array_merge($products, $pageResult['data']['products'] ?? []);
+            $lastPage = (int) ($pageResult['data']['pagination']['total_pages'] ?? $page);
+            $page++;
+        } while ($page <= $lastPage);
+
+        return [
+            'success' => true,
+            'data' => [
+                'products' => $products,
+            ],
+        ];
+    }
+
     public function getProductByIdFromOdoo($id)
     {
         $token = $this->getAccessToken()['access_token'];
