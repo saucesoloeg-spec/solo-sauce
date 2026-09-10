@@ -180,35 +180,83 @@ class OdooAuthService
         ];
     }
 
+    // public function getProductsFromOdoo($filters = [])
+    // {
+    //     $token = $this->getAccessToken()['access_token'];
+    //     $url = env('ODOO_API_URL').'/products';
+
+    //     if (!empty($filters)) {
+    //         $url .= '?' . http_build_query($filters);
+    //     }
+
+    //     $response = curl_init($url);
+    //     curl_setopt($response, CURLOPT_HTTPGET, true);
+    //     curl_setopt($response, CURLOPT_HTTPHEADER, array(
+    //         'Accept: application/json',
+    //         'Content-Type: application/json',
+    //         'Authorization: Bearer ' . $token,
+    //     ));
+    //     curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
+        
+    //     try {
+    //         $result = json_decode(curl_exec($response), true);
+    //         if(isset($result['error'])) {
+    //             throw new \Exception('Failed to fetch products from Odoo: ' . $result['error']['details']);
+    //         }
+    //     } catch (\Throwable $th) {
+    //         throw new \Exception('Failed to fetch products from Odoo: ' . $th->getMessage());
+    //     }
+
+    //     curl_close($response);
+
+    //     return $result;
+    // }
+
     public function getProductsFromOdoo($filters = [])
     {
         $token = $this->getAccessToken()['access_token'];
-        $url = env('ODOO_API_URL').'/products';
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/products';
 
         if (!empty($filters)) {
             $url .= '?' . http_build_query($filters);
         }
 
-        $response = curl_init($url);
-        curl_setopt($response, CURLOPT_HTTPGET, true);
-        curl_setopt($response, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $token,
-        ));
-        curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
-        
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPGET => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+        ]);
+
         try {
-            $result = json_decode(curl_exec($response), true);
-            if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch products from Odoo: ' . $result['error']['details']);
+            $body = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($body === false) {
+                throw new \Exception(curl_error($ch));
             }
+
+            $result = json_decode($body, true);
+
+            if ($httpCode >= 400 || empty($result['success'])) {
+                $detail = $result['error']['detail'] ?? 'Unknown API error';
+                throw new \Exception($detail);
+            }
+
+            // Return products + pagination from nested data
+            // return [
+            //     'products'   => $result['data']['products'] ?? [],
+            //     'pagination' => $result['data']['pagination'] ?? [],
+            // ];
+            return $result;
         } catch (\Throwable $th) {
             throw new \Exception('Failed to fetch products from Odoo: ' . $th->getMessage());
+        } finally {
+            curl_close($ch);
         }
-
-        curl_close($response);
-
-        return $result;
     }
 
     public function getAllProductsFromOdoo($filters = [])
@@ -223,11 +271,10 @@ class OdooAuthService
 
         do {
             $pageResult = $this->getProductsFromOdoo(array_merge($filters, ['page' => $page]));
-
             if (empty($pageResult['success'])) {
                 return $pageResult;
             }
-
+            
             $products = array_merge($products, $pageResult['data']['products'] ?? []);
             $lastPage = (int) ($pageResult['data']['pagination']['total_pages'] ?? $page);
             $page++;
