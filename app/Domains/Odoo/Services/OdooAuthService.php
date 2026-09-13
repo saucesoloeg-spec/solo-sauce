@@ -220,7 +220,7 @@ class OdooAuthService
         if (!empty($filters)) {
             $url .= '?' . http_build_query($filters);
         }
-
+        
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_HTTPGET => true,
@@ -261,10 +261,11 @@ class OdooAuthService
 
     public function getAllProductsFromOdoo($filters = [])
     {
+        $filters['category_id'] = 4;
         $filters = array_filter($filters, function ($value, $key) {
             return $key !== 'page' && !is_null($value) && $value !== '';
         }, ARRAY_FILTER_USE_BOTH);
-
+        
         $page = 1;
         $products = [];
         $lastPage = 1;
