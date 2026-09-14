@@ -142,53 +142,37 @@
                         </thead>
                         <tbody>
                             @forelse($customers ?? [] as $key => $customer)
-                            <tr data-status="{{ $customer->sales_id ? 'verified' : 'pending' }}" data-customer-id="{{ $customer->id }}" id="row-{{$customer->id}}">
+                            <tr data-status="all" data-customer-id="{{ $customer['id'] }}" id="row-{{$customer['id']}}">
                                 <td>
                                     <div class="d-flex px-2 py-1">
                                         <div class="d-flex align-items-center">
                                             <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
                                         </div>
                                         <div class="d-flex flex-column justify-content-center ms-1">
-                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $customer->name }}</h6>
-                                            <p class="text-sm text-secondary mb-0">{{ $customer->email }}</p>
-                                            <p class="text-sm text-secondary mb-0">{{ $customer->phone_number }}</p>
+                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $customer['name'] ?? '-' }}</h6>
+                                            <p class="text-sm text-secondary mb-0">{{ $customer['email'] ?? '-' }}</p>
+                                            <p class="text-sm text-secondary mb-0">{{ $customer['phone'] ?: ($customer['mobile'] ?? '-') }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">Commercial: {{ $customer->commercial_name }}</p>
-                                    <p class="text-sm text-secondary mb-0">Taxes: {{ $customer->taxtation_name }}</p>
-                                </td>
-                                <!-- <td class="text-left">
-                                    @if(!$customer->Files)
-                                    No Files
-                                    @else
-                                    <a class="view-images-btn cursor-pointer" data-customer-id="{{ $customer->id }}">
-                                        <svg width="20px" height="20px" viewBox="0 0 0.6 0.6" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>pic_line</title><g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g id="File" transform="translate(-912)" fill-rule="nonzero"><g id="pic_line" transform="translate(912)"><path d="M0.6 0v0.6H0V0zM0.315 0.581l0 0 -0.002 0.001 -0.001 0 0 0 -0.002 -0.001q0 0 -0.001 0l0 0 0 0.011 0 0.001 0 0 0.003 0.002 0 0 0 0 0.003 -0.002 0 0 0 0 0 -0.011q0 0 0 0m0.007 -0.003 0 0 -0.005 0.002 0 0 0 0 ...
-                                        id="MingCute" fill-rule="nonzero"/><path d="M<PASSWORD> <PASSWORD> <PASSWORD> <PASSWORD>" id="形状" fill="#<PASSWORD>"/></g></g></g></svg>
-                                    </a>
-                                    Include files for each company in a hidden div
-                                    <div class="company-images d-none" id="company-images-{{ $customer->id }}">
-                                        @foreach($customer->Files as $file)
-                                        <img src="{{ $file->download_link }}" alt="Company Image" class="company-image">
-                                        @endforeach
-                                    </div>
-                                    @endif
-                                </td> -->
-                                <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer->address }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">ID: {{ $customer['id'] }}</p>
+                                    <p class="text-sm text-secondary mb-0">Country: {{ $customer['country'] ?? '-' }}</p>
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer->zone }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer['address'] ?? '-' }}</p>
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer->city }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer['state'] ?? '-' }}</p>
+                                </td>
+                                <td class="text-center">
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer['city'] ?? '-' }}</p>
                                 </td>
                                 <td class="align-middle text-center">
-                                    <span class="text-secondary text-sm font-weight-normal">{{ $customer->created_at->toDateString() }}</span>
+                                    <span class="text-secondary text-sm font-weight-normal">{{ !empty($customer['created_at']) ? \Illuminate\Support\Carbon::parse($customer['created_at'])->toDateString() : '-' }}</span>
                                 </td>
                                 <td class="align-middle">
-                                    <a href="{{ route('customers.show', ['id' => $customer->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="View Customer">
+                                    <a href="{{ route('customers.show', ['id' => $customer['id']]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="View Customer">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
@@ -293,69 +277,31 @@
         const filterVerified = document.getElementById('filter-verified');
         const filterPending  = document.getElementById('filter-pending');
 
-        const searchInput    = document.getElementById('searchInput');
-        const table          = document.getElementById('companiesTable');
-        const tableRows      = Array.from(table.querySelectorAll('tbody tr')); // Get all rows from the table body
+        const searchInput = document.getElementById('searchInput');
+        const pageInfo = document.querySelector('.paging');
+        const prevButton = document.querySelector('.previous');
+        const nextButton = document.querySelector('.next');
+        const pagination = JSON.parse('{{ addslashes(json_encode($pagination ?? [])) }}');
+        const currentPage = Number(pagination.page || 1);
+        const totalPages = Number(pagination.total_pages || 1);
 
-        let filteredRows     = [...tableRows]; // Rows currently visible (filtered or searched)
-        let currentFilter    = 'all'; // Keep track of the active filter
-        const rowsPerPage    = 10; // Maximum rows per page
-        let currentPage      = 1; // Default current page
+        function loadPage(page) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', page);
 
-        const pageInfo       = document.querySelector('.paging'); // Page info text
-        const prevButton     = document.querySelector('.previous'); // Previous button
-        const nextButton     = document.querySelector('.next'); // Next button
+            const search = searchInput.value.trim();
+            if (search) {
+                params.set('search', search);
+            } else {
+                params.delete('search');
+            }
 
-        // Function to update the table based on the current page
-        function updateTable() {
-            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = currentPage * rowsPerPage;
-
-            // Hide all rows, then show only the rows for the current page
-            tableRows.forEach(row => (row.style.display = 'none')); // Hide all rows
-            filteredRows.slice(startIndex, endIndex).forEach(row => (row.style.display = '')); // Show filtered rows for the current page
-
-            // Update the page info text
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-
-            // Enable/disable pagination buttons based on the current page
-            prevButton.disabled = currentPage === 1;
-            nextButton.disabled = currentPage === totalPages || totalPages === 0;
+            window.location.href = `${window.location.pathname}?${params.toString()}`;
         }
 
-        // Function to filter rows based on the selected filter
-        function filterTable(filterType) {
-            currentFilter = filterType; // Update the current filter
-            filteredRows = tableRows.filter(row => {
-                const status = row.getAttribute('data-status');
-                return filterType === 'all' || status === filterType;
-            });
-
-            // Apply search on top of the filtered rows
-            searchTable();
-
-            currentPage = 1; // Reset to the first page after filtering
-            updateTable(); // Update the table display
-        }
-
-        // Function to search within the current filtered rows
-        function searchTable() {
-            const query = searchInput.value.toLowerCase().trim();
-
-            // Filter the rows based on the current filter and search query
-            filteredRows = tableRows.filter(row => {
-                const status = row.getAttribute('data-status');
-                const companyName = row.cells[0].textContent.toLowerCase();
-                const matchesFilter = currentFilter === 'all' || status === currentFilter;
-                const matchesSearch = companyName.includes(query);
-
-                return matchesFilter && matchesSearch; // Row must satisfy both filter and search criteria
-            });
-
-            currentPage = 1; // Reset to the first page after searching
-            updateTable(); // Update the table display
-        }
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        prevButton.disabled = currentPage <= 1;
+        nextButton.disabled = currentPage >= totalPages;
 
         // Add event listeners to the filter buttons only when they exist
         if (filterAll && filterVerified && filterPending) {
@@ -366,30 +312,27 @@
 
         // Add event listener to the search input
         if (searchInput) {
-            searchInput.addEventListener('input', function () {
-                searchTable();
+            searchInput.value = new URLSearchParams(window.location.search).get('search') || '';
+            searchInput.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    loadPage(1);
+                }
             });
         }
 
         // Event listener for the "Previous" button
         prevButton.addEventListener('click', () => {
             if (currentPage > 1) {
-                currentPage--;
-                updateTable();
+                loadPage(currentPage - 1);
             }
         });
 
         // Event listener for the "Next" button
         nextButton.addEventListener('click', () => {
-            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
             if (currentPage < totalPages) {
-                currentPage++;
-                updateTable();
+                loadPage(currentPage + 1);
             }
         });
-
-        // Initialize the table display
-        updateTable();
 
         const modal         = document.getElementById('imageModal');
         const carouselInner = document.querySelector('#imageCarousel .carousel-inner');
