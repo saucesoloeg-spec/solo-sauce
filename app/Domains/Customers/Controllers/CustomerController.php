@@ -21,14 +21,9 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $response = $this->customer_service->getAssignedCustomers([
-            'search' => $request->query('search'),
-            'city'   => $request->query('city'),
-            'page'   => max(1, (int) $request->query('page', 1)),
-            'limit'  => min(100, max(1, (int) $request->query('limit', 20))),
-        ]);
+        $response = $this->customer_service->getAssignedCustomers();
 
         return response()->json($response, $response['response_code']);
     }

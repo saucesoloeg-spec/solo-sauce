@@ -16,19 +16,11 @@ class CustomerService
         $this->customer_repository = $customer_repository;
     }
 
-    public function getAssignedCustomers(array $filters = [])
+    public function getAssignedCustomers()
     {
         $sales = auth()->user();
 
-        // $assigned_customers = $this->customer_repository->getAssignedCustomers($sales->id);
-
-        $result             = $this->odoo_service->getAllCustomers(array_filter($filters, function ($value, $key) {
-            return !in_array($key, ['page', 'limit'], true)
-                && $value !== null
-                && $value !== '';
-        }, ARRAY_FILTER_USE_BOTH));
-        $assigned_customers = collect($result['data']['customers'] ?? [])
-            ->map(fn (array $customer) => $this->normalizeOdooCustomer($customer));
+        $assigned_customers = $this->customer_repository->getAssignedCustomers($sales->id);
 
         if(!$assigned_customers->isEmpty()) {
             return [
@@ -71,13 +63,10 @@ class CustomerService
         // $customer   = $this->customer_repository->find($id);
         $statistics = $this->customer_repository->getCustomerStatistics($id);
 
-        $result   = $this->odoo_service->getCustomerById($id);
-        $customer = isset($result['data'])
-            ? $this->normalizeOdooCustomer($result['data'])
-            : null;
+        $customer = $this->customer_repository->find($id);
 
         if($customer) {
-            $customer['statistics'] = $statistics;
+            $customer->statistics = $statistics;
 
             return [
                 'response_code'    => 200,
@@ -90,33 +79,6 @@ class CustomerService
             'response_code'    => 404,
             'response_message' => 'Customer not found',
             'response_data'    => null
-        ];
-    }
-
-    private function normalizeOdooCustomer(array $customer): array
-    {
-        return [
-            'id'              => $customer['id'] ?? null,
-            'sales_id'        => null,
-            'name'            => $customer['name'] ?? null,
-            'email'           => $customer['email'] ?? null,
-            'phone'           => $customer['phone'] ?: ($customer['mobile'] ?? null),
-            'mobile'          => $customer['mobile'] ?? null,
-            'via'             => null,
-            'address'         => $customer['address'] ?? null,
-            'zone'            => $customer['city'] ?? null,
-            'city'            => $customer['state'] ?? null,
-            'country'         => $customer['country'] ?? null,
-            'state'           => $customer['state'] ?? null,
-            'country_odoo_id' => $customer['country_id'] ?? null,
-            'state_odoo_id'   => $customer['state_id'] ?? null,
-            'city_odoo_id'    => $customer['city_id'] ?? null,
-            'zip_code'        => $customer['zip_code'] ?? null,
-            'latitude'        => $customer['latitude'] ?? null,
-            'longitude'       => $customer['longitude'] ?? null,
-            'created_at'      => $customer['created_at'] ?? null,
-            'updated_at'      => $customer['updated_at'] ?? null,
-            'new_customer'    => true,
         ];
     }
 

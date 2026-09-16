@@ -218,7 +218,7 @@
 
                     <div class="form-section">
                         <h6 class="font-weight-semibold mb-3">{{ __('customers.order_history') }}</h6>
-                        @if($orders->isEmpty())
+                        @if($customer->orders->isEmpty())
                             <p>No orders found for this customer.</p>
                         @else
                             <table class="table table-bordered">

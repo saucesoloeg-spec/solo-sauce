@@ -77,6 +77,7 @@ class CustomerRepository
             'email'           => $data['email'] ?? null,
             'phone'           => $data['phone'],
             'via'             => $data['via'],
+            'is_imported'     => $data['is_imported'] ?? false,
             'address'         => $data['address'],
             'city'            => $data['city'] ?? null,
             'state'           => $data['state'] ?? null,

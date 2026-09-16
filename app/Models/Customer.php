@@ -17,9 +17,10 @@ class Customer extends Model
         'email',
         'phone',
         'via',
+        'is_imported',
         'address',
-        'zone',
         'city',
+        'state',
         'country_odoo_id',
         'state_odoo_id',
         'city_odoo_id',
@@ -32,6 +33,7 @@ class Customer extends Model
     ];
 
     protected $casts = [
+        'is_imported' => 'boolean',
         'new_customer' => 'boolean',
     ];
 
