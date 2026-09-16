@@ -34,20 +34,14 @@ class CustomerService
             return [
                 'response_code'    => 200,
                 'response_message' => 'Assigned customers retrieved successfully',
-                'response_data'    => [
-                    'customers'  => $assigned_customers,
-                    'pagination' => $result['data']['pagination'] ?? [],
-                ]
+                'response_data'    => $assigned_customers
             ];
         }
 
         return [
             'response_code'    => 404,
             'response_message' => 'No assigned customers found',
-            'response_data'    => [
-                'customers'  => collect(),
-                'pagination' => $result['data']['pagination'] ?? [],
-            ]
+            'response_data'    => null
         ];
     }
 
