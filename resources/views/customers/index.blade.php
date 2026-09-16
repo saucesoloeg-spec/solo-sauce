@@ -258,7 +258,9 @@
                 </div>
                 <!-- Update Modal -->
                 <div class="border-top py-3 px-3 d-flex align-items-center">
-                    <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
+                    <p class="font-weight-semibold mb-0 text-dark text-sm paging">
+                        Page {{ $pagination['page'] ?? 1 }} of {{ $pagination['total_pages'] ?? 1 }}
+                    </p>
                     <div class="ms-auto">
                         <button class="btn btn-sm btn-white mb-0 previous">{{ __('sales.previous') }}</button>
                         <button class="btn btn-sm btn-white mb-0 next">{{ __('sales.next') }}</button>
@@ -281,9 +283,8 @@
         const pageInfo = document.querySelector('.paging');
         const prevButton = document.querySelector('.previous');
         const nextButton = document.querySelector('.next');
-        const pagination = JSON.parse('{{ addslashes(json_encode($pagination ?? [])) }}');
-        const currentPage = Number(pagination.page || 1);
-        const totalPages = Number(pagination.total_pages || 1);
+        const currentPage = {{ (int) ($pagination['page'] ?? 1) }};
+        const totalPages = {{ (int) ($pagination['total_pages'] ?? 1) }};
 
         function loadPage(page) {
             const params = new URLSearchParams(window.location.search);

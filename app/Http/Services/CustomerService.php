@@ -23,7 +23,7 @@ class CustomerService
 
         $result    = $this->odoo_service->getCustomers(array_filter(array_merge([
             'page'  => 1,
-            'limit' => 10,
+            'limit' => 20,
         ], $filters), function ($value) {
             return $value !== null && $value !== '';
         }));

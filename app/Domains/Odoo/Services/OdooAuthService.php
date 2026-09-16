@@ -358,6 +358,41 @@ class OdooAuthService
         }
     }
 
+    public function getAllCustomers($filters = [])
+    {
+        $filters = array_filter($filters, function ($value, $key) {
+            return $key !== 'page' && $key !== 'limit' && $value !== null && $value !== '';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        $page = 1;
+        $customers = [];
+        $lastPage = 1;
+
+        do {
+            $pageResult = $this->getCustomers(array_merge($filters, [
+                'page'  => $page,
+                'limit' => 100,
+            ]));
+
+            $customers = array_merge($customers, $pageResult['data']['customers'] ?? []);
+            $lastPage = (int) ($pageResult['data']['pagination']['total_pages'] ?? $page);
+            $page++;
+        } while ($page <= $lastPage);
+
+        return [
+            'success' => true,
+            'data' => [
+                'customers' => $customers,
+                'pagination' => [
+                    'total' => count($customers),
+                    'page' => 1,
+                    'limit' => count($customers),
+                    'total_pages' => 1,
+                ],
+            ],
+        ];
+    }
+
     public function sendCustomerToOdoo($customer)
     {
         $token = $this->getAccessToken()['access_token'];

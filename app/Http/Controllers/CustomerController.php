@@ -24,7 +24,7 @@ class CustomerController extends Controller
         $response = $this->customer_service->getAll([
             'search' => $request->query('search'),
             'page'   => max(1, (int) $request->query('page', 1)),
-            'limit'  => 10,
+            'limit'  => 20,
         ]);
         $data = $response['response_data'] ?? [];
 
