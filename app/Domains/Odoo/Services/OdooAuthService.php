@@ -318,7 +318,7 @@ class OdooAuthService
     public function getCustomers($filters = [])
     {
         $token = $this->getAccessToken()['access_token'];
-        $url = env('ODOO_API_URL').'/customers';
+        $url = rtrim(env('ODOO_API_URL'), '/').'/customers';
 
         if (!empty($filters)) {
             $url .= '?' . http_build_query($filters);
@@ -333,17 +333,64 @@ class OdooAuthService
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
         try {
-            $result = json_decode(curl_exec($response), true);
-            if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch customers from Odoo: ' . $result['error']['details']);
+            $body = curl_exec($response);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if ($body === false) {
+                throw new \Exception(curl_error($response));
             }
+
+            $result = json_decode($body, true);
+
+            if ($httpCode >= 400 || !is_array($result) || empty($result['success'])) {
+                $detail = $result['error']['detail']['message']
+                    ?? $result['error']['detail']
+                    ?? $result['error']['message']
+                    ?? 'Unknown API error';
+                throw new \Exception($detail);
+            }
+
+            return $result;
         } catch (\Throwable $th) {
             throw new \Exception('Failed to fetch customers from Odoo: ' . $th->getMessage());
+        } finally {
+            curl_close($response);
         }
+    }
 
-        curl_close($response);
+    public function getAllCustomers($filters = [])
+    {
+        $filters = array_filter($filters, function ($value, $key) {
+            return $key !== 'page' && $key !== 'limit' && $value !== null && $value !== '';
+        }, ARRAY_FILTER_USE_BOTH);
 
-        return $result;
+        $page = 1;
+        $customers = [];
+        $lastPage = 1;
+
+        do {
+            $pageResult = $this->getCustomers(array_merge($filters, [
+                'page'  => $page,
+                'limit' => 100,
+            ]));
+
+            $customers = array_merge($customers, $pageResult['data']['customers'] ?? []);
+            $lastPage = (int) ($pageResult['data']['pagination']['total_pages'] ?? $page);
+            $page++;
+        } while ($page <= $lastPage);
+
+        return [
+            'success' => true,
+            'data' => [
+                'customers' => $customers,
+                'pagination' => [
+                    'total' => count($customers),
+                    'page' => 1,
+                    'limit' => count($customers),
+                    'total_pages' => 1,
+                ],
+            ],
+        ];
     }
 
     public function sendCustomerToOdoo($customer)
@@ -401,7 +448,7 @@ class OdooAuthService
     public function getCustomerById($id)
     {
         $token = $this->getAccessToken()['access_token'];
-        $url = env('ODOO_API_URL').'/customers/' . $id;
+        $url = rtrim(env('ODOO_API_URL'), '/').'/customers/' . $id;
 
         $response = curl_init($url);
         curl_setopt($response, CURLOPT_HTTPGET, true);
@@ -412,17 +459,29 @@ class OdooAuthService
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
 
         try {
-            $result = json_decode(curl_exec($response), true);
-            if(isset($result['error'])) {
-                throw new \Exception('Failed to fetch customer from Odoo: ' . $result['error']['details']);
+            $body = curl_exec($response);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if ($body === false) {
+                throw new \Exception(curl_error($response));
             }
+
+            $result = json_decode($body, true);
+
+            if ($httpCode >= 400 || !is_array($result) || empty($result['success'])) {
+                $detail = $result['error']['detail']['message']
+                    ?? $result['error']['detail']
+                    ?? $result['error']['message']
+                    ?? 'Unknown API error';
+                throw new \Exception($detail);
+            }
+
+            return $result;
         } catch (\Throwable $th) {
             throw new \Exception('Failed to fetch customer from Odoo: ' . $th->getMessage());
+        } finally {
+            curl_close($response);
         }
-
-        curl_close($response);
-
-        return $result;
     }
 
     public function getOrders($filters = [])
