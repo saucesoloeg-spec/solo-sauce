@@ -142,37 +142,37 @@
                         </thead>
                         <tbody>
                             @forelse($customers ?? [] as $key => $customer)
-                            <tr data-status="{{ $customer->sales_id ? 'verified' : 'pending' }}" data-customer-id="{{ $customer->id }}" id="row-{{$customer->id}}">
+                            <tr data-status="all" data-customer-id="{{ $customer['id'] }}" id="row-{{$customer['id']}}">
                                 <td>
                                     <div class="d-flex px-2 py-1">
                                         <div class="d-flex align-items-center">
                                             <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
                                         </div>
                                         <div class="d-flex flex-column justify-content-center ms-1">
-                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $customer->name }}</h6>
-                                            <p class="text-sm text-secondary mb-0">{{ $customer->email }}</p>
-                                            <p class="text-sm text-secondary mb-0">{{ $customer->phone_number }}</p>
+                                            <h6 class="mb-0 text-sm font-weight-semibold">{{ $customer['name'] ?? '-' }}</h6>
+                                            <p class="text-sm text-secondary mb-0">{{ $customer['email'] ?? '-' }}</p>
+                                            <p class="text-sm text-secondary mb-0">{{ $customer['phone'] ?? ($customer['mobile'] ?? '-') }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">Commercial: {{ $customer->commercial_name }}</p>
-                                    <p class="text-sm text-secondary mb-0">Taxes: {{ $customer->taxtation_name }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">ID: {{ $customer['id'] }}</p>
+                                    <p class="text-sm text-secondary mb-0">Country: {{ $customer['country'] ?? '-' }}</p>
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer->address }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer['address'] ?? '-' }}</p>
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer->zone }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer['state'] ?? '-' }}</p>
                                 </td>
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer->city }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $customer['city'] ?? '-' }}</p>
                                 </td>
                                 <td class="align-middle text-center">
-                                    <span class="text-secondary text-sm font-weight-normal">{{ $customer->created_at->toDateString() }}</span>
+                                    <span class="text-secondary text-sm font-weight-normal">{{ !empty($customer['created_at']) ? \Illuminate\Support\Carbon::parse($customer['created_at'])->toDateString() : '-' }}</span>
                                 </td>
                                 <td class="align-middle">
-                                    <a href="{{ route('customers.show', ['id' => $customer->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="View Customer">
+                                    <a href="{{ route('customers.show', ['id' => $customer['id']]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="View Customer">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
@@ -258,7 +258,9 @@
                 </div>
                 <!-- Update Modal -->
                 <div class="border-top py-3 px-3 d-flex align-items-center">
-                    <p class="font-weight-semibold mb-0 text-dark text-sm paging"></p>
+                    <p class="font-weight-semibold mb-0 text-dark text-sm paging" data-current-page="{{ $pagination['page'] ?? 1 }}" data-total-pages="{{ $pagination['total_pages'] ?? 1 }}">
+                        Page {{ $pagination['page'] ?? 1 }} of {{ $pagination['total_pages'] ?? 1 }}
+                    </p>
                     <div class="ms-auto">
                         <button class="btn btn-sm btn-white mb-0 previous">{{ __('sales.previous') }}</button>
                         <button class="btn btn-sm btn-white mb-0 next">{{ __('sales.next') }}</button>
@@ -277,59 +279,30 @@
         const filterVerified = document.getElementById('filter-verified');
         const filterPending  = document.getElementById('filter-pending');
 
-        const searchInput    = document.getElementById('searchInput');
-        const table          = document.getElementById('companiesTable');
-        const tableRows      = Array.from(table.querySelectorAll('tbody tr'));
+        const searchInput = document.getElementById('searchInput');
+        const pageInfo = document.querySelector('.paging');
+        const prevButton = document.querySelector('.previous');
+        const nextButton = document.querySelector('.next');
+        const currentPage = Number(pageInfo.dataset.currentPage || 1);
+        const totalPages = Number(pageInfo.dataset.totalPages || 1);
 
-        let filteredRows     = [...tableRows];
-        let currentFilter    = 'all';
-        const rowsPerPage    = 10;
-        let currentPage      = 1;
+        function loadPage(page) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', page);
 
-        const pageInfo       = document.querySelector('.paging');
-        const prevButton     = document.querySelector('.previous');
-        const nextButton     = document.querySelector('.next');
+            const search = searchInput.value.trim();
+            if (search) {
+                params.set('search', search);
+            } else {
+                params.delete('search');
+            }
 
-        function updateTable() {
-            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = currentPage * rowsPerPage;
-
-            tableRows.forEach(row => (row.style.display = 'none'));
-            filteredRows.slice(startIndex, endIndex).forEach(row => (row.style.display = ''));
-
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-            prevButton.disabled = currentPage === 1;
-            nextButton.disabled = currentPage === totalPages || totalPages === 0;
+            window.location.href = `${window.location.pathname}?${params.toString()}`;
         }
 
-        function filterTable(filterType) {
-            currentFilter = filterType;
-            filteredRows = tableRows.filter(row => {
-                const status = row.getAttribute('data-status');
-                return filterType === 'all' || status === filterType;
-            });
-
-            searchTable();
-            currentPage = 1;
-            updateTable();
-        }
-
-        function searchTable() {
-            const query = searchInput.value.toLowerCase().trim();
-
-            filteredRows = tableRows.filter(row => {
-                const status = row.getAttribute('data-status');
-                const companyName = row.cells[0].textContent.toLowerCase();
-                const matchesFilter = currentFilter === 'all' || status === currentFilter;
-                const matchesSearch = companyName.includes(query);
-
-                return matchesFilter && matchesSearch;
-            });
-
-            currentPage = 1;
-            updateTable();
-        }
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        prevButton.disabled = currentPage <= 1;
+        nextButton.disabled = currentPage >= totalPages;
 
         // Add event listeners to the filter buttons only when they exist
         if (filterAll && filterVerified && filterPending) {
@@ -340,29 +313,27 @@
 
         // Add event listener to the search input
         if (searchInput) {
-            searchInput.addEventListener('input', function () {
-                searchTable();
+            searchInput.value = new URLSearchParams(window.location.search).get('search') || '';
+            searchInput.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    loadPage(1);
+                }
             });
         }
 
         // Event listener for the "Previous" button
         prevButton.addEventListener('click', () => {
             if (currentPage > 1) {
-                currentPage--;
-                updateTable();
+                loadPage(currentPage - 1);
             }
         });
 
         // Event listener for the "Next" button
         nextButton.addEventListener('click', () => {
-            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
             if (currentPage < totalPages) {
-                currentPage++;
-                updateTable();
+                loadPage(currentPage + 1);
             }
         });
-
-        updateTable();
 
         const modal         = document.getElementById('imageModal');
         const carouselInner = document.querySelector('#imageCarousel .carousel-inner');

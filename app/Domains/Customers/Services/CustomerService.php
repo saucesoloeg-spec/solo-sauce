@@ -16,11 +16,15 @@ class CustomerService
         $this->customer_repository = $customer_repository;
     }
 
-    public function getAssignedCustomers()
+    public function getAssignedCustomers(array $filters = [])
     {
         $sales = auth()->user();
 
-        $assigned_customers = $this->customer_repository->getAssignedCustomers($sales->id);
+        $result = $this->odoo_service->getAllCustomers(array_filter($filters, function ($value, $key) {
+            return !in_array($key, ['page', 'limit'], true) && $value !== null && $value !== '';
+        }, ARRAY_FILTER_USE_BOTH));
+        $assigned_customers = collect($result['data']['customers'] ?? [])
+            ->map(fn (array $customer) => $this->normalizeOdooCustomer($customer));
 
         if(!$assigned_customers->isEmpty()) {
             return [
@@ -60,13 +64,13 @@ class CustomerService
 
     public function getCustomer($id)
     {
-        // $customer   = $this->customer_repository->find($id);
         $statistics = $this->customer_repository->getCustomerStatistics($id);
 
-        $customer = $this->customer_repository->find($id);
+        $result = $this->odoo_service->getCustomerById($id);
+        $customer = isset($result['data']) ? $this->normalizeOdooCustomer($result['data']) : null;
 
         if($customer) {
-            $customer->statistics = $statistics;
+            $customer['statistics'] = $statistics;
 
             return [
                 'response_code'    => 200,
@@ -79,6 +83,33 @@ class CustomerService
             'response_code'    => 404,
             'response_message' => 'Customer not found',
             'response_data'    => null
+        ];
+    }
+
+    private function normalizeOdooCustomer(array $customer): array
+    {
+        return [
+            'id'              => $customer['id'] ?? null,
+            'sales_id'        => null,
+            'name'            => $customer['name'] ?? null,
+            'email'           => $customer['email'] ?? null,
+            'phone'           => $customer['phone'] ?: ($customer['mobile'] ?? null),
+            'mobile'          => $customer['mobile'] ?? null,
+            'via'             => null,
+            'is_imported'     => true,
+            'address'         => $customer['address'] ?? null,
+            'city'            => $customer['city'] ?? null,
+            'state'           => $customer['state'] ?? null,
+            'country'         => $customer['country'] ?? null,
+            'country_odoo_id' => $customer['country_id'] ?? null,
+            'state_odoo_id'   => $customer['state_id'] ?? null,
+            'city_odoo_id'    => $customer['city_id'] ?? null,
+            'zip_code'        => $customer['zip_code'] ?? null,
+            'latitude'        => $customer['latitude'] ?? null,
+            'longitude'       => $customer['longitude'] ?? null,
+            'created_at'      => $customer['created_at'] ?? null,
+            'updated_at'      => $customer['updated_at'] ?? null,
+            'new_customer'    => true,
         ];
     }
 
@@ -148,6 +179,17 @@ class CustomerService
             'response_code'    => 200,
             'response_message' => 'Customer updated successfully',
             'response_data'    => $customer
+        ];
+    }
+
+    public function updateCustomerInOdoo($customer_id, array $data)
+    {
+        $result = $this->odoo_service->updateCustomer($customer_id, $data);
+
+        return [
+            'response_code'    => 200,
+            'response_message' => 'Customer updated in Odoo successfully',
+            'response_data'    => $result['data'] ?? null,
         ];
     }
 

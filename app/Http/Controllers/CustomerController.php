@@ -19,11 +19,19 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $response = $this->customer_service->getAll();
+        $response = $this->customer_service->getAll([
+            'search' => $request->query('search'),
+            'page' => max(1, (int) $request->query('page', 1)),
+            'limit' => 20,
+        ]);
+        $data = $response['response_data'] ?? [];
 
-        return view('customers.index', ['customers' => $response['response_data'] ?? []]);
+        return view('customers.index', [
+            'customers' => $data['customers'] ?? [],
+            'pagination' => $data['pagination'] ?? [],
+        ]);
     }
 
     /**
