@@ -2,9 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Domains\Customers\Services\CustomerService;
 use App\Domains\Odoo\Services\OdooAuthService;
+use App\Models\Customer;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ImportCustomersCommand extends Command
 {
@@ -23,18 +24,16 @@ class ImportCustomersCommand extends Command
     protected $description = 'Import customer data from odoo to the database';
 
     protected $odoo_service;
-    protected $customer_service;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(OdooAuthService $odoo_service, CustomerService $customer_service)
+    public function __construct(OdooAuthService $odoo_service)
     {
         parent::__construct();
-        $this->odoo_service     = $odoo_service;
-        $this->customer_service = $customer_service;
+        $this->odoo_service = $odoo_service;
     }
 
     /**
@@ -44,57 +43,109 @@ class ImportCustomersCommand extends Command
      */
     public function handle()
     {
-        $db_customers = $this->customer_service->getCustomersFromDB();
-        $cusomters_ids = $db_customers['response_data']->pluck('id')->toArray();
-
         $filters = [
             'limit' => 100,
-            'page'  => 1
+            'page'  => 1,
         ];
-        $emails = [];
-        $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
-        dd($odoo_customers);
-        while($filters['page'] <= $odoo_customers['pagination']['total_pages']) {
-            $odoo_customers = $this->odoo_service->getCustomers($filters)['data'];
-            
-            if(!empty($odoo_customers)) {
-                foreach($odoo_customers['customers'] as $key => $odoo_customer) {
-                    if(!in_array($odoo_customer['id'], $cusomters_ids)) {
-                        // filter email, phone and name from odoo response should not be null or empty string
-                        if(!empty($odoo_customer['email']) && !empty($odoo_customer['phone']) && !empty($odoo_customer['name'])) {    
-                            if(in_array($odoo_customer['email'], $emails)) {
-                                echo "Customer ID: {$odoo_customer['id']} - {$odoo_customer['name']} skipped due to duplicate email.\n";
-                                continue;
-                            }
-                            $emails[] = $odoo_customer['email'];
+        $imported = 0;
+        $existing = 0;
+        $skipped = 0;
+        $totalPages = 1;
 
-                            // create customer
-                            $customer_data = [
-                                'id'              => $odoo_customer['id'],
-                                'sales_id'        => null, // assign to sales later
-                                'name'            => $odoo_customer['name'],
-                                'phone'           => $odoo_customer['phone'],
-                                'email'           => $odoo_customer['email'],
-                                'address'         => $odoo_customer['address'],
-                                'zone'            => $odoo_customer['city'],
-                                'city'            => $odoo_customer['state'],
-                                'country_odoo_id' => $odoo_customer['country_id'],
-                                'state_odoo_id'   => $odoo_customer['state_id'],
-                                'city_odoo_id'    => $odoo_customer['city_id']
-                                
-                            ];
-                            $customer = $this->customer_service->createCustomers($customer_data);
+        try {
+            do {
+                $page = null;
+                $attempt = 0;
 
-                            echo "Customer ID: {$odoo_customer['id']} - {$odoo_customer['name']} imported successfully.\n";
+                while ($page === null && $attempt < 3) {
+                    $attempt++;
+
+                    try {
+                        $page = $this->odoo_service->getCustomers($filters);
+                    } catch (\Throwable $exception) {
+                        if ($attempt === 3) {
+                            throw $exception;
                         }
-                        else {
-                            echo "Customer ID: {$odoo_customer['id']} - {$odoo_customer['name']} skipped due to missing email, phone or name.\n";
-                        }
+
+                        usleep(500000);
                     }
                 }
-            }
-            
-            $filters['page']++;
+
+                $data = $page['data'] ?? [];
+                $totalPages = (int) ($data['pagination']['total_pages'] ?? $filters['page']);
+
+                foreach ($data['customers'] ?? [] as $odooCustomer) {
+                    $name = trim((string) ($odooCustomer['name'] ?? ''));
+                    $phone = trim((string) ($odooCustomer['phone'] ?? ''));
+
+                    if ($phone === '') {
+                        $phone = trim((string) ($odooCustomer['mobile'] ?? ''));
+                    }
+
+                    if ($name === '' || $phone === '' || empty($odooCustomer['id'])) {
+                        $skipped++;
+                        continue;
+                    }
+
+                    $existingPhone = Customer::withTrashed()
+                        ->where('phone', $phone)
+                        ->where('id', '!=', $odooCustomer['id'])
+                        ->exists();
+
+                    if ($existingPhone) {
+                        $skipped++;
+                        continue;
+                    }
+
+                    $email = trim((string) ($odooCustomer['email'] ?? '')) ?: null;
+                    if ($email && Customer::withTrashed()
+                        ->where('email', $email)
+                        ->where('id', '!=', $odooCustomer['id'])
+                        ->exists()) {
+                        $email = null;
+                    }
+
+                    $customer = Customer::withTrashed()->updateOrCreate(
+                        ['id' => $odooCustomer['id']],
+                        [
+                            'name'            => $name,
+                            'phone'           => $phone,
+                            'email'           => $email,
+                            'is_imported'     => true,
+                            'address'         => $odooCustomer['address'] ?? '',
+                            'city'            => $odooCustomer['city'] ?? '',
+                            'state'           => $odooCustomer['state'] ?? '',
+                            'country_odoo_id' => $odooCustomer['country_id'] ?? null,
+                            'state_odoo_id'   => $odooCustomer['state_id'] ?? null,
+                            'city_odoo_id'    => $odooCustomer['city_id'] ?? null,
+                            'latitude'        => $odooCustomer['latitude'] ?? null,
+                            'longitude'       => $odooCustomer['longitude'] ?? null,
+                        ]
+                    );
+
+                    if ($customer->trashed()) {
+                        $customer->restore();
+                    }
+
+                    if ($customer->wasRecentlyCreated) {
+                        $imported++;
+                    } else {
+                        $existing++;
+                    }
+                }
+
+                $filters['page']++;
+            } while ($filters['page'] <= $totalPages);
+        } finally {
+            Log::channel('customer_import')->info(sprintf(
+                'Customer import run at %s. Imported new: %d. Existing updated: %d. Skipped: %d.',
+                now()->toDateTimeString(),
+                $imported,
+                $existing,
+                $skipped
+            ));
         }
+
+        return self::SUCCESS;
     }
 }

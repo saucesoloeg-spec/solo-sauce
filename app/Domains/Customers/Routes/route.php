@@ -19,6 +19,7 @@ use App\Domains\Customers\Controllers\CustomerController;
 Route::middleware('auth:sales')->group(function () {
     Route::get('/', [CustomerController::class, 'index']);
     Route::post('/', [CustomerController::class, 'store']);
+    Route::put('/odoo/{customer}', [CustomerController::class, 'updateOdoo']);
     Route::get('/{customer}', [CustomerController::class, 'show']);
     Route::put('/{customer}', [CustomerController::class, 'update']);
     Route::delete('/delete/{customer}', [CustomerController::class, 'destroy']);

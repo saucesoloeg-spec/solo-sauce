@@ -14,15 +14,13 @@ class CustomerService
     public function __construct(CustomerRepository $customer_repository, OdooAuthService $odoo_service) 
     {
         $this->customer_repository = $customer_repository;
-        $this->odoo_service        = $odoo_service;
+        $this->odoo_service = $odoo_service;
     }
 
     public function getAll(array $filters = []) 
     {
-        // $customers = $this->customer_repository->getAll();
-
-        $result    = $this->odoo_service->getCustomers(array_filter(array_merge([
-            'page'  => 1,
+        $result = $this->odoo_service->getCustomers(array_filter(array_merge([
+            'page' => 1,
             'limit' => 20,
         ], $filters), function ($value) {
             return $value !== null && $value !== '';
@@ -34,7 +32,7 @@ class CustomerService
                 'response_code'    => 200,
                 'response_message' => 'Customers retrieved successfully.',
                 'response_data'    => [
-                    'customers'  => $customers,
+                    'customers' => $customers,
                     'pagination' => $result['data']['pagination'] ?? [],
                 ]
             ];
@@ -43,24 +41,21 @@ class CustomerService
         return [
             'response_code'    => 404,
             'response_message' => 'No customers found.',
-            'response_data'    => []
+                'response_data'    => []
         ];
     }
 
     public function getById($id) 
     {
-        // $customer = $this->customer_repository->getById($id);
-        // $orders   = $customer->orders()->paginate(10);
-
-        $result   = $this->odoo_service->getCustomerById($id);
+        $result = $this->odoo_service->getCustomerById($id);
         $customer = $result['data'] ?? null;
-        $orders   = Order::where('customer_id', $id)->paginate(10);
+        $orders = Order::where('customer_id', $id)->paginate(10);
         
         if($customer) {
             return [
                 'response_code'    => 200,
                 'response_message' => 'Customer retrieved successfully.',
-            'response_data'    => ['customer' => (object) $customer, 'orders' => $orders]
+                'response_data'    => ['customer' => (object) $customer, 'orders' => $orders]
             ];
         }
 

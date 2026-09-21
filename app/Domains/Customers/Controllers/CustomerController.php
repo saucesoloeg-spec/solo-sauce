@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Domains\Customers\Services\CustomerService;
 use App\Domains\Customers\Requests\CreateCustomerRequest;
+use App\Domains\Customers\Requests\UpdateOdooCustomerRequest;
 
 class CustomerController extends Controller
 {
@@ -90,6 +91,16 @@ class CustomerController extends Controller
     public function update(CreateCustomerRequest $request, Customer $customer)
     {
         $response = $this->customer_service->updateCustomer($customer->id, $request->validated());
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    public function updateOdoo(UpdateOdooCustomerRequest $request, $customer)
+    {
+        $response = $this->customer_service->updateCustomerInOdoo(
+            $customer,
+            $request->validated()
+        );
 
         return response()->json($response, $response['response_code']);
     }

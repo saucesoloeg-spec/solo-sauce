@@ -701,4 +701,47 @@ class OdooAuthService
         return $result;
     }
 
+    public function updateCustomer($id, array $data)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/customers/' . $id;
+
+        $response = curl_init($url);
+        curl_setopt_array($response, [
+            CURLOPT_CUSTOMREQUEST => 'PUT',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+            CURLOPT_POSTFIELDS => json_encode($data),
+        ]);
+
+        try {
+            $body = curl_exec($response);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if ($body === false) {
+                throw new \Exception(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+
+            if ($httpCode >= 400 || !is_array($result) || empty($result['success'])) {
+                $detail = $result['error']['detail']['message']
+                    ?? $result['error']['detail']
+                    ?? $result['error']['message']
+                    ?? 'Unknown API error';
+                throw new \Exception($detail);
+            }
+
+            return $result;
+        } catch (\Throwable $th) {
+            throw new \Exception('Failed to update customer in Odoo: ' . $th->getMessage());
+        } finally {
+            curl_close($response);
+        }
+    }
+
 }

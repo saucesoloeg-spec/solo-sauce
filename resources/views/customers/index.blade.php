@@ -151,7 +151,7 @@
                                         <div class="d-flex flex-column justify-content-center ms-1">
                                             <h6 class="mb-0 text-sm font-weight-semibold">{{ $customer['name'] ?? '-' }}</h6>
                                             <p class="text-sm text-secondary mb-0">{{ $customer['email'] ?? '-' }}</p>
-                                            <p class="text-sm text-secondary mb-0">{{ $customer['phone'] ?: ($customer['mobile'] ?? '-') }}</p>
+                                            <p class="text-sm text-secondary mb-0">{{ $customer['phone'] ?? ($customer['mobile'] ?? '-') }}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -258,7 +258,7 @@
                 </div>
                 <!-- Update Modal -->
                 <div class="border-top py-3 px-3 d-flex align-items-center">
-                    <p class="font-weight-semibold mb-0 text-dark text-sm paging">
+                    <p class="font-weight-semibold mb-0 text-dark text-sm paging" data-current-page="{{ $pagination['page'] ?? 1 }}" data-total-pages="{{ $pagination['total_pages'] ?? 1 }}">
                         Page {{ $pagination['page'] ?? 1 }} of {{ $pagination['total_pages'] ?? 1 }}
                     </p>
                     <div class="ms-auto">
@@ -283,8 +283,8 @@
         const pageInfo = document.querySelector('.paging');
         const prevButton = document.querySelector('.previous');
         const nextButton = document.querySelector('.next');
-        const currentPage = {{ (int) ($pagination['page'] ?? 1) }};
-        const totalPages = {{ (int) ($pagination['total_pages'] ?? 1) }};
+        const currentPage = Number(pageInfo.dataset.currentPage || 1);
+        const totalPages = Number(pageInfo.dataset.totalPages || 1);
 
         function loadPage(page) {
             const params = new URLSearchParams(window.location.search);

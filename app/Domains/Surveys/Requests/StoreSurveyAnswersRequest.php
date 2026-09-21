@@ -27,7 +27,7 @@ class StoreSurveyAnswersRequest extends FormRequest
             'answers'               => 'required|array',
             'answers.*.survey_id'   => 'required|exists:surveys,id',
             'answers.*.answer'      => 'required|string', // if question is dropdown send the option value as string
-            'answers.*.customer_id' => 'required|exists:customers,id',
+            'answers.*.customer_id' => 'required|numeric',
             'answers.*.note'        => 'nullable|string|max:255',
         ];
     }
