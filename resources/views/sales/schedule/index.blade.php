@@ -220,12 +220,12 @@
                                             <img src="../assets/img/team-2.jpg" class="avatar avatar-sm rounded-circle me-2" alt="user1">
                                         </div>
                                         <div class="d-flex flex-column justify-content-center ms-1">
-                                            <h6 class="mb-0 text-sm font-weight-semibold" data-sales-id="{{ $schedule->sales->id }}">{{ $schedule->sales->name }}</h6>
+                                            <h6 class="mb-0 text-sm font-weight-semibold" data-sales-id="{{ optional($schedule->sales)->id }}">{{ optional($schedule->sales)->name ?? 'Unknown sales representative' }}</h6>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $schedule->customer->name }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ optional($schedule->customer)->name ?? 'Unknown customer' }}</p>
                                 </td>
                                 <td class="text-center" data-date="{{ date('Y-m-d', strtotime($schedule->visit_at)) }}">
                                     <p class="text-sm text-dark font-weight-semibold mb-0">{{ $schedule->visit_at ? \Carbon\Carbon::parse($schedule->visit_at)->format('Y-m-d') : 'Not Set' }}</p>
