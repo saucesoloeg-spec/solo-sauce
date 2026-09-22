@@ -82,12 +82,12 @@ class ImportCustomersCommand extends Command
                         $phone = trim((string) ($odooCustomer['mobile'] ?? ''));
                     }
 
-                    if ($name === '' || $phone === '' || empty($odooCustomer['id'])) {
+                    if ($name === '' || empty($odooCustomer['id'])) {
                         $skipped++;
                         continue;
                     }
 
-                    $existingPhone = Customer::withTrashed()
+                    $existingPhone = $phone !== '' && Customer::withTrashed()
                         ->where('phone', $phone)
                         ->where('id', '!=', $odooCustomer['id'])
                         ->exists();
@@ -109,7 +109,7 @@ class ImportCustomersCommand extends Command
                         ['id' => $odooCustomer['id']],
                         [
                             'name'            => $name,
-                            'phone'           => $phone,
+                            'phone'           => $phone !== '' ? $phone : null,
                             'email'           => $email,
                             'is_imported'     => true,
                             'address'         => $odooCustomer['address'] ?? '',
