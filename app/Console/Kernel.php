@@ -15,8 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('import:customers')->everyMinute()->withoutOverlapping();
-        // $schedule->command('import:customers')->dailyAt('00:00')->withoutOverlapping();
+        // $schedule->command('import:customers')->everyMinute()->withoutOverlapping();
+        $schedule->command('import:customers')->dailyAt('00:00')->withoutOverlapping();
         $schedule->command('income:monthly')->lastDayOfMonth('23:59')->withoutOverlapping();
     }
 
