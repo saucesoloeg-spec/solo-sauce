@@ -5,6 +5,7 @@ namespace App\Domains\Odoo\Controllers;
 use App\Domains\Odoo\Services\OdooAuthService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OdooController extends Controller
 {
@@ -97,6 +98,31 @@ class OdooController extends Controller
         $response = $this->odoo_service->getCities($state_id);
         
         return response()->json($response, $response['response_code']);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'email'            => ['required', 'email'],
+            'new_password'     => ['required', 'string', 'min:8', 'max:128', 'regex:/[A-Z]/', 'regex:/[0-9]/'],
+            'confirm_password' => ['required', 'same:new_password'],
+        ]);
+
+        try {
+            $response = $this->odoo_service->resetPassword($validated);
+
+            return response()->json($response['body'], $response['status']);
+        } catch (\Throwable $exception) {
+            Log::error('Failed to reset Odoo password: ' . $exception->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'error' => [
+                    'detail' => 'Unable to reset the password at this time.',
+                ],
+            ], 502);
+        }
     }
 
     /**
