@@ -3,6 +3,7 @@
 namespace App\Domains\Odoo\Services;
 
 use App\Domains\Odoo\Repositories\OdooAuthRepository;
+use Illuminate\Support\Facades\Log;
 
 class OdooAuthService
 {
@@ -46,7 +47,7 @@ class OdooAuthService
         try {
             $result = json_decode(curl_exec($response), true);
             if(isset($result['error'])) {
-                \Log::error('Failed to create Odoo account: ' . $result['error']['detail']['message']);
+                Log::error('Failed to create Odoo account: ' . $result['error']['detail']['message']);
 
                 return [
                     'success' => false,
@@ -62,7 +63,7 @@ class OdooAuthService
 
             return $result;
         } catch (\Throwable $th) {
-            \Log::error('Failed to create Odoo account: ' . $th->getMessage());
+            Log::error('Failed to create Odoo account: ' . $th->getMessage());
 
             return [
                 'success' => false,
@@ -113,7 +114,7 @@ class OdooAuthService
             
             return $result;
         } catch (\Throwable $th) {
-            \Log::error('Failed to update Odoo account: ' . $th->getMessage());
+            Log::error('Failed to update Odoo account: ' . $th->getMessage());
             throw new \Exception('Failed to update Odoo account: ' . $th->getMessage());
         }
 
@@ -178,6 +179,48 @@ class OdooAuthService
             'refresh_token' => $result->refresh_token,
             'expires_at'    => $result->expires_at,
         ];
+    }
+
+    public function resetPassword($request = [])
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $response = curl_init(rtrim(env('ODOO_API_URL'), '/') . '/auth/reset-password');
+
+        curl_setopt_array($response, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'email' => $request['email'],
+                'new_password' => $request['new_password'],
+                'confirm_password' => $request['confirm_password'],
+            ]),
+        ]);
+
+        try {
+            $body = curl_exec($response);
+            
+            if ($body === false) {
+                throw new \Exception(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+
+            if (!is_array($result)) {
+                throw new \Exception('Invalid response from Odoo.');
+            }
+
+            return [
+                'status' => curl_getinfo($response, CURLINFO_HTTP_CODE) ?: 502,
+                'body' => $result,
+            ];
+        } finally {
+            curl_close($response);
+        }
     }
 
     // public function getProductsFromOdoo($filters = [])

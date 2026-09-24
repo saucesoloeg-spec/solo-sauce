@@ -18,3 +18,4 @@ use App\Domains\Odoo\Controllers\OdooController;
 Route::get('/countries', [OdooController::class, 'countries']);
 Route::get('/states/{country_id}', [OdooController::class, 'states']);
 Route::get('/cities/{state_id}', [OdooController::class, 'cities']);
+Route::post('/reset-password', [OdooController::class, 'resetPassword']);
