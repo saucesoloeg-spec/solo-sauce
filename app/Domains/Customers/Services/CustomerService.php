@@ -92,6 +92,7 @@ class CustomerService
             'id'              => $customer['id'] ?? null,
             'sales_id'        => null,
             'name'            => $customer['name'] ?? null,
+            'store_name'      => $customer['store_name'] ?? null,
             'email'           => $customer['email'] ?? null,
             'phone'           => $customer['phone'] ?: ($customer['mobile'] ?? null),
             'mobile'          => $customer['mobile'] ?? null,
