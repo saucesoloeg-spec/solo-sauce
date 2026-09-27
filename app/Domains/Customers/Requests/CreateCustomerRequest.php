@@ -28,6 +28,7 @@ class CreateCustomerRequest extends FormRequest
         
         return [
             'name'            => 'required|string|max:255',
+            'store_name'      => 'required|string|max:255',
             'commercial_name' => 'nullable|string|max:255',
             'taxtation_name'  => 'nullable|string|max:255',
             'email'           => ['nullable','email', $customer_id ? Rule::unique('customers', 'email')->ignore($customer_id) : 'unique:customers,email'],

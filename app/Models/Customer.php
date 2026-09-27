@@ -14,6 +14,7 @@ class Customer extends Model
         'id',
         'sales_id',
         'name',
+        'store_name',
         'email',
         'phone',
         'via',
