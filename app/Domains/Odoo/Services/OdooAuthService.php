@@ -443,6 +443,7 @@ class OdooAuthService
 
         $odoo_customer = [
             "name"       => $customer['name'],
+            "store_name" => $customer['store_name'] ?? null,
             "phone"      => $customer['phone'],
             "mobile"     => $customer['phone'],
             "email"      => $customer['email'] ?? null,
