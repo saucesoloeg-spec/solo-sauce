@@ -135,8 +135,9 @@ class CustomerService
 
     public function createCustomer(array $data)
     {
-        $sales            = auth()->user();
-        $data['sales_id'] = $sales->id;
+        $sales                 = auth()->user();
+        $data['sales_id']      = $sales->id;
+        $data['odoo_sales_id'] = $sales->odoo_id;
         $send_odoo = $this->odoo_service->sendCustomerToOdoo($data);
         
         if($send_odoo['response_code'] == 201) {

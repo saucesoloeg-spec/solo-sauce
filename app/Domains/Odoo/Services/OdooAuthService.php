@@ -442,6 +442,7 @@ class OdooAuthService
         $url = env('ODOO_API_URL').'/customers';
 
         $odoo_customer = [
+            "sales_id"   => $customer['odoo_sales_id'] ?? null,
             "name"       => $customer['name'],
             "store_name" => $customer['store_name'] ?? null,
             "phone"      => $customer['phone'],
