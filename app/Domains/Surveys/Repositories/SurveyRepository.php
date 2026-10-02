@@ -59,6 +59,10 @@ class SurveyRepository
 
     public function getAnswersByCustomerId($data)
     {
+        if (empty($data['visit_id'])) {
+            return $this->getAnswersGroupedByVisit($data['customer_id']);
+        }
+
         $visit = $this->sales_customers_model->where('id', $data['visit_id'])->first();
         if (!$visit) {
             return null; // or throw an exception
@@ -71,6 +75,33 @@ class SurveyRepository
                     })
                     ->select('surveys.*', 'survey_answers.answer')
                     ->get();
+    }
+
+    private function getAnswersGroupedByVisit($customer_id)
+    {
+        $surveys = $this->model->all();
+
+        $visits = $this->sales_customers_model
+                    ->where('customer_id', $customer_id)
+                    ->whereHas('answers')
+                    ->with('answers')
+                    ->orderByDesc('visit_at')
+                    ->get();
+
+        return $visits->map(function ($visit) use ($surveys) {
+            $answers = $visit->answers->keyBy('survey_id');
+
+            return [
+                'visit_id' => $visit->id,
+                'visit_at' => $visit->visit_at,
+                'surveys'  => $surveys->map(function ($survey) use ($answers) {
+                    $item = $survey->toArray();
+                    $item['answer'] = optional($answers->get($survey->id))->answer;
+
+                    return $item;
+                })->values(),
+            ];
+        })->values();
     }
 
     public function getAnswersBySalesId($id, $filters = [])
