@@ -109,7 +109,7 @@ class SurveyRepository
         return Customer::with([
             'answers' => function ($q) use ($id, $filters) {
                 $q->where('sales_id', $id)
-                ->with('survey');
+                ->with(['survey', 'visit']);
                 if(isset($filters['from']) && isset($filters['to'])) {
                     $q->whereBetween('created_at', [$filters['from'], $filters['to']]);
                 }
@@ -121,7 +121,24 @@ class SurveyRepository
                 $q->whereBetween('created_at', [$filters['from'], $filters['to']]);
             }
         })
-        ->get();
+        ->get()
+        ->each(function ($customer) {
+            $grouped = $customer->answers
+                ->groupBy('sales_customer_id')
+                ->map(function ($answers, $visit_id) {
+                    return [
+                        'visit_id' => $visit_id,
+                        'visit_at' => optional($answers->first()->visit)->visit_at,
+                        'answers'  => $answers->map(function ($answer) {
+                            return $answer->makeHidden('visit');
+                        })->values(),
+                    ];
+                })
+                ->sortByDesc('visit_at')
+                ->values();
+
+            $customer->setRelation('answers', $grouped);
+        });
     }
 
 }
