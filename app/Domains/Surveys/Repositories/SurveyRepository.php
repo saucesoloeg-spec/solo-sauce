@@ -142,6 +142,7 @@ class SurveyRepository
                     return [
                         'visit_id' => $visit_id,
                         'visit_at' => optional($answers->first()->visit)->visit_at,
+                        'sales_notes' => optional($answers->first()->visit)->sales_notes,
                         'answers'  => $answers->map(function ($answer) {
                             return $answer->makeHidden('visit');
                         })->values(),

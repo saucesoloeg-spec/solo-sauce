@@ -250,6 +250,41 @@ class SalesVisitNotesTest extends TestCase
             ->assertJsonPath('response_data.0.sales_notes', 'Customer not present');
     }
 
+    // ---- GET /api/sales/schedule-history ----
+
+    public function test_schedule_history_returns_sales_notes_for_visits_and_survey_groups()
+    {
+        $sales    = $this->makeSales();
+        $customer = $this->makeCustomer($sales->id);
+        $survey   = $this->makeSurvey();
+        $noteOnly = $this->makeVisit($sales->id, $customer, [
+            'status'      => 'completed',
+            'visit_at'    => now()->subDay(),
+            'sales_notes' => 'Customer not present',
+        ]);
+        $answered = $this->makeVisit($sales->id, $customer, [
+            'status'      => 'completed',
+            'visit_at'    => now()->subMinute(),
+            'sales_notes' => 'Surveyed',
+        ]);
+        SurveyAnswer::create([
+            'sales_id'          => $sales->id,
+            'sales_customer_id' => $answered->id,
+            'survey_id'         => $survey->id,
+            'customer_id'       => $customer,
+            'answer'            => 'yes',
+        ]);
+        Sanctum::actingAs($sales, [], 'sales');
+
+        $response = $this->getJson('/api/sales/schedule-history')->assertStatus(200);
+
+        $visits = collect($response->json('response_data.visits'))->keyBy('id');
+        $this->assertSame('Customer not present', $visits[$noteOnly->id]['sales_notes']);
+        $this->assertSame('Surveyed', $visits[$answered->id]['sales_notes']);
+
+        $response->assertJsonPath('response_data.surveys.0.answers.0.sales_notes', 'Surveyed');
+    }
+
     public function test_get_customer_answers_excludes_visits_without_answers_or_notes()
     {
         $sales    = $this->makeSales();
