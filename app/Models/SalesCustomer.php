@@ -17,6 +17,7 @@ class SalesCustomer extends Model
         'survey',
         'status',
         'notes',
+        'sales_notes',
     ];
 
     public function sales()

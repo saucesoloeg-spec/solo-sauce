@@ -72,6 +72,22 @@ class SalesRepository
         return $query->with('order')->get();
     }
 
+    public function updateVisit($visitId, $salesId, array $data)
+    {
+        $visit = $this->sales_customer_model
+            ->where('id', $visitId)
+            ->where('sales_id', $salesId)
+            ->first();
+
+        if (!$visit) {
+            return null;
+        }
+
+        $visit->update(array_intersect_key($data, array_flip(['status', 'sales_notes'])));
+
+        return $visit->fresh(['order', 'customer']);
+    }
+
     public function cancelSchedule($scheduleId, $salesId)
     {
         return $this->sales_customer_model
