@@ -143,10 +143,12 @@ class SalesVisitNotesTest extends TestCase
             ->assertStatus(422)->assertJsonValidationErrors('customer_id');
     }
 
-    public function test_store_survey_with_only_sales_notes_completes_pending_visit_without_answers()
+    public function test_store_survey_with_only_sales_notes_completes_pending_visit_with_empty_answers()
     {
         $sales    = $this->makeSales();
         $customer = $this->makeCustomer($sales->id);
+        $this->makeSurvey('Q1');
+        $this->makeSurvey('Q2');
         $visit    = $this->makeVisit($sales->id, $customer);
         Sanctum::actingAs($sales, [], 'sales');
 
@@ -159,7 +161,10 @@ class SalesVisitNotesTest extends TestCase
         $this->assertSame('completed', $visit->status);
         $this->assertSame('Customer not present', $visit->sales_notes);
         $this->assertFalse((bool) $visit->survey);
-        $this->assertSame(0, SurveyAnswer::count());
+
+        $records = SurveyAnswer::where('sales_customer_id', $visit->id)->get();
+        $this->assertCount(2, $records);
+        $this->assertTrue($records->every(fn ($r) => $r->answer === null && (int) $r->sales_id === $sales->id));
     }
 
     public function test_store_survey_with_only_sales_notes_creates_visit_when_none_pending()
@@ -251,6 +256,24 @@ class SalesVisitNotesTest extends TestCase
     }
 
     // ---- GET /api/sales/schedule-history ----
+
+    public function test_schedule_returns_note_only_visit_in_surveys_after_store()
+    {
+        $sales    = $this->makeSales();
+        $customer = $this->makeCustomer($sales->id);
+        $this->makeSurvey();
+        $visit    = $this->makeVisit($sales->id, $customer);
+        Sanctum::actingAs($sales, [], 'sales');
+
+        $this->postJson('/api/surveys', ['customer_id' => $customer, 'sales_notes' => 'Shop closed'])
+            ->assertStatus(201);
+
+        $this->getJson('/api/sales/schedule')
+            ->assertStatus(200)
+            ->assertJsonPath('response_data.surveys.0.answers.0.visit_id', $visit->id)
+            ->assertJsonPath('response_data.surveys.0.answers.0.sales_notes', 'Shop closed')
+            ->assertJsonPath('response_data.surveys.0.answers.0.answers.0.answer', null);
+    }
 
     public function test_schedule_history_returns_sales_notes_for_visits_and_survey_groups()
     {

@@ -55,6 +55,12 @@ class SurveyRepository
             ]);
         }
 
+        if (!$has_answers) {
+            $answers = $this->model->pluck('id')->map(function ($survey_id) use ($customer_id) {
+                return ['survey_id' => $survey_id, 'customer_id' => $customer_id, 'answer' => null];
+            })->all();
+        }
+
         foreach ($answers as $answer) {
             $answer['sales_id']          = auth('sales')->id();
             $answer['sales_customer_id'] = $visit->id; 
