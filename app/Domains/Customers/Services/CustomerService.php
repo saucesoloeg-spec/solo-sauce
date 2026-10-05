@@ -90,7 +90,7 @@ class CustomerService
     {
         return [
             'id'              => $customer['id'] ?? null,
-            'sales_id'        => null,
+            'sales_id'        => $customer['sales_id'] ?? null,
             'name'            => $customer['name'] ?? null,
             'store_name'      => $customer['store_name'] ?? null,
             'email'           => $customer['email'] ?? null,

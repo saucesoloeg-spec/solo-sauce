@@ -87,12 +87,23 @@ class ImportCustomersCommand extends Command
                         continue;
                     }
 
-                    $existingPhone = $phone !== '' && Customer::withTrashed()
+                    $latitude = isset($odooCustomer['latitude']) && is_numeric($odooCustomer['latitude'])
+                        ? (float) $odooCustomer['latitude']
+                        : null;
+                    $longitude = isset($odooCustomer['longitude']) && is_numeric($odooCustomer['longitude'])
+                        ? (float) $odooCustomer['longitude']
+                        : null;
+
+                    $hasDuplicateIdentity = $phone !== '' && $latitude !== null && $longitude !== null;
+                    $isDuplicate = $hasDuplicateIdentity && Customer::withTrashed()
+                        ->where('name', $name)
                         ->where('phone', $phone)
+                        ->whereRaw('ROUND(latitude, 6) = ?', [round($latitude, 6)])
+                        ->whereRaw('ROUND(longitude, 6) = ?', [round($longitude, 6)])
                         ->where('id', '!=', $odooCustomer['id'])
                         ->exists();
 
-                    if ($existingPhone) {
+                    if ($isDuplicate) {
                         $skipped++;
                         continue;
                     }
@@ -118,8 +129,8 @@ class ImportCustomersCommand extends Command
                             'country_odoo_id' => $odooCustomer['country_id'] ?? null,
                             'state_odoo_id'   => $odooCustomer['state_id'] ?? null,
                             'city_odoo_id'    => $odooCustomer['city_id'] ?? null,
-                            'latitude'        => $odooCustomer['latitude'] ?? null,
-                            'longitude'       => $odooCustomer['longitude'] ?? null,
+                            'latitude'        => $latitude,
+                            'longitude'       => $longitude,
                         ]
                     );
 
