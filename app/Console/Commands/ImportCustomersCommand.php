@@ -93,9 +93,21 @@ class ImportCustomersCommand extends Command
                     $longitude = isset($odooCustomer['longitude']) && is_numeric($odooCustomer['longitude'])
                         ? (float) $odooCustomer['longitude']
                         : null;
+                    $storeName = trim((string) ($odooCustomer['store_name'] ?? '')) ?: null;
+
+                    $customer = Customer::withTrashed()->where('id', $odooCustomer['id'])->first();
+
+                    if (!$customer && $phone !== '' && $latitude !== null && $longitude !== null) {
+                        $customer = Customer::withTrashed()
+                            ->where('name', $name)
+                            ->where('phone', $phone)
+                            ->whereRaw('ROUND(latitude, 6) = ?', [round($latitude, 6)])
+                            ->whereRaw('ROUND(longitude, 6) = ?', [round($longitude, 6)])
+                            ->first();
+                    }
 
                     $hasDuplicateIdentity = $phone !== '' && $latitude !== null && $longitude !== null;
-                    $isDuplicate = $hasDuplicateIdentity && Customer::withTrashed()
+                    $isDuplicate = $hasDuplicateIdentity && !$customer && Customer::withTrashed()
                         ->where('name', $name)
                         ->where('phone', $phone)
                         ->whereRaw('ROUND(latitude, 6) = ?', [round($latitude, 6)])
@@ -111,34 +123,40 @@ class ImportCustomersCommand extends Command
                     $email = trim((string) ($odooCustomer['email'] ?? '')) ?: null;
                     if ($email && Customer::withTrashed()
                         ->where('email', $email)
-                        ->where('id', '!=', $odooCustomer['id'])
+                        ->where('id', '!=', ($customer ? $customer->id : $odooCustomer['id']))
                         ->exists()) {
                         $email = null;
                     }
 
-                    $customer = Customer::withTrashed()->updateOrCreate(
-                        ['id' => $odooCustomer['id']],
-                        [
-                            'name'            => $name,
-                            'phone'           => $phone !== '' ? $phone : null,
-                            'email'           => $email,
-                            'is_imported'     => true,
-                            'address'         => $odooCustomer['address'] ?? '',
-                            'city'            => $odooCustomer['city'] ?? '',
-                            'state'           => $odooCustomer['state'] ?? '',
-                            'country_odoo_id' => $odooCustomer['country_id'] ?? null,
-                            'state_odoo_id'   => $odooCustomer['state_id'] ?? null,
-                            'city_odoo_id'    => $odooCustomer['city_id'] ?? null,
-                            'latitude'        => $latitude,
-                            'longitude'       => $longitude,
-                        ]
-                    );
+                    $isNewCustomer = false;
+                    if (!$customer) {
+                        $customer = new Customer();
+                        $customer->id = $odooCustomer['id'];
+                        $isNewCustomer = true;
+                    }
+
+                    $customer->fill([
+                        'name'            => $name,
+                        'store_name'      => $storeName,
+                        'phone'           => $phone !== '' ? $phone : null,
+                        'email'           => $email,
+                        'is_imported'     => true,
+                        'address'         => $odooCustomer['address'] ?? '',
+                        'city'            => $odooCustomer['city'] ?? '',
+                        'state'           => $odooCustomer['state'] ?? '',
+                        'country_odoo_id' => $odooCustomer['country_id'] ?? null,
+                        'state_odoo_id'   => $odooCustomer['state_id'] ?? null,
+                        'city_odoo_id'    => $odooCustomer['city_id'] ?? null,
+                        'latitude'        => $latitude,
+                        'longitude'       => $longitude,
+                    ]);
+                    $customer->save();
 
                     if ($customer->trashed()) {
                         $customer->restore();
                     }
 
-                    if ($customer->wasRecentlyCreated) {
+                    if ($isNewCustomer) {
                         $imported++;
                     } else {
                         $existing++;
