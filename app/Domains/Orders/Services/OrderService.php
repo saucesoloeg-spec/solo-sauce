@@ -20,6 +20,7 @@ class OrderService
     {
         $payload = [
             'customer_id'    => (int)$data['customer_id'], // cast it as integer
+            'type_id'        => 2,
             'date_order'     => date('Y-m-d H:i:s'), // current date and time
             'amount_total'   => (float)$data['amount_total'], // cast it as
             'notes'          => $data['notes'] ?? '', // default to empty string if not provided
