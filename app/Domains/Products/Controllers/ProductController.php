@@ -61,6 +61,18 @@ class ProductController extends Controller
         return response()->json($response);
     }
 
+    public function stockBalance(Request $request)
+    {
+        $filters = $request->validate([
+            'location_id' => ['sometimes', 'nullable', 'integer'],
+            'product_id'  => ['sometimes', 'nullable', 'integer'],
+        ]);
+
+        $response = $this->product_service->getStockBalance($filters);
+
+        return response()->json($response);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *

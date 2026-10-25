@@ -41,7 +41,10 @@ class SalesController extends Controller
     {
         $countries = $this->odoo_service->getCountries();
         
-        return view('sales.create', ['countries' => $countries['data']['countries']]);
+        return view('sales.create', [
+            'countries' => $countries['data']['countries'],
+            'storageLocations' => $this->odoo_service->getStorageLocations(),
+        ]);
     }
 
     /**

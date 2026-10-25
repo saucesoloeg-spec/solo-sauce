@@ -217,6 +217,11 @@ class SalesService
             $data['city_odoo_id'] = (int) $allowedCityIds[0];
         }
 
+        $trashed = \App\Models\Sales::onlyTrashed()->where('email', $data['email'])->first();
+        if ($trashed) {
+            return $this->restoreSales($trashed, $data, $allowedCityIds);
+        }
+
         $authResponse = $this->odoo_service->createOdooAccount(array_merge($data, [
             'allowed_city_ids' => $allowedCityIds,
         ]));
@@ -246,6 +251,38 @@ class SalesService
             'response_code'    => 400,
             'response_message' => $authResponse['error']['detail'] ?? 'Failed to create sales.',
             'response_data'    => null
+        ];
+    }
+
+    private function restoreSales($sales, array $data, array $allowedCityIds)
+    {
+        if (!empty($sales->odoo_id)) {
+            try {
+                $this->odoo_service->updateOdooAccount([
+                    'odoo_id' => $sales->odoo_id,
+                    'allowed_city_ids' => $allowedCityIds,
+                    'city_odoo_id' => $data['city_odoo_id'] ?? null,
+                ]);
+            } catch (\Exception $e) {
+                return [
+                    'response_code'    => 400,
+                    'response_message' => $e->getMessage(),
+                    'response_data'    => null
+                ];
+            }
+        }
+
+        // Keep the original uuid and odoo link of the restored account.
+        unset($data['uuid'], $data['odoo_id']);
+
+        $sales->restore();
+        $sales->fill($data)->save();
+        $this->sales_repository->syncAllowedCities($sales->id, $allowedCityIds);
+
+        return [
+            'response_code'    => 201,
+            'response_message' => 'Sales created successfully.',
+            'response_data'    => $sales
         ];
     }
 

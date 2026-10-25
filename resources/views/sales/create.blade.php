@@ -148,7 +148,8 @@
                             <div class="form-group">
                                 <label for="email" class="form-label">{{ __('sales.email') }} <span style="color: red;">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
-                                @error('email')
+                                                                <small class="form-text text-muted">{{ __('sales.email_restore_hint') }}</small>
+                                                                @error('email')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -189,6 +190,19 @@
                                 </select>
 
                                 @error('state')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="storage_location_odoo_id" class="form-label">Storage Location <span style="color: red;">*</span></label>
+                                <select id="storage_location_odoo_id" name="storage_location_odoo_id" class="form-select" required>
+                                    <option value="">Select Storage Location</option>
+                                    @foreach($storageLocations as $location)
+                                        <option value="{{ $location['id'] }}" @selected(old('storage_location_odoo_id') == $location['id']) @disabled(!empty($location['is_assigned']))>{{ $location['name'] ?? $location['id'] }}{{ !empty($location['is_assigned']) ? ' (assigned)' : '' }}</option>
+                                    @endforeach
+                                </select>
+                                @error('storage_location_odoo_id')
                                     <div class="error-message">{{ $message }}</div>
                                 @enderror
                             </div>

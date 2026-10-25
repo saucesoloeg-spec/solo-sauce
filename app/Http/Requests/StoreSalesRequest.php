@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Sales;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSalesRequest extends FormRequest
 {
@@ -23,19 +25,24 @@ class StoreSalesRequest extends FormRequest
      */
     public function rules()
     {
+        // A soft-deleted salesman with the same email is restored on creation,
+        // so its row must not trigger uniqueness errors.
+        $trashedId = Sales::onlyTrashed()->where('email', $this->input('email'))->value('id');
+
         return [
-            'name'               => 'required|string|max:255',
-            'email'              => 'required|email|max:255|unique:sales,email',
-            'phone'              => 'required|string|max:20|unique:sales,phone',
-            'national_number'    => 'nullable|string|max:14|unique:sales,national_number',
-            'address'            => 'nullable|string',
-            'zone'               => 'nullable|string|max:255',
-            'city'               => 'nullable|string|max:255',
-            'country_odoo_id'    => 'required|integer',
-            'state_odoo_id'      => 'required|integer',
-            'allowed_city_ids'   => 'required|array|min:1',
-            'allowed_city_ids.*' => 'required|integer',
-            'password'           => 'required|string|min:8|confirmed',
+            'name'                     => 'required|string|max:255',
+            'email'                    => ['required', 'email', 'max:255', Rule::unique('sales', 'email')->whereNull('deleted_at')],
+            'phone'                    => ['required', 'string', 'max:20', Rule::unique('sales', 'phone')->ignore($trashedId)],
+            'national_number'          => ['nullable', 'string', 'max:14', Rule::unique('sales', 'national_number')->ignore($trashedId)],
+            'address'                  => 'nullable|string',
+            'zone'                     => 'nullable|string|max:255',
+            'city'                     => 'nullable|string|max:255',
+            'country_odoo_id'          => 'required|integer',
+            'state_odoo_id'            => 'required|integer',
+            'storage_location_odoo_id' => 'required|integer',
+            'allowed_city_ids'         => 'required|array|min:1',
+            'allowed_city_ids.*'       => 'required|integer',
+            'password'                 => 'required|string|min:8|confirmed',
         ];
     }
 

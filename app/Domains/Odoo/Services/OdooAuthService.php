@@ -38,6 +38,7 @@ class OdooAuthService
             'password'         => env('ODOO_PASSWORD'),
             'phone'            => $request['phone'] ?? "01234567890",
             'role'             => 'salesperson',
+            'location_id'      => isset($request['storage_location_odoo_id']) ? (int) $request['storage_location_odoo_id'] : null,
             'allowed_city_ids' => array_values(array_unique(array_filter($allowedCityIds, function ($cityId) {
                 return !is_null($cityId) && $cityId !== '';
             }))),
@@ -356,6 +357,42 @@ class OdooAuthService
         curl_close($response);
 
         return $result;
+    }
+
+    public function getStorageLocations(): array
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $response = curl_init(rtrim(env('ODOO_API_URL'), '/') .         '/storage-locations/storage-location');
+        curl_setopt_array($response, [
+            CURLOPT_HTTPGET => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+        ]);
+
+        try {
+            $body = curl_exec($response);
+            $result = is_string($body) ? json_decode($body, true) : null;
+
+            if (!is_array($result) || isset($result['error'])) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            $data = $result['data'] ?? $result;
+            $list = $data['storage_locations'] ?? $data['locations'] ?? $data;
+
+            return array_values(array_filter(is_array($list) ? $list : [], function ($location) {
+                return is_array($location) && isset($location['id']);
+            }));
+        } catch (\Throwable $exception) {
+            Log::error('Failed to fetch storage locations from Odoo: ' . $exception->getMessage());
+
+            return [];
+        } finally {
+            curl_close($response);
+        }
     }
 
     public function getStockBalanceFromOdoo(array $filters = [])

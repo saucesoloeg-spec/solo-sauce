@@ -31,6 +31,7 @@ class Sales extends Authenticatable
         'country_odoo_id',
         'state_odoo_id',
         'city_odoo_id',
+        'storage_location_odoo_id',
         'password',
         'fcm_token',
     ];
