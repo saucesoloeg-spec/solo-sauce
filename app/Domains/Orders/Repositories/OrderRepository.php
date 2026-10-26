@@ -37,8 +37,8 @@ class OrderRepository
                 'customer_phone'   => $data['customer_phone'] ?? 'Unknown Phone',
                 'delivery_date'    => $data['delivery_date'] ?? now(),
                 'amount_total'     => $data['amount_total'],
-                'tax'              => $data['tax'] ?? false,
-                'amount_tax'       => $data['tax'] ? $data['amount_total'] * SystemConstants::TAX_PERCENTAGE : 0,
+                'tax'              => (bool) ($data['tax'] ?? false),
+                'amount_tax'       => !empty($data['tax']) ? $data['amount_total'] * SystemConstants::TAX_PERCENTAGE : 0,
                 'state'            => $data['state'] ?? 'pending',
                 'payment_status'   => $data['payment_status'],
                 'driver_id'        => $data['driver_id'] ?? null,
@@ -70,7 +70,13 @@ class OrderRepository
                 ->first();
             
             if ($visit) {
-                $this->sales_customer_model->where('id', $visit->id)->update(['order_id' => $order->id, 'status' => 'completed']);
+                // getPastSchedule only returns visits with visit_at <= now(), so a completed visit scheduled later today would be hidden
+                $visitUpdate = ['order_id' => $order->id, 'status' => 'completed'];
+                if ($visit->visit_at && \Illuminate\Support\Carbon::parse($visit->visit_at)->isFuture()) {
+                    $visitUpdate['visit_at'] = now();
+                }
+
+                $this->sales_customer_model->where('id', $visit->id)->update($visitUpdate);
             }
             else {
                 $this->sales_customer_model->create([

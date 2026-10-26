@@ -34,6 +34,13 @@ class OrderService
         
         if(isset($send_order['success']) && $send_order['success'] === true) {
                 $order = $this->order_repository->saveOrder($data, $send_order['data']['id'] ?? null);
+                if (!$order) {
+                    return [
+                        'response_code'    => 500,
+                        'response_message' => 'Order was sent to Odoo but failed to be saved locally',
+                        'response_data'    => null
+                    ];
+                }
         } else {
             return [
                 'response_code'    => 500,
