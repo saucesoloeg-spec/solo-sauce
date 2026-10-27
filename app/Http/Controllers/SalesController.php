@@ -104,6 +104,7 @@ class SalesController extends Controller
             'countries' => $countriesData,
             'states' => $states,
             'cities' => $cities,
+            'storageLocations' => $this->odoo_service->getStorageLocations(),
             'selectedCountryId' => $selectedCountryId,
             'selectedStateId' => $selectedStateId,
             'selectedCityIds' => $selectedCityIds,

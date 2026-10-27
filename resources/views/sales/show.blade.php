@@ -225,6 +225,26 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="storage_location_odoo_id" class="form-label">Storage Location <span style="color: red;">*</span></label>
+                                <select id="storage_location_odoo_id" name="storage_location_odoo_id" class="form-select" required>
+                                    <option value="">Select Storage Location</option>
+                                    @php
+                                        $currentLocationId = (int) old('storage_location_odoo_id', $sales->storage_location_odoo_id);
+                                    @endphp
+                                    @foreach($storageLocations as $location)
+                                        @php
+                                            $isCurrentLocation = (int) $location['id'] === $currentLocationId;
+                                            $isTakenByOther = !empty($location['is_assigned']) && (int) $location['id'] !== (int) $sales->storage_location_odoo_id;
+                                        @endphp
+                                        <option value="{{ $location['id'] }}" {{ $isCurrentLocation ? 'selected' : '' }} {{ $isTakenByOther ? 'disabled' : '' }}>{{ $location['name'] ?? $location['id'] }}{{ $isTakenByOther ? ' (assigned)' : '' }}</option>
+                                    @endforeach
+                                </select>
+                                @error('storage_location_odoo_id')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
                                 <label for="cityDropdownToggle" class="form-label">{{ __('sales.city') }}</label>
                                 <div class="dropdown">
                                     <button type="button" id="cityDropdownToggle" class="form-select text-start d-flex justify-content-between align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" {{ empty($cities) ? 'disabled' : '' }}>

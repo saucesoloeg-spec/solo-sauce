@@ -38,7 +38,9 @@ class OdooAuthService
             'password'         => env('ODOO_PASSWORD'),
             'phone'            => $request['phone'] ?? "01234567890",
             'role'             => 'salesperson',
-            'location_id'      => isset($request['storage_location_odoo_id']) ? (int) $request['storage_location_odoo_id'] : null,
+            'location_id'      => isset($request['location_id'])
+                ? (int) $request['location_id']
+                : (isset($request['storage_location_odoo_id']) ? (int) $request['storage_location_odoo_id'] : null),
             'allowed_city_ids' => array_values(array_unique(array_filter($allowedCityIds, function ($cityId) {
                 return !is_null($cityId) && $cityId !== '';
             }))),
@@ -95,11 +97,17 @@ class OdooAuthService
             $allowedCityIds = [5];
         }
 
-        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
+        $payload = [
             'allowed_city_ids' => array_values(array_unique(array_filter($allowedCityIds, function ($cityId) {
                 return !is_null($cityId) && $cityId !== '';
             }))),
-        ]));
+        ];
+
+        if (isset($request['location_id']) && $request['location_id'] !== '') {
+            $payload['location_id'] = (int) $request['location_id'];
+        }
+
+        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
         try {

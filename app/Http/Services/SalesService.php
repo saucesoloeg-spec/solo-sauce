@@ -178,6 +178,7 @@ class SalesService
                     'odoo_id' => $sales->odoo_id,
                     'allowed_city_ids' => $allowedCityIds,
                     'city_odoo_id' => $data['city_odoo_id'] ?? null,
+                    'location_id' => $data['storage_location_odoo_id'] ?? null,
                 ]);
             } catch (\Exception $e) {
                 return [
@@ -262,6 +263,7 @@ class SalesService
                     'odoo_id' => $sales->odoo_id,
                     'allowed_city_ids' => $allowedCityIds,
                     'city_odoo_id' => $data['city_odoo_id'] ?? null,
+                    'location_id' => $data['storage_location_odoo_id'] ?? null,
                 ]);
             } catch (\Exception $e) {
                 return [
