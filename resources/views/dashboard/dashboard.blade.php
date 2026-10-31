@@ -47,7 +47,7 @@
                                 <p class="text-sm text-secondary mb-1">{{ __('dashboard.total_visits') }}</p>
                                 <h4 class="mb-2 font-weight-bold"> {{$monthly_income->total_visits ?? 0}} </h4>
                                 <div class="d-flex align-items-center">
-                                    @if($monthly_income->total_visits >= $past_monthly_income->total_visits)
+                                    @if(($monthly_income->total_visits ?? 0) >= ($past_monthly_income->total_visits ?? 0))
                                     <span class="text-sm text-success font-weight-bolder">
                                         <i class="fa fa-chevron-up text-xs me-1"></i> +{{ $monthly_income->total_visits ? round((($monthly_income->total_visits - $past_monthly_income->total_visits) / $past_monthly_income->total_visits) * 100, 2) : 0 }}%
                                     </span>

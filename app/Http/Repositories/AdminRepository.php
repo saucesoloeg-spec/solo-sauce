@@ -45,7 +45,7 @@ class AdminRepository
 
     public function PastMonthlyIncome() 
     {
-        $lastMonth = now()->subMonths(2);
+        $lastMonth = now()->subMonthsNoOverflow(2);
         $endDate   = $lastMonth->copy()->endOfMonth();
         
         return $this->monthly_income_model->where('collect_date', $endDate->format('Y-m-d'))->first();   
@@ -53,7 +53,7 @@ class AdminRepository
 
     public function monthlyIncome() 
     {
-        $lastMonth = now()->subMonth();
+        $lastMonth = now()->subMonthNoOverflow();
         $endDate   = $lastMonth->copy()->endOfMonth();
         
         return $this->monthly_income_model->where('collect_date', $endDate->format('Y-m-d'))->first();   
@@ -61,7 +61,7 @@ class AdminRepository
 
     public function monthlyOrders() 
     {
-        $lastMonth = now()->subMonth();
+        $lastMonth = now()->subMonthNoOverflow();
         $start     = $lastMonth->copy()->startOfMonth();
         $end       = $lastMonth->copy()->endOfMonth()->endOfDay();
         
@@ -77,7 +77,7 @@ class AdminRepository
 
     private function getLastMonthRange()
     {
-        $lastMonth = now()->subMonth();
+        $lastMonth = now()->subMonthNoOverflow();
         return [
             $lastMonth->copy()->startOfMonth(),
             $lastMonth->copy()->endOfMonth()->endOfDay(),
