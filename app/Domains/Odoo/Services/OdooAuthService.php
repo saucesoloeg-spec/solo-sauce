@@ -711,6 +711,139 @@ class OdooAuthService
         return $result;
     }
 
+    public function confirmOrderInOdoo($saleOrderId)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/sales-orders/' . (int) $saleOrderId;
+        $response = curl_init($url);
+
+        if ($response === false) {
+            throw new \RuntimeException('Failed to initialize order confirmation request to Odoo.');
+        }
+
+        curl_setopt_array($response, [
+            CURLOPT_CUSTOMREQUEST => 'PUT',
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'state' => 'post',
+            ]),
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+
+        try {
+            $body = curl_exec($response);
+
+            if ($body === false) {
+                throw new \RuntimeException(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if (!is_array($result)) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            if ($httpCode >= 400 || ($result['success'] ?? false) !== true) {
+                $detail = $result['error']['detail']['message']
+                    ?? $result['error']['detail']
+                    ?? $result['error']['message']
+                    ?? 'Unknown API error';
+                if (!is_scalar($detail)) {
+                    $detail = json_encode($detail) ?: 'Unknown API error';
+                }
+
+                throw new \RuntimeException((string) $detail);
+            }
+
+            return $result;
+        } catch (\Throwable $exception) {
+            throw new \RuntimeException(
+                'Failed to confirm order in Odoo: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
+        } finally {
+            curl_close($response);
+        }
+    }
+
+    public function createInvoiceForOrder($saleOrderId, $paymentMethod)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/invoices';
+        $response = curl_init($url);
+
+        if ($response === false) {
+            throw new \RuntimeException('Failed to initialize invoice request to Odoo.');
+        }
+
+        curl_setopt_array($response, [
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'sale_order_id' => (int) $saleOrderId,
+                'payment_method' => $paymentMethod,
+            ]),
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+
+        try {
+            $body = curl_exec($response);
+
+            if ($body === false) {
+                throw new \RuntimeException(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if (!is_array($result)) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            if ($httpCode >= 400 || ($result['success'] ?? false) !== true) {
+                $detail = $result['error']['detail']['message']
+                    ?? $result['error']['detail']
+                    ?? $result['error']['message']
+                    ?? 'Unknown API error';
+                if (!is_scalar($detail)) {
+                    $detail = json_encode($detail) ?: 'Unknown API error';
+                }
+
+                throw new \RuntimeException((string) $detail);
+            }
+
+            $invoiceData = $result['data'] ?? [];
+            if (!is_array($invoiceData)) {
+                throw new \RuntimeException('Odoo invoice response did not include invoice data.');
+            }
+
+            $invoiceId = $invoiceData['id'] ?? $invoiceData['invoice_id'] ?? null;
+            if (!is_numeric($invoiceId) || (int) $invoiceId < 1) {
+                throw new \RuntimeException('Odoo invoice response did not include a valid invoice ID.');
+            }
+
+            return (int) $invoiceId;
+        } catch (\Throwable $exception) {
+            throw new \RuntimeException(
+                'Failed to create invoice in Odoo: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
+        } finally {
+            curl_close($response);
+        }
+    }
+
     public function getOrderById($id)
     {
         $token = $this->getAccessToken()['access_token'];

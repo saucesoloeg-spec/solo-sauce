@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Order;
 use App\Models\Sales;
 use App\Models\SalesCustomer;
 use App\Models\Survey;
@@ -306,6 +307,39 @@ class SalesVisitNotesTest extends TestCase
         $this->assertSame('Surveyed', $visits[$answered->id]['sales_notes']);
 
         $response->assertJsonPath('response_data.surveys.0.answers.0.sales_notes', 'Surveyed');
+    }
+
+    public function test_schedule_history_returns_the_odoo_order_name_in_invoice_id()
+    {
+        $sales = $this->makeSales();
+        $customer = $this->makeCustomer($sales->id);
+        $order = Order::create([
+            'code'           => 'SO000001',
+            'odoo_id'        => 42,
+            'invoice_id'     => 'S00042',
+            'sales_id'       => $sales->id,
+            'customer_id'    => $customer,
+            'customer_name'  => 'Customer 1',
+            'customer_phone' => '01200000001',
+            'delivery_date'  => now(),
+            'amount_total'   => 100,
+            'amount_tax'     => 0,
+            'state'          => 'pending',
+            'payment_status' => 'pending',
+            'delivery_status' => 'pending',
+        ]);
+        $visit = $this->makeVisit($sales->id, $customer, [
+            'status'   => 'completed',
+            'visit_at' => now()->subDay(),
+            'order_id' => $order->id,
+        ]);
+        Sanctum::actingAs($sales, [], 'sales');
+
+        $this->getJson('/api/sales/schedule-history')
+            ->assertStatus(200)
+            ->assertJsonPath('response_data.visits.0.id', $visit->id)
+            ->assertJsonPath('response_data.visits.0.order.invoice_id', 'S00042')
+            ->assertJsonPath('response_data.new_deals.0.invoice_id', 'S00042');
     }
 
     public function test_get_customer_answers_excludes_visits_without_answers_or_notes()

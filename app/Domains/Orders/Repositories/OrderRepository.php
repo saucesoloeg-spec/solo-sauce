@@ -153,6 +153,17 @@ class OrderRepository
         return $this->model->with(['customer', 'products'])->find($id);
     }
 
+    public function saveInvoiceId(Order $order, $invoiceId)
+    {
+        $order->invoice_id = $invoiceId;
+
+        if (!$order->save()) {
+            throw new \RuntimeException('Failed to save the Odoo order reference locally.');
+        }
+
+        return $order;
+    }
+
     public function updateOrderStatus($data)
     {
         try {
