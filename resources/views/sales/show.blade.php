@@ -236,7 +236,7 @@
                                             $isCurrentLocation = (int) $location['id'] === $currentLocationId;
                                             $isTakenByOther = !empty($location['is_assigned']) && (int) $location['id'] !== (int) $sales->storage_location_odoo_id;
                                         @endphp
-                                        <option value="{{ $location['id'] }}" {{ $isCurrentLocation ? 'selected' : '' }} {{ $isTakenByOther ? 'disabled' : '' }}>{{ $location['name'] ?? $location['id'] }}{{ $isTakenByOther ? ' (assigned)' : '' }}</option>
+                                        <option value="{{ $location['id'] }}" {{ $isCurrentLocation ? 'selected' : '' }} {{ $isTakenByOther ? 'disabled' : '' }}>{{ $location['name'] ?? $location['id'] }}{{ !empty($location['warehouse_name']) ? ' - ' . $location['warehouse_name'] : '' }}{{ $isTakenByOther ? ' (assigned)' : '' }}</option>
                                     @endforeach
                                 </select>
                                 @error('storage_location_odoo_id')

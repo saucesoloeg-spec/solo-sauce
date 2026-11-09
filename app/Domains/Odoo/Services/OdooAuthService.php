@@ -392,7 +392,9 @@ class OdooAuthService
             $list = $data['storage_locations'] ?? $data['locations'] ?? $data;
 
             return array_values(array_filter(is_array($list) ? $list : [], function ($location) {
-                return is_array($location) && isset($location['id']);
+                return is_array($location)
+                    && isset($location['id'])
+                    && ($location['usage'] ?? null) === 'view';
             }));
         } catch (\Throwable $exception) {
             Log::error('Failed to fetch storage locations from Odoo: ' . $exception->getMessage());

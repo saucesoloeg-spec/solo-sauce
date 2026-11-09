@@ -199,7 +199,7 @@
                                 <select id="storage_location_odoo_id" name="storage_location_odoo_id" class="form-select" required>
                                     <option value="">Select Storage Location</option>
                                     @foreach($storageLocations as $location)
-                                        <option value="{{ $location['id'] }}" @selected(old('storage_location_odoo_id') == $location['id']) @disabled(!empty($location['is_assigned']))>{{ $location['name'] ?? $location['id'] }}{{ !empty($location['is_assigned']) ? ' (assigned)' : '' }}</option>
+                                        <option value="{{ $location['id'] }}" @selected(old('storage_location_odoo_id') == $location['id']) @disabled(!empty($location['is_assigned']))>{{ $location['name'] ?? $location['id'] }}{{ !empty($location['warehouse_name']) ? ' - ' . $location['warehouse_name'] : '' }}{{ !empty($location['is_assigned']) ? ' (assigned)' : '' }}</option>
                                     @endforeach
                                 </select>
                                 @error('storage_location_odoo_id')
