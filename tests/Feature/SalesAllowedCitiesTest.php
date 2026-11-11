@@ -25,6 +25,8 @@ class SalesAllowedCitiesTest extends TestCase
 
         $this->assertArrayHasKey('country_odoo_id', $rules);
         $this->assertArrayHasKey('state_odoo_id', $rules);
+        $this->assertArrayHasKey('storage_location_odoo_id', $rules);
+        $this->assertSame('required|integer', $rules['storage_location_odoo_id']);
         $this->assertArrayHasKey('allowed_city_ids', $rules);
         $this->assertSame('required|array|min:1', $rules['allowed_city_ids']);
         $this->assertSame('required|integer', $rules['allowed_city_ids.*']);

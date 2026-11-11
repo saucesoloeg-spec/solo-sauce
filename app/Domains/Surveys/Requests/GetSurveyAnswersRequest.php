@@ -25,7 +25,7 @@ class GetSurveyAnswersRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|exists:customers,id',
-            'visit_id'    => 'required|integer',
+            'visit_id'    => 'nullable|integer',
         ];
     }
 }

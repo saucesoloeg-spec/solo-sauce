@@ -182,7 +182,7 @@
                             @forelse($orders ?? [] as $key => $order)
                             <tr data-status="{{ $order->state }}" data-order-id="{{ $order->id }}" id="row-{{$order->id}}">
                                 <td class="text-center">
-                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->code }}</p>
+                                    <p class="text-sm text-dark font-weight-semibold mb-0">{{ $order->invoice_id ?? $order->code }}</p>
                                 </td>
                                 <td>
                                     <div class="d-flex px-2 py-1">

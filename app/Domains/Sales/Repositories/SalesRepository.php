@@ -47,7 +47,7 @@ class SalesRepository
 
     public function getSchedule($id, $filters = []) 
     {
-        $query = $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', date("Y-m-d"))->with(['order', 'customer']); //->whereNotIn('status', ['cancelled', 'completed'])
+        $query = $this->sales_customer_model->where('sales_id', $id)->where('visit_at', '>=', date("Y-m-d"))->with(['order', 'customer'])->whereNotIn('status', ['cancelled', 'completed']);
         
         if(!empty($filters) && (isset($filters['from']) && isset($filters['to']))) {
             $query->whereDate('visit_at', '>=', date("Y-m-d", strtotime($filters['from'])))
@@ -70,6 +70,22 @@ class SalesRepository
         }
 
         return $query->with('order')->get();
+    }
+
+    public function updateVisit($visitId, $salesId, array $data)
+    {
+        $visit = $this->sales_customer_model
+            ->where('id', $visitId)
+            ->where('sales_id', $salesId)
+            ->first();
+
+        if (!$visit) {
+            return null;
+        }
+
+        $visit->update(array_intersect_key($data, array_flip(['status', 'sales_notes'])));
+
+        return $visit->fresh(['order', 'customer']);
     }
 
     public function cancelSchedule($scheduleId, $salesId)

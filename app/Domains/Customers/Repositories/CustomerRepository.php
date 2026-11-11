@@ -73,6 +73,7 @@ class CustomerRepository
         return $this->customer_model->create([
             'id'              => $data['id'],
             'sales_id'        => $data['sales_id'] ?? null,
+            'store_name'      => $data['store_name'],
             'name'            => $data['name'],
             'email'           => $data['email'] ?? null,
             'phone'           => $data['phone'],

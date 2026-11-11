@@ -6,6 +6,7 @@ use App\Domains\Odoo\Requests\GetProductRequest;
 use App\Domains\Products\Services\ProductService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -58,6 +59,25 @@ class ProductController extends Controller
     public function show($id)
     {
         $response = $this->product_service->getProductById($id);
+        return response()->json($response);
+    }
+
+    public function stockBalance(Request $request)
+    {
+        $filters = $request->validate([
+            'product_id'  => ['sometimes', 'nullable', 'integer'],
+        ]);
+
+        $sales = auth('sales')->user();
+        $location = Validator::make(
+            ['location_id' => $sales ? $sales->storage_location_odoo_id : null],
+            ['location_id' => ['required', 'integer']]
+        )->validate();
+
+        $filters['location_id'] = $location['location_id'];
+
+        $response = $this->product_service->getStockBalance($filters);
+
         return response()->json($response);
     }
 

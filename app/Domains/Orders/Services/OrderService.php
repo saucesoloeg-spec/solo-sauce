@@ -20,8 +20,9 @@ class OrderService
     {
         $payload = [
             'customer_id'    => (int)$data['customer_id'], // cast it as integer
+            'type_id'        => (int)$data['type_id'], // cast it as integer
             'date_order'     => date('Y-m-d H:i:s'), // current date and time
-            'amount_total'   => (float)$data['amount_total'], // cast it as
+            'amount_total'   => (float)$data['amount_total'], // cast it as float
             'notes'          => $data['notes'] ?? '', // default to empty string if not provided
             'payment_method' => $data['payment_method'],
             'delivery_date'  => (string)$data['delivery_date'],
@@ -32,7 +33,25 @@ class OrderService
         $send_order = $this->odoo_service->sendOrderToOdoo($payload);
         
         if(isset($send_order['success']) && $send_order['success'] === true) {
-                $order = $this->order_repository->saveOrder($data, $send_order['data']['id'] ?? null);
+            $order = $this->order_repository->saveOrder($data, $send_order['data']['id'] ?? null);
+            if (!$order) {
+                return [
+                    'response_code'    => 500,
+                    'response_message' => 'Order was sent to Odoo but failed to be saved locally',
+                    'response_data'    => null
+                ];
+            }
+
+            $orderName = $send_order['data']['name'] ?? null;
+            if (!is_string($orderName) || trim($orderName) === '') {
+                return [
+                    'response_code'    => 502,
+                    'response_message' => 'Order was created in Odoo but its name was missing from the response',
+                    'response_data'    => $order,
+                ];
+            }
+
+            $order = $this->order_repository->saveInvoiceId($order, $orderName);
         } else {
             return [
                 'response_code'    => 500,

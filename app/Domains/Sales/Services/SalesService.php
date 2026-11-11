@@ -168,6 +168,25 @@ class SalesService
         ];
     }
 
+    public function updateVisitStatus($visitId, $salesId, array $data)
+    {
+        $visit = $this->sales_repository->updateVisit($visitId, $salesId, $data);
+
+        if ($visit) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Visit updated successfully.',
+                'response_data'    => $visit
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Visit not found or not belonging to this sales user.',
+            'response_data'    => null
+        ];
+    }
+
     public function sendFirebaseTestNotification($sales, array $data = [])
     {
         if (!$sales || empty($sales->fcm_token)) {

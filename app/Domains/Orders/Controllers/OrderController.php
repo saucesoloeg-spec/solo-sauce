@@ -43,6 +43,17 @@ class OrderController extends Controller
         ]);
     }
 
+    public function types()
+    {
+        $response = $this->odoo_service->getOrderTypes();
+
+        return response()->json([
+            'response_code'    => 200,
+            'response_message' => 'Order types fetched successfully',
+            'response_data'    => $response['data']['types'] ?? [],
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

@@ -32,6 +32,7 @@ Route::middleware('auth:sales')->group(function () {
     Route::get('/schedule', [SalesController::class, 'schedule']);
     Route::get('/schedule-history', [SalesController::class, 'scheduleHistory']);
     Route::get('/cancel-schedule/{id}', [SalesController::class, 'cancelSchedule']);
+    Route::post('/visits/{id}/status', [SalesController::class, 'updateVisitStatus']);
 
 });
     

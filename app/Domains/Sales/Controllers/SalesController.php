@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Domains\Sales\Services\SalesService;
 use App\Http\Requests\GetScheduleRequest;
+use App\Domains\Sales\Requests\UpdateVisitStatusRequest;
 
 class SalesController extends Controller
 {
@@ -96,6 +97,17 @@ class SalesController extends Controller
     {
         $sales = auth('sales')->user();
         $response = $this->sales_service->cancelSchedule($id, $sales->id);
+
+        return response()->json($response, $response['response_code']);
+    }
+
+    /**
+     * Update the status (and optional notes) of a visit.
+     */
+    public function updateVisitStatus(UpdateVisitStatusRequest $request, $id)
+    {
+        $sales = auth('sales')->user();
+        $response = $this->sales_service->updateVisitStatus($id, $sales->id, $request->validated());
 
         return response()->json($response, $response['response_code']);
     }

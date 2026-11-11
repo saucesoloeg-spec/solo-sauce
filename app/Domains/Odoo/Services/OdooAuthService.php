@@ -38,6 +38,9 @@ class OdooAuthService
             'password'         => env('ODOO_PASSWORD'),
             'phone'            => $request['phone'] ?? "01234567890",
             'role'             => 'salesperson',
+            'location_id'      => isset($request['location_id'])
+                ? (int) $request['location_id']
+                : (isset($request['storage_location_odoo_id']) ? (int) $request['storage_location_odoo_id'] : null),
             'allowed_city_ids' => array_values(array_unique(array_filter($allowedCityIds, function ($cityId) {
                 return !is_null($cityId) && $cityId !== '';
             }))),
@@ -94,11 +97,17 @@ class OdooAuthService
             $allowedCityIds = [5];
         }
 
-        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
+        $payload = [
             'allowed_city_ids' => array_values(array_unique(array_filter($allowedCityIds, function ($cityId) {
                 return !is_null($cityId) && $cityId !== '';
             }))),
-        ]));
+        ];
+
+        if (isset($request['location_id']) && $request['location_id'] !== '') {
+            $payload['location_id'] = (int) $request['location_id'];
+        }
+
+        curl_setopt($response, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
         
         try {
@@ -358,6 +367,108 @@ class OdooAuthService
         return $result;
     }
 
+    public function getStorageLocations(): array
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $response = curl_init(rtrim(env('ODOO_API_URL'), '/') .         '/storage-locations/storage-location');
+        curl_setopt_array($response, [
+            CURLOPT_HTTPGET => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+        ]);
+
+        try {
+            $body = curl_exec($response);
+            $result = is_string($body) ? json_decode($body, true) : null;
+
+            if (!is_array($result) || isset($result['error'])) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            $data = $result['data'] ?? $result;
+            $list = $data['storage_locations'] ?? $data['locations'] ?? $data;
+
+            return array_values(array_filter(is_array($list) ? $list : [], function ($location) {
+                return is_array($location)
+                    && isset($location['id'])
+                    && ($location['usage'] ?? null) === 'internal';
+            }));
+        } catch (\Throwable $exception) {
+            Log::error('Failed to fetch storage locations from Odoo: ' . $exception->getMessage());
+
+            return [];
+        } finally {
+            curl_close($response);
+        }
+    }
+
+    public function getStockBalanceFromOdoo(array $filters = [])
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/storage-locations/stock-balance';
+        $filters = array_filter($filters, function ($value) {
+            return $value !== null && $value !== '';
+        });
+
+        if (!empty($filters)) {
+            $url .= '?' . http_build_query($filters);
+        }
+
+        $response = curl_init($url);
+        curl_setopt_array($response, [
+            CURLOPT_HTTPGET => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+        ]);
+
+        try {
+            $body = curl_exec($response);
+
+            if ($body === false) {
+                throw new \RuntimeException(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if (!is_array($result)) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            if ($httpCode >= 400 || empty($result['success'])) {
+                $detail = $result['error']['detail'] ?? 'Unknown API error';
+                if (is_array($detail)) {
+                    $message = $detail['message'] ?? null;
+                    $detail = is_scalar($message)
+                        ? (string) $message
+                        : (json_encode($detail) ?: 'Unknown API error');
+                }
+
+                if (!is_scalar($detail)) {
+                    $detail = 'Unknown API error';
+                }
+
+                throw new \RuntimeException((string) $detail);
+            }
+
+            return $result;
+        } catch (\Throwable $exception) {
+            throw new \RuntimeException(
+                'Failed to fetch stock balance from Odoo: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
+        } finally {
+            curl_close($response);
+        }
+    }
+
     public function getCustomers($filters = [])
     {
         $token = $this->getAccessToken()['access_token'];
@@ -442,6 +553,7 @@ class OdooAuthService
         $url = env('ODOO_API_URL').'/customers';
 
         $odoo_customer = [
+            "sales_id"   => $customer['odoo_sales_id'] ?? null,
             "name"       => $customer['name'],
             "store_name" => $customer['store_name'] ?? null,
             "phone"      => $customer['phone'],
@@ -601,6 +713,139 @@ class OdooAuthService
         return $result;
     }
 
+    public function confirmOrderInOdoo($saleOrderId)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/sales-orders/' . (int) $saleOrderId;
+        $response = curl_init($url);
+
+        if ($response === false) {
+            throw new \RuntimeException('Failed to initialize order confirmation request to Odoo.');
+        }
+
+        curl_setopt_array($response, [
+            CURLOPT_CUSTOMREQUEST => 'PUT',
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'state' => 'post',
+            ]),
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+
+        try {
+            $body = curl_exec($response);
+
+            if ($body === false) {
+                throw new \RuntimeException(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if (!is_array($result)) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            if ($httpCode >= 400 || ($result['success'] ?? false) !== true) {
+                $detail = $result['error']['detail']['message']
+                    ?? $result['error']['detail']
+                    ?? $result['error']['message']
+                    ?? 'Unknown API error';
+                if (!is_scalar($detail)) {
+                    $detail = json_encode($detail) ?: 'Unknown API error';
+                }
+
+                throw new \RuntimeException((string) $detail);
+            }
+
+            return $result;
+        } catch (\Throwable $exception) {
+            throw new \RuntimeException(
+                'Failed to confirm order in Odoo: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
+        } finally {
+            curl_close($response);
+        }
+    }
+
+    public function createInvoiceForOrder($saleOrderId, $paymentMethod)
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/invoices';
+        $response = curl_init($url);
+
+        if ($response === false) {
+            throw new \RuntimeException('Failed to initialize invoice request to Odoo.');
+        }
+
+        curl_setopt_array($response, [
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'sale_order_id' => (int) $saleOrderId,
+                'payment_method' => $paymentMethod,
+            ]),
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+
+        try {
+            $body = curl_exec($response);
+
+            if ($body === false) {
+                throw new \RuntimeException(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if (!is_array($result)) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            if ($httpCode >= 400 || ($result['success'] ?? false) !== true) {
+                $detail = $result['error']['detail']['message']
+                    ?? $result['error']['detail']
+                    ?? $result['error']['message']
+                    ?? 'Unknown API error';
+                if (!is_scalar($detail)) {
+                    $detail = json_encode($detail) ?: 'Unknown API error';
+                }
+
+                throw new \RuntimeException((string) $detail);
+            }
+
+            $invoiceData = $result['data'] ?? [];
+            if (!is_array($invoiceData)) {
+                throw new \RuntimeException('Odoo invoice response did not include invoice data.');
+            }
+
+            $invoiceId = $invoiceData['id'] ?? $invoiceData['invoice_id'] ?? null;
+            if (!is_numeric($invoiceId) || (int) $invoiceId < 1) {
+                throw new \RuntimeException('Odoo invoice response did not include a valid invoice ID.');
+            }
+
+            return (int) $invoiceId;
+        } catch (\Throwable $exception) {
+            throw new \RuntimeException(
+                'Failed to create invoice in Odoo: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
+        } finally {
+            curl_close($response);
+        }
+    }
+
     public function getOrderById($id)
     {
         $token = $this->getAccessToken()['access_token'];
@@ -628,6 +873,63 @@ class OdooAuthService
         curl_close($response);
 
         return $result;
+    }
+
+    public function getOrderTypes()
+    {
+        $token = $this->getAccessToken()['access_token'];
+        $url = rtrim(env('ODOO_API_URL'), '/') . '/sale-order-types';
+
+        $response = curl_init($url);
+        curl_setopt_array($response, [
+            CURLOPT_HTTPGET => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Authorization: Bearer ' . $token,
+            ],
+        ]);
+
+        try {
+            $body = curl_exec($response);
+
+            if ($body === false) {
+                throw new \RuntimeException(curl_error($response));
+            }
+
+            $result = json_decode($body, true);
+            $httpCode = curl_getinfo($response, CURLINFO_HTTP_CODE);
+
+            if (!is_array($result)) {
+                throw new \RuntimeException('Invalid response from Odoo.');
+            }
+
+            if ($httpCode >= 400 || empty($result['success'])) {
+                $detail = $result['error']['detail'] ?? 'Unknown API error';
+                if (is_array($detail)) {
+                    $message = $detail['message'] ?? null;
+                    $detail = is_scalar($message)
+                        ? (string) $message
+                        : (json_encode($detail) ?: 'Unknown API error');
+                }
+
+                if (!is_scalar($detail)) {
+                    $detail = 'Unknown API error';
+                }
+
+                throw new \RuntimeException((string) $detail);
+            }
+
+            return $result;
+        } catch (\Throwable $exception) {
+            throw new \RuntimeException(
+                'Failed to fetch order types from Odoo: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
+        } finally {
+            curl_close($response);
+        }
     }
 
     public function getCountries()

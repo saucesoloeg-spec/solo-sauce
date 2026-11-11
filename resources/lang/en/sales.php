@@ -17,6 +17,7 @@ return [
     'next'                        => 'Next',
     'salesman'                    => 'Salesman',
     'email'                       => 'E-mail',
+    'email_restore_hint'          => 'If this email belongs to a previously deleted salesman, the account will be restored and updated with the information entered here.',
     'phone'                       => 'Phone No.',
     'registered_at'               => 'Registered At',
     'search_by_name'              => 'Search by name',

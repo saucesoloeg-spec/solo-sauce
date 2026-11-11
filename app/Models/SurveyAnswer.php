@@ -22,6 +22,11 @@ class SurveyAnswer extends Model
         return $this->belongsTo(Survey::class);
     }
 
+    public function visit()
+    {
+        return $this->belongsTo(SalesCustomer::class, 'sales_customer_id');
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');

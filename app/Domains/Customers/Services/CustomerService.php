@@ -4,6 +4,7 @@ namespace App\Domains\Customers\Services;
 
 use App\Domains\Customers\Repositories\CustomerRepository;
 use App\Domains\Odoo\Services\OdooAuthService;
+use App\Models\Sales;
 
 class CustomerService
 {
@@ -88,9 +89,19 @@ class CustomerService
 
     private function normalizeOdooCustomer(array $customer): array
     {
+        $salesId = $customer['sales_id'] ?? null;
+
+        if (!is_null($salesId)) {
+            $localSalesId = Sales::query()->where('odoo_id', $salesId)->value('id');
+
+            if (!is_null($localSalesId)) {
+                $salesId = $localSalesId;
+            }
+        }
+
         return [
             'id'              => $customer['id'] ?? null,
-            'sales_id'        => null,
+            'sales_id'        => $salesId,
             'name'            => $customer['name'] ?? null,
             'store_name'      => $customer['store_name'] ?? null,
             'email'           => $customer['email'] ?? null,
@@ -135,8 +146,9 @@ class CustomerService
 
     public function createCustomer(array $data)
     {
-        $sales            = auth()->user();
-        $data['sales_id'] = $sales->id;
+        $sales                 = auth()->user();
+        $data['sales_id']      = $sales->id;
+        $data['odoo_sales_id'] = $sales->odoo_id;
         $send_odoo = $this->odoo_service->sendCustomerToOdoo($data);
         
         if($send_odoo['response_code'] == 201) {

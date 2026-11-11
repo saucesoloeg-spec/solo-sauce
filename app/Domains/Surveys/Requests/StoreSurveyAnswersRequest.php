@@ -24,7 +24,9 @@ class StoreSurveyAnswersRequest extends FormRequest
     public function rules()
     {
         return [
-            'answers'               => 'required|array',
+            'sales_notes'           => 'nullable|string|max:5000',
+            'customer_id'           => 'required_with:sales_notes|integer',
+            'answers'               => 'required_without:sales_notes|array',
             'answers.*.survey_id'   => 'required|exists:surveys,id',
             'answers.*.answer'      => 'required|string', // if question is dropdown send the option value as string
             'answers.*.customer_id' => 'required|integer',

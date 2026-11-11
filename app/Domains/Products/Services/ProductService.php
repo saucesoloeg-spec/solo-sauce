@@ -50,5 +50,24 @@ class ProductService
             'response_data'    => null
         ];
     }
+
+    public function getStockBalance(array $filters = [])
+    {
+        $stockBalance = $this->odoo_auth_service->getStockBalanceFromOdoo($filters);
+
+        if ($stockBalance['success'] ?? false) {
+            return [
+                'response_code'    => 200,
+                'response_message' => 'Stock balance retrieved successfully',
+                'response_data'    => $stockBalance['data'] ?? null,
+            ];
+        }
+
+        return [
+            'response_code'    => 404,
+            'response_message' => 'Stock balance not found',
+            'response_data'    => null,
+        ];
+    }
     
 }

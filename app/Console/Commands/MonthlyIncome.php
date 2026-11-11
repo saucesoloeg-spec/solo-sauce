@@ -30,7 +30,7 @@ class MonthlyIncome extends Command
     public function handle()
     {
         // Get the previous month's income
-        $lastMonth = now()->subMonth();
+        $lastMonth = now();
         $startDate = $lastMonth->copy()->startOfMonth();
         $endDate   = $lastMonth->copy()->endOfMonth();
 
