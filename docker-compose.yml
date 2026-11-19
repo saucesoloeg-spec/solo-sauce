@@ -65,6 +65,8 @@ services:
         ports:
             - 8888:80
         environment:
+            PMA_HOST: mysql
+            PMA_PORT: 3306
             MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
             UPLOAD_LIMIT: 128M
         links:

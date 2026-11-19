@@ -147,25 +147,22 @@ class OdooAuthService
                     return $exists->toArray();
                 } 
                 else {
-                    $response = curl_init(env('ODOO_API_URL').'/auth/signin');
-                    curl_setopt($response, CURLOPT_POST, true);
-                    curl_setopt($response, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-                    curl_setopt($response, CURLOPT_POSTFIELDS, json_encode([
-                        'email'    => $email,
-                        'password' => $password,
-                    ]));
-                    curl_setopt($response, CURLOPT_RETURNTRANSFER, true);
-                    $data = curl_exec($response);
-                    $data = json_decode($data, true);
-                    curl_close($response);
-                    
-                    if($data['success'] && isset($data['data']['tokens'])) {
+                    $data = $this->signInToOdoo($email, $password);
+
+                    if ($sales && $this->hasInvalidCredentials($data)) {
+                        $this->resetSalespersonPassword($email, $password);
+                        $data = $this->signInToOdoo($email, $password);
+                    }
+
+                    if (!empty($data['success']) && isset($data['data']['tokens'])) {
                         $result = $this->odoo_auth_repository->create([
                             'email'         => $email,
                             'access_token'  => $data['data']['tokens']['access_token'],
                             'refresh_token' => $data['data']['tokens']['refresh_token'],
                             'expires_at'    => $data['data']['tokens']['expires_in'],
                         ]);
+                    } else {
+                        throw new \RuntimeException('Unable to retrieve an Odoo access token.');
                     }
                     $true = false;
                 }
@@ -188,6 +185,97 @@ class OdooAuthService
             'refresh_token' => $result->refresh_token,
             'expires_at'    => $result->expires_at,
         ];
+    }
+
+    protected function signInToOdoo($email, $password)
+    {
+        $response = $this->postOdooJson('/auth/signin', [
+            'email' => $email,
+            'password' => $password,
+        ]);
+
+        return $response['body'];
+    }
+
+    protected function hasInvalidCredentials(array $response)
+    {
+        return isset($response['error']['code'])
+            && $response['error']['code'] === 'INVALID_CREDENTIALS';
+    }
+
+    protected function resetSalespersonPassword($email, $password)
+    {
+        $adminEmail = env('ODOO_SUPERUSER_EMAIL');
+        $adminPassword = env('ODOO_SUPERUSER_PASSWORD');
+
+        if (!$adminEmail || !$adminPassword) {
+            throw new \RuntimeException('Odoo administrator credentials are not configured.');
+        }
+
+        $adminResponse = $this->signInToOdoo($adminEmail, $adminPassword);
+        if (
+            empty($adminResponse['success'])
+            || empty($adminResponse['data']['tokens']['access_token'])
+        ) {
+            throw new \RuntimeException('Unable to authenticate with the Odoo administrator account.');
+        }
+
+        $resetResponse = $this->postOdooJson('/auth/reset-password', [
+            'email' => $email,
+            'new_password' => $password,
+            'confirm_password' => $password,
+        ], $adminResponse['data']['tokens']['access_token']);
+
+        if (
+            $resetResponse['status'] < 200
+            || $resetResponse['status'] >= 300
+            || (isset($resetResponse['body']['success']) && !$resetResponse['body']['success'])
+            || isset($resetResponse['body']['error'])
+        ) {
+            throw new \RuntimeException('Odoo rejected the salesperson password reset.');
+        }
+    }
+
+    protected function postOdooJson($path, array $payload, $token = null)
+    {
+        $headers = [
+            'Accept: application/json',
+            'Content-Type: application/json',
+        ];
+        if ($token) {
+            $headers[] = 'Authorization: Bearer ' . $token;
+        }
+
+        $response = curl_init(rtrim(env('ODOO_API_URL'), '/') . $path);
+        if ($response === false) {
+            throw new \RuntimeException('Unable to initialize the Odoo request.');
+        }
+
+        curl_setopt_array($response, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_POSTFIELDS => json_encode($payload),
+        ]);
+
+        try {
+            $body = curl_exec($response);
+            if ($body === false) {
+                throw new \RuntimeException('Odoo request failed: ' . curl_error($response));
+            }
+
+            $decoded = json_decode($body, true);
+            if (!is_array($decoded)) {
+                throw new \RuntimeException('Odoo returned an invalid JSON response.');
+            }
+
+            return [
+                'status' => curl_getinfo($response, CURLINFO_HTTP_CODE),
+                'body' => $decoded,
+            ];
+        } finally {
+            curl_close($response);
+        }
     }
 
     public function resetPassword($request = [])
