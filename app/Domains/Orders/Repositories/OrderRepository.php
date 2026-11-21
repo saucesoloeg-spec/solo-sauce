@@ -135,7 +135,7 @@ class OrderRepository
             : $query->get();
     }
 
-    public function getRegularDealsForSales($id, $filters = []) 
+    public function getRegularDealsForSales($id, $filters = [], $perPage = null, $pageName = 'page')
     {
         $query = Order::query()
             ->from('orders as o')
@@ -155,7 +155,17 @@ class OrderRepository
                 ->whereDate('o.created_at', '<=', date("Y-m-d", strtotime($filters['to'])));
         }
 
-        return $query->get();
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            if (in_array($filters['status'], ['canceled', 'cancelled'], true)) {
+                $query->whereIn('o.state', ['canceled', 'cancelled']);
+            } else {
+                $query->where('o.state', $filters['status']);
+            }
+        }
+
+        return $perPage
+            ? $query->paginate($perPage, ['*'], $pageName)
+            : $query->get();
     }
 
     public function getOrderById($id)

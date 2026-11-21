@@ -32,9 +32,10 @@ class SalesService
         $this->order_repository = $order_repository;
     }
 
-    public function getSalesmanActivity($salesId, array $newDealsRange, array $productsRange)
+    public function getSalesmanActivity($salesId, array $newDealsRange, array $reordersRange, array $productsRange)
     {
         $newDeals = $this->order_repository->getNewDealsForSales($salesId, $newDealsRange, 10, 'new_deals_page');
+        $reorders = $this->order_repository->getRegularDealsForSales($salesId, $reordersRange, 10, 'reorders_page');
 
         $soldProductsQuery = OrderProduct::query()
             ->join('orders', 'orders.id', '=', 'order_products.order_id')
@@ -86,6 +87,7 @@ class SalesService
 
         return [
             'new_deals' => $newDeals,
+            'reorders' => $reorders,
             'sold_products' => $soldProducts,
             'total_quantity' => $totalQuantity,
             'total_price' => $totalPrice,

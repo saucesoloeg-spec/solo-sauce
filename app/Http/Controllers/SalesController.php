@@ -76,6 +76,9 @@ class SalesController extends Controller
             'new_deals_period' => ['nullable', 'in:today,last_week,this_month'],
             'sold_products_period' => ['nullable', 'in:today,last_week,this_month'],
             'new_deals_status' => ['nullable', 'in:all,pending,confirmed,shipped,delivered,canceled,suspended'],
+            'reorders_period' => ['nullable', 'in:today,last_week,this_month'],
+            'reorders_status' => ['nullable', 'in:all,pending,confirmed,shipped,delivered,canceled,suspended'],
+            'reorders_page' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $response = $this->sales_service->getById($id);
@@ -85,14 +88,19 @@ class SalesController extends Controller
         }
 
         $sales = $response['response_data'];
-        $newDealsPeriod = request()->input('new_deals_period') ?: 'today';
-        $soldProductsPeriod = request()->input('sold_products_period') ?: 'today';
+        $newDealsPeriod = request()->input('new_deals_period') ?: 'this_month';
+        $soldProductsPeriod = request()->input('sold_products_period') ?: 'this_month';
         $newDealsStatus = request()->input('new_deals_status') ?: 'all';
+        $reordersPeriod = request()->input('reorders_period') ?: 'this_month';
+        $reordersStatus = request()->input('reorders_status') ?: 'all';
         $newDealsRange = $this->salesActivityDateRange($newDealsPeriod);
         $newDealsRange['status'] = $newDealsStatus;
+        $reordersRange = $this->salesActivityDateRange($reordersPeriod);
+        $reordersRange['status'] = $reordersStatus;
         $activity = $this->sales_service->getSalesmanActivity(
             $sales->id,
             $newDealsRange,
+            $reordersRange,
             $this->salesActivityDateRange($soldProductsPeriod)
         );
 
@@ -126,12 +134,15 @@ class SalesController extends Controller
             'selectedStateId' => $selectedStateId,
             'selectedCityIds' => $selectedCityIds,
             'newDeals' => $activity['new_deals'],
+            'reorders' => $activity['reorders'],
             'soldProducts' => $activity['sold_products'],
             'totalSoldQuantity' => $activity['total_quantity'],
             'totalSoldPrice' => $activity['total_price'],
             'newDealsPeriod' => $newDealsPeriod,
             'soldProductsPeriod' => $soldProductsPeriod,
             'newDealsStatus' => $newDealsStatus,
+            'reordersPeriod' => $reordersPeriod,
+            'reordersStatus' => $reordersStatus,
         ]);
     }
 

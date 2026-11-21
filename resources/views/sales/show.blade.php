@@ -350,6 +350,9 @@
                         <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}">
                             <input type="hidden" name="sold_products_period" value="{{ $soldProductsPeriod }}">
                             <input type="hidden" name="sold_products_page" value="{{ request('sold_products_page', 1) }}">
+                            <input type="hidden" name="reorders_period" value="{{ $reordersPeriod }}">
+                            <input type="hidden" name="reorders_status" value="{{ $reordersStatus }}">
+                            <input type="hidden" name="reorders_page" value="{{ request('reorders_page', 1) }}">
                             <label class="sr-only" for="new-deals-status">{{ __('sales.status') }}</label>
                             <select id="new-deals-status" name="new_deals_status" class="form-select" onchange="this.form.submit()">
                                 <option value="all" {{ $newDealsStatus === 'all' ? 'selected' : '' }}>{{ __('orders.all') }}</option>
@@ -422,6 +425,96 @@
                         <strong>{{ __('sales.total_new_deals', ['total' => $newDeals->total()]) }}</strong>
                         <span>{{ __('sales.showing_rows', ['from' => $newDeals->firstItem() ?? 0, 'to' => $newDeals->lastItem() ?? 0, 'total' => $newDeals->total()]) }}</span>
                         {{ $newDeals->withQueryString()->links() }}
+                    </div>
+                </section>
+
+                <section class="mb-5">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                        <div>
+                            <h6 class="font-weight-semibold mb-1">{{ __('sales.reorders') }}</h6>
+                            <p class="text-sm text-muted mb-0">{{ __('sales.reorders_description') }}</p>
+                        </div>
+                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}">
+                            <input type="hidden" name="new_deals_period" value="{{ $newDealsPeriod }}">
+                            <input type="hidden" name="new_deals_status" value="{{ $newDealsStatus }}">
+                            <input type="hidden" name="new_deals_page" value="{{ request('new_deals_page', 1) }}">
+                            <input type="hidden" name="reorders_period" value="{{ $reordersPeriod }}">
+                            <input type="hidden" name="reorders_status" value="{{ $reordersStatus }}">
+                            <input type="hidden" name="reorders_page" value="{{ request('reorders_page', 1) }}">
+                            <input type="hidden" name="sold_products_period" value="{{ $soldProductsPeriod }}">
+                            <input type="hidden" name="sold_products_page" value="{{ request('sold_products_page', 1) }}">
+                            <label class="sr-only" for="reorders-status">{{ __('sales.status') }}</label>
+                            <select id="reorders-status" name="reorders_status" class="form-select" onchange="this.form.submit()">
+                                <option value="all" {{ $reordersStatus === 'all' ? 'selected' : '' }}>{{ __('orders.all') }}</option>
+                                <option value="pending" {{ $reordersStatus === 'pending' ? 'selected' : '' }}>{{ __('orders.pending') }}</option>
+                                <option value="confirmed" {{ $reordersStatus === 'confirmed' ? 'selected' : '' }}>{{ __('orders.confirmed') }}</option>
+                                <option value="shipped" {{ $reordersStatus === 'shipped' ? 'selected' : '' }}>{{ __('orders.shipped') }}</option>
+                                <option value="delivered" {{ $reordersStatus === 'delivered' ? 'selected' : '' }}>{{ __('orders.delivered') }}</option>
+                                <option value="canceled" {{ $reordersStatus === 'canceled' ? 'selected' : '' }}>{{ __('orders.canceled') }}</option>
+                                <option value="suspended" {{ $reordersStatus === 'suspended' ? 'selected' : '' }}>{{ __('orders.suspended') }}</option>
+                            </select>
+                            <label class="sr-only" for="reorders-period">{{ __('sales.date_range') }}</label>
+                            <select id="reorders-period" name="reorders_period" class="form-select" onchange="this.form.submit()">
+                                <option value="today" {{ $reordersPeriod === 'today' ? 'selected' : '' }}>{{ __('sales.today') }}</option>
+                                <option value="last_week" {{ $reordersPeriod === 'last_week' ? 'selected' : '' }}>{{ __('sales.last_week') }}</option>
+                                <option value="this_month" {{ $reordersPeriod === 'this_month' ? 'selected' : '' }}>{{ __('sales.this_month') }}</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.order') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.customer') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.status') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7 text-end">{{ __('sales.total_amount') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.date') }}</th>
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($reorders as $order)
+                                    @php
+                                        $status = [
+                                            'pending' => ['label' => __('orders.pending'), 'class' => 'border-secondary text-secondary bg-secondary'],
+                                            'confirmed' => ['label' => __('orders.confirmed'), 'class' => 'border-info text-info bg-info'],
+                                            'shipped' => ['label' => __('orders.shipped'), 'class' => 'border-warning text-warning bg-warning'],
+                                            'delivered' => ['label' => __('orders.delivered'), 'class' => 'border-success text-success bg-success'],
+                                            'canceled' => ['label' => __('orders.canceled'), 'class' => 'border-danger text-danger bg-danger'],
+                                            'cancelled' => ['label' => __('orders.canceled'), 'class' => 'border-danger text-danger bg-danger'],
+                                            'suspended' => ['label' => __('orders.suspended'), 'class' => 'border-danger text-danger bg-danger'],
+                                        ][$order->state] ?? null;
+                                    @endphp
+                                    <tr>
+                                        <td class="text-sm font-weight-semibold">{{ $order->invoice_id ?? $order->code }}</td>
+                                        <td class="text-sm">{{ $order->customer->name ?? $order->customer_name }}</td>
+                                        <td class="align-middle text-center text-sm">
+                                            @if($status)
+                                                <span class="badge badge-sm border {{ $status['class'] }} reservation">{{ $status['label'] }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-sm text-end">{{ number_format((float) $order->amount_total, 2) }}</td>
+                                        <td class="text-sm">{{ optional($order->created_at)->format('Y-m-d') }}</td>
+                                        <td class="align-middle">
+                                            <a href="{{ route('dashboard.orders.show', ['id' => $order->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('sales.view_order') }}" aria-label="{{ __('sales.view_order') }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="6" class="text-center py-4 text-secondary">{{ __('sales.no_reorders') }}</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
+                        <strong>{{ __('sales.total_reorders', ['total' => $reorders->total()]) }}</strong>
+                        <span>{{ __('sales.showing_rows', ['from' => $reorders->firstItem() ?? 0, 'to' => $reorders->lastItem() ?? 0, 'total' => $reorders->total()]) }}</span>
+                        {{ $reorders->withQueryString()->links() }}
                     </div>
                 </section>
 
