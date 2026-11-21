@@ -100,6 +100,36 @@
         font-size: 12px;
         margin-top: 5px;
     }
+    .sales-activity-card {
+        margin-top: 24px;
+    }
+    .sales-filter-form {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+    .sales-filter-form .form-select {
+        flex: 0 0 160px;
+        min-width: 0;
+    }
+    .sales-activity-card .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    .sales-activity-card .pagination .page-item.active .page-link {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: #fff;
+    }
+    @media (max-width: 767.98px) {
+        .sales-filter-form {
+            width: 100%;
+        }
+        .sales-filter-form .form-select {
+            flex: 1 1 0;
+            width: 0;
+        }
+    }
 </style>
 @stop
 
@@ -301,6 +331,148 @@
                         <button type="submit" class="btn-update">{{ __('sales.update') }}</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card border shadow-xs sales-activity-card">
+            <div class="card-header border-bottom pb-3">
+                <h6 class="font-weight-semibold text-lg mb-0">{{ __('sales.sales_activity') }}</h6>
+                <p class="text-sm mb-0">{{ __('sales.sales_activity_description') }}</p>
+            </div>
+            <div class="card-body p-4">
+                <section class="mb-5">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                        <div>
+                            <h6 class="font-weight-semibold mb-1">{{ __('sales.new_deals') }}</h6>
+                            <p class="text-sm text-muted mb-0">{{ __('sales.first_orders_description') }}</p>
+                        </div>
+                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}">
+                            <input type="hidden" name="sold_products_period" value="{{ $soldProductsPeriod }}">
+                            <input type="hidden" name="sold_products_page" value="{{ request('sold_products_page', 1) }}">
+                            <label class="sr-only" for="new-deals-status">{{ __('sales.status') }}</label>
+                            <select id="new-deals-status" name="new_deals_status" class="form-select" onchange="this.form.submit()">
+                                <option value="all" {{ $newDealsStatus === 'all' ? 'selected' : '' }}>{{ __('orders.all') }}</option>
+                                <option value="pending" {{ $newDealsStatus === 'pending' ? 'selected' : '' }}>{{ __('orders.pending') }}</option>
+                                <option value="confirmed" {{ $newDealsStatus === 'confirmed' ? 'selected' : '' }}>{{ __('orders.confirmed') }}</option>
+                                <option value="shipped" {{ $newDealsStatus === 'shipped' ? 'selected' : '' }}>{{ __('orders.shipped') }}</option>
+                                <option value="delivered" {{ $newDealsStatus === 'delivered' ? 'selected' : '' }}>{{ __('orders.delivered') }}</option>
+                                <option value="canceled" {{ $newDealsStatus === 'canceled' ? 'selected' : '' }}>{{ __('orders.canceled') }}</option>
+                                <option value="suspended" {{ $newDealsStatus === 'suspended' ? 'selected' : '' }}>{{ __('orders.suspended') }}</option>
+                            </select>
+                            <label class="sr-only" for="new-deals-period">{{ __('sales.date_range') }}</label>
+                            <select id="new-deals-period" name="new_deals_period" class="form-select" onchange="this.form.submit()">
+                                <option value="today" {{ $newDealsPeriod === 'today' ? 'selected' : '' }}>{{ __('sales.today') }}</option>
+                                <option value="last_week" {{ $newDealsPeriod === 'last_week' ? 'selected' : '' }}>{{ __('sales.last_week') }}</option>
+                                <option value="this_month" {{ $newDealsPeriod === 'this_month' ? 'selected' : '' }}>{{ __('sales.this_month') }}</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.order') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.customer') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.status') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7 text-end">{{ __('sales.total_amount') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.date') }}</th>
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($newDeals as $order)
+                                    @php
+                                        $status = [
+                                            'pending' => ['label' => __('orders.pending'), 'class' => 'border-secondary text-secondary bg-secondary'],
+                                            'confirmed' => ['label' => __('orders.confirmed'), 'class' => 'border-info text-info bg-info'],
+                                            'shipped' => ['label' => __('orders.shipped'), 'class' => 'border-warning text-warning bg-warning'],
+                                            'delivered' => ['label' => __('orders.delivered'), 'class' => 'border-success text-success bg-success'],
+                                            'canceled' => ['label' => __('orders.canceled'), 'class' => 'border-danger text-danger bg-danger'],
+                                            'cancelled' => ['label' => __('orders.canceled'), 'class' => 'border-danger text-danger bg-danger'],
+                                            'suspended' => ['label' => __('orders.suspended'), 'class' => 'border-danger text-danger bg-danger'],
+                                        ][$order->state] ?? null;
+                                    @endphp
+                                    <tr>
+                                        <td class="text-sm font-weight-semibold">{{ $order->invoice_id ?? $order->code }}</td>
+                                        <td class="text-sm">{{ $order->customer->name ?? $order->customer_name }}</td>
+                                        <td class="align-middle text-center text-sm">
+                                            @if($status)
+                                                <span class="badge badge-sm border {{ $status['class'] }} reservation">{{ $status['label'] }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-sm text-end">{{ number_format((float) $order->amount_total, 2) }}</td>
+                                        <td class="text-sm">{{ optional($order->created_at)->format('Y-m-d') }}</td>
+                                        <td class="align-middle">
+                                            <a href="{{ route('dashboard.orders.show', ['id' => $order->id]) }}" class="text-secondary font-weight-bold text-xs m-2 view cursor-pointer" data-bs-toggle="tooltip" data-bs-title="{{ __('sales.view_order') }}" aria-label="{{ __('sales.view_order') }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="6" class="text-center py-4 text-secondary">{{ __('sales.no_new_deals') }}</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
+                        <strong>{{ __('sales.total_new_deals', ['total' => $newDeals->total()]) }}</strong>
+                        <span>{{ __('sales.showing_rows', ['from' => $newDeals->firstItem() ?? 0, 'to' => $newDeals->lastItem() ?? 0, 'total' => $newDeals->total()]) }}</span>
+                        {{ $newDeals->withQueryString()->links() }}
+                    </div>
+                </section>
+
+                <section>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                        <div>
+                            <h6 class="font-weight-semibold mb-1">{{ __('sales.items_sold') }}</h6>
+                            <p class="text-sm text-muted mb-0">{{ __('sales.sold_products_description') }}</p>
+                        </div>
+                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}">
+                            <input type="hidden" name="new_deals_period" value="{{ $newDealsPeriod }}">
+                            <input type="hidden" name="new_deals_status" value="{{ $newDealsStatus }}">
+                            <input type="hidden" name="new_deals_page" value="{{ request('new_deals_page', 1) }}">
+                            <label class="sr-only" for="sold-products-period">{{ __('sales.date_range') }}</label>
+                            <select id="sold-products-period" name="sold_products_period" class="form-select" onchange="this.form.submit()">
+                                <option value="today" {{ $soldProductsPeriod === 'today' ? 'selected' : '' }}>{{ __('sales.today') }}</option>
+                                <option value="last_week" {{ $soldProductsPeriod === 'last_week' ? 'selected' : '' }}>{{ __('sales.last_week') }}</option>
+                                <option value="this_month" {{ $soldProductsPeriod === 'this_month' ? 'selected' : '' }}>{{ __('sales.this_month') }}</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7">{{ __('sales.product') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7 text-end">{{ __('sales.quantity') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7 text-end">{{ __('sales.unit_price') }}</th>
+                                    <th class="text-secondary text-xs font-weight-semibold opacity-7 text-end">{{ __('sales.total_price') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($soldProducts as $product)
+                                    <tr>
+                                        <td class="text-sm font-weight-semibold">{{ $product['name'] }}</td>
+                                        <td class="text-sm text-end">{{ $product['quantity'] }}</td>
+                                        <td class="text-sm text-end">{{ number_format($product['unit_price'], 2) }}</td>
+                                        <td class="text-sm text-end">{{ number_format($product['total_price'], 2) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" class="text-center py-4 text-secondary">{{ __('sales.no_items_sold') }}</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
+                        <strong>{{ __('sales.total_quantity_and_price', ['quantity' => number_format($totalSoldQuantity), 'price' => number_format($totalSoldPrice, 2)]) }}</strong>
+                        <span>{{ __('sales.showing_rows', ['from' => $soldProducts->firstItem() ?? 0, 'to' => $soldProducts->lastItem() ?? 0, 'total' => $soldProducts->total()]) }}</span>
+                        {{ $soldProducts->withQueryString()->links() }}
+                    </div>
+                </section>
             </div>
         </div>
     </div>

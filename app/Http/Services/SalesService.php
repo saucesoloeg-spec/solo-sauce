@@ -3,25 +3,107 @@
 namespace App\Http\Services;
 
 use App\Domains\Odoo\Services\OdooAuthService;
+use App\Domains\Orders\Repositories\OrderRepository;
 use App\Http\Repositories\CustomerRepository;
 use App\Http\Repositories\SalesRepository;
+use App\Models\OrderProduct;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 class SalesService
 {
     private $sales_repository;
     private $customer_repository;
     private $odoo_service;
+    private $order_repository;
 
     public function __construct(
         SalesRepository $sales_repository, 
         CustomerRepository $customer_repository,
-        OdooAuthService $odoo_service
+        OdooAuthService $odoo_service,
+        OrderRepository $order_repository
     ) 
     {
         $this->sales_repository    = $sales_repository;
         $this->customer_repository = $customer_repository;
         $this->odoo_service = $odoo_service;
+        $this->order_repository = $order_repository;
+    }
+
+    public function getSalesmanActivity($salesId, array $newDealsRange, array $productsRange)
+    {
+        $newDeals = $this->order_repository->getNewDealsForSales($salesId, $newDealsRange, 10, 'new_deals_page');
+
+        $soldProductsQuery = OrderProduct::query()
+            ->join('orders', 'orders.id', '=', 'order_products.order_id')
+            ->where('orders.sales_id', $salesId)
+            ->whereNull('orders.deleted_at')
+            ->select('order_products.product_id')
+            ->selectRaw('SUM(order_products.quantity) as quantity')
+            ->groupBy('order_products.product_id')
+            ->orderBy('order_products.product_id');
+
+        if (isset($productsRange['from'], $productsRange['to'])) {
+            $soldProductsQuery->whereDate('orders.created_at', '>=', $productsRange['from'])
+                ->whereDate('orders.created_at', '<=', $productsRange['to']);
+        }
+
+        $allSoldProducts = (clone $soldProductsQuery)->get();
+        $productDetails = [];
+        $totalQuantity = 0;
+        $totalPrice = 0;
+
+        foreach ($allSoldProducts as $soldProduct) {
+            $productId = (int) $soldProduct->product_id;
+            $productDetails[$productId] = $this->getOdooProductDetails($productId);
+            $quantity = (int) $soldProduct->quantity;
+            $totalQuantity += $quantity;
+            $totalPrice += (float) $productDetails[$productId]['list_price'] * $quantity;
+        }
+
+        $soldProducts = $soldProductsQuery->paginate(
+            10,
+            ['order_products.product_id', DB::raw('SUM(order_products.quantity) as quantity')],
+            'sold_products_page'
+        );
+        $soldProducts->getCollection()->transform(function ($soldProduct) use ($productDetails) {
+            $productId = (int) $soldProduct->product_id;
+            $product = $productDetails[$productId];
+
+            $unitPrice = (float) $product['list_price'];
+            $quantity = (int) $soldProduct->quantity;
+
+            return [
+                'product_id' => $productId,
+                'name' => $product['name'] ?? ('Product #' . $productId),
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'total_price' => $unitPrice * $quantity,
+            ];
+        });
+
+        return [
+            'new_deals' => $newDeals,
+            'sold_products' => $soldProducts,
+            'total_quantity' => $totalQuantity,
+            'total_price' => $totalPrice,
+        ];
+    }
+
+    private function getOdooProductDetails(int $productId): array
+    {
+        return Cache::remember('odoo_product_' . $productId, now()->addHours(6), function () use ($productId) {
+            $response = $this->odoo_service->getProductByIdFromOdoo($productId);
+            $productData = $response['data'] ?? null;
+
+            if (!is_array($productData) || !isset($productData['list_price'])) {
+                throw new RuntimeException('Odoo did not return product details and a list price for product ' . $productId . '.');
+            }
+
+            return $productData;
+        });
     }
 
     public function getAll() 

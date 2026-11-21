@@ -72,6 +72,12 @@ class SalesController extends Controller
      */
     public function show($id)
     {
+        request()->validate([
+            'new_deals_period' => ['nullable', 'in:today,last_week,this_month'],
+            'sold_products_period' => ['nullable', 'in:today,last_week,this_month'],
+            'new_deals_status' => ['nullable', 'in:all,pending,confirmed,shipped,delivered,canceled,suspended'],
+        ]);
+
         $response = $this->sales_service->getById($id);
 
         if($response['response_code'] != 200) {
@@ -79,6 +85,17 @@ class SalesController extends Controller
         }
 
         $sales = $response['response_data'];
+        $newDealsPeriod = request()->input('new_deals_period') ?: 'today';
+        $soldProductsPeriod = request()->input('sold_products_period') ?: 'today';
+        $newDealsStatus = request()->input('new_deals_status') ?: 'all';
+        $newDealsRange = $this->salesActivityDateRange($newDealsPeriod);
+        $newDealsRange['status'] = $newDealsStatus;
+        $activity = $this->sales_service->getSalesmanActivity(
+            $sales->id,
+            $newDealsRange,
+            $this->salesActivityDateRange($soldProductsPeriod)
+        );
+
         $countries = $this->odoo_service->getCountries();
         $countriesData = $countries['data']['countries'] ?? [];
 
@@ -108,7 +125,38 @@ class SalesController extends Controller
             'selectedCountryId' => $selectedCountryId,
             'selectedStateId' => $selectedStateId,
             'selectedCityIds' => $selectedCityIds,
+            'newDeals' => $activity['new_deals'],
+            'soldProducts' => $activity['sold_products'],
+            'totalSoldQuantity' => $activity['total_quantity'],
+            'totalSoldPrice' => $activity['total_price'],
+            'newDealsPeriod' => $newDealsPeriod,
+            'soldProductsPeriod' => $soldProductsPeriod,
+            'newDealsStatus' => $newDealsStatus,
         ]);
+    }
+
+    private function salesActivityDateRange(string $period): array
+    {
+        $today = now()->toDateString();
+
+        if ($period === 'last_week') {
+            return [
+                'from' => now()->subDays(6)->toDateString(),
+                'to' => $today,
+            ];
+        }
+
+        if ($period === 'this_month') {
+            return [
+                'from' => now()->startOfMonth()->toDateString(),
+                'to' => $today,
+            ];
+        }
+
+        return [
+            'from' => $today,
+            'to' => $today,
+        ];
     }
 
     /**

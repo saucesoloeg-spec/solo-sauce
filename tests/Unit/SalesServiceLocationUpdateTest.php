@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Domains\Odoo\Services\OdooAuthService;
+use App\Domains\Orders\Repositories\OrderRepository;
 use App\Http\Repositories\CustomerRepository;
 use App\Http\Repositories\SalesRepository;
 use App\Http\Services\SalesService;
@@ -43,7 +44,8 @@ class SalesServiceLocationUpdateTest extends TestCase
         $service = new SalesService(
             $salesRepository,
             Mockery::mock(CustomerRepository::class),
-            $odooService
+            $odooService,
+            Mockery::mock(OrderRepository::class)
         );
 
         $response = $service->updateSales(7, [
