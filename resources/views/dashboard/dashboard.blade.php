@@ -3,6 +3,21 @@
 @section('content')
 <div class="container-fluid py-4 px-5">
 
+    @php
+        $currentMonthKpis = $monthly_kpis['current'];
+        $previousMonthKpis = $monthly_kpis['previous'];
+        $rollingYearKpis = $monthly_kpis['rolling'];
+        $surveyChange = $previousMonthKpis['surveys'] > 0
+            ? round(abs(($currentMonthKpis['surveys'] - $previousMonthKpis['surveys']) / $previousMonthKpis['surveys']) * 100, 2)
+            : ($currentMonthKpis['surveys'] === 0 ? 0 : null);
+        $reorderChange = $previousMonthKpis['reorders'] > 0
+            ? round(abs(($currentMonthKpis['reorders'] - $previousMonthKpis['reorders']) / $previousMonthKpis['reorders']) * 100, 2)
+            : ($currentMonthKpis['reorders'] === 0 ? 0 : null);
+        $newDealChange = $previousMonthKpis['new_deals'] > 0
+            ? round(abs(($currentMonthKpis['new_deals'] - $previousMonthKpis['new_deals']) / $previousMonthKpis['new_deals']) * 100, 2)
+            : ($currentMonthKpis['new_deals'] === 0 ? 0 : null);
+    @endphp
+
     <div class="row">
         <div class="col-md-12">
             <div class="d-md-flex align-items-center mb-3 mx-2">
@@ -32,7 +47,8 @@
 
     <hr class="mt-0 mb-5">
 
-    <div class="row">
+    <div class="d-flex flex-column">
+    <div class="row order-2">
         <div class="col-xl-2 col-sm-3 mb-xl-0">
             <div class="card border shadow-xs mb-4">
                 <div class="card-body text-start p-3 w-100">
@@ -268,7 +284,7 @@
         </div>
 
     </div>
-    <div class="row">
+    <div class="row order-1">
         <div class="col-xl-4 col-sm-6 mb-xl-0">
             <div class="card border shadow-xs mb-4">
                 <div class="card-body text-start p-3 w-100">
@@ -290,20 +306,21 @@
                         <div class="col-12">
                             <div class="w-100">
                                 <p class="text-sm text-secondary mb-1">{{ __('dashboard.surveys') }}</p>
-                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->total_surveys ?? 0 }}</h4>
+                                <p class="text-xs text-secondary mb-1">{{ __('dashboard.last_12_months') }}</p>
+                                <h4 class="mb-2 font-weight-bold">{{ $rollingYearKpis['surveys'] }}</h4>
                                 <div class="d-flex align-items-center">
-                                    @if($monthly_income->total_surveys >= $past_monthly_income->total_surveys)
+                                    @if($currentMonthKpis['surveys'] >= $previousMonthKpis['surveys'])
                                     <span class="text-sm text-success font-weight-bolder">
-                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->total_surveys ? round((($monthly_income->total_surveys - $past_monthly_income->total_surveys) / ($past_monthly_income->total_surveys ?: 1)) * 100, 2) : 0 }}%
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $surveyChange === null ? 'N/A' : '+' . $surveyChange . '%' }}
                                     </span>
                                     @else
                                     <span class="text-sm text-danger font-weight-bolder">
-                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->total_surveys ? round((($past_monthly_income->total_surveys - $monthly_income->total_surveys) / ($past_monthly_income->total_surveys ?: 1)) * 100, 2) : 0 }}%
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $surveyChange === null ? 'N/A' : '-' . $surveyChange . '%' }}
                                     </span>
                                     @endif
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->total_surveys ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                    <span class="text-sm ms-1">{{ __('dashboard.month_comparison', ['current' => $currentMonthKpis['surveys'], 'previous' => $previousMonthKpis['surveys']]) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -328,20 +345,21 @@
                         <div class="col-12">
                             <div class="w-100">
                                 <p class="text-sm text-secondary mb-1">{{ __('dashboard.reorders') }}</p>
-                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->total_reorders ?? 0 }}</h4>
+                                <p class="text-xs text-secondary mb-1">{{ __('dashboard.last_12_months') }}</p>
+                                <h4 class="mb-2 font-weight-bold">{{ $rollingYearKpis['reorders'] }}</h4>
                                 <div class="d-flex align-items-center">
-                                    @if($monthly_income->total_reorders >= $past_monthly_income->total_reorders)
+                                    @if($currentMonthKpis['reorders'] >= $previousMonthKpis['reorders'])
                                     <span class="text-sm text-success font-weight-bolder">
-                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->total_reorders ? round((($monthly_income->total_reorders - $past_monthly_income->total_reorders) / ($past_monthly_income->total_reorders ?: 1)) * 100, 2) : 0 }}%
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $reorderChange === null ? 'N/A' : '+' . $reorderChange . '%' }}
                                     </span>
                                     @else
                                     <span class="text-sm text-danger font-weight-bolder">
-                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->total_reorders ? round((($past_monthly_income->total_reorders - $monthly_income->total_reorders) / ($past_monthly_income->total_reorders ?: 1)) * 100, 2) : 0 }}%
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $reorderChange === null ? 'N/A' : '-' . $reorderChange . '%' }}
                                     </span>
                                     @endif
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->total_reorders ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                    <span class="text-sm ms-1">{{ __('dashboard.month_comparison', ['current' => $currentMonthKpis['reorders'], 'previous' => $previousMonthKpis['reorders']]) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -368,20 +386,21 @@
                         <div class="col-12">
                             <div class="w-100">
                                 <p class="text-sm text-secondary mb-1">{{ __('dashboard.new_deals') }}</p>
-                                <h4 class="mb-2 font-weight-bold">{{ $monthly_income->total_new_orders ?? 0 }}</h4>
+                                <p class="text-xs text-secondary mb-1">{{ __('dashboard.last_12_months') }}</p>
+                                <h4 class="mb-2 font-weight-bold">{{ $rollingYearKpis['new_deals'] }}</h4>
                                 <div class="d-flex align-items-center">
-                                    @if($monthly_income->total_new_orders >= $past_monthly_income->total_new_orders)
+                                    @if($currentMonthKpis['new_deals'] >= $previousMonthKpis['new_deals'])
                                     <span class="text-sm text-success font-weight-bolder">
-                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $monthly_income->total_new_orders ? round((($monthly_income->total_new_orders - $past_monthly_income->total_new_orders) / ($past_monthly_income->total_new_orders ?: 1)) * 100, 2) : 0 }}%
+                                    <i class="fa fa-chevron-up text-xs me-1"></i> {{ $newDealChange === null ? 'N/A' : '+' . $newDealChange . '%' }}
                                     </span>
                                     @else
                                     <span class="text-sm text-danger font-weight-bolder">
-                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $monthly_income->total_new_orders ? round((($past_monthly_income->total_new_orders - $monthly_income->total_new_orders) / ($past_monthly_income->total_new_orders ?: 1)) * 100, 2) : 0 }}%
+                                    <i class="fa fa-chevron-down text-xs me-1"></i> {{ $newDealChange === null ? 'N/A' : '-' . $newDealChange . '%' }}
                                     </span>
                                     @endif
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <span class="text-sm ms-1">{{__('dashboard.from')}} {{ $past_monthly_income->total_new_orders ?? 0 }} {{__('dashboard.previous_month')}}</span>
+                                    <span class="text-sm ms-1">{{ __('dashboard.month_comparison', ['current' => $currentMonthKpis['new_deals'], 'previous' => $previousMonthKpis['new_deals']]) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -389,6 +408,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <div class="row my-4">
@@ -683,7 +703,7 @@
                         </div> -->
                     </div>
                     <div class="d-sm-flex align-items-center">
-                        <h3 class="mb-4 font-weight-semibold">${{ $yearly_income->sum('income') ?? 0 }}</h3>
+                        <h3 class="mb-4 font-weight-semibold">{{ __('dashboard.currency_prefix') }} {{ number_format($yearly_income->sum('income') ?? 0) }}</h3>
                         <span class="badge badge-sm border border-success text-success bg-success border-radius-sm ms-sm-3 px-2">
                             <svg width="9" height="9" viewBox="0 0 10 9" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0.46967 4.46967C0.176777 4.76256 0.176777 5.23744 0.46967 5.53033C0.762563 5.82322 1.23744 5.82322 1.53033 5.53033L0.46967 4.46967ZM5.53033 1.53033C5.82322 1.23744 5.82322 0.762563 5.53033 0.46967C5.23744 0.176777 4.76256 0.176777 4.46967 0.46967L5.53033 1.53033ZM5.53033 0.46967C5.23744 0.176777 4.76256 0.176777 4.46967 0.46967C4.17678 0.762563 4.17678 1.23744 4.46967 1.53033L5.53033 0.46967ZM8.46967 5.53033C8.76256 5.82322 9.23744 5.82322 9.53033 5.53033C9.82322 5.23744 9.82322 4.76256 9.53033 4.46967L8.46967 5.53033ZM1.53033 5.53033L5.53033 1.53033L4.46967 0.46967L0.46967 4.46967L1.53033 5.53033ZM4.46967 1.53033L8.46967 5.53033L9.53033 4.46967L5.53033 0.46967L4.46967 1.53033Z" fill="#67C23A"></path>
@@ -795,8 +815,8 @@
         });
     };
 
-    const monthlyIncome = @json($monthly_income);
-    const monthlyOrders = @json($monthly_orders);
+    const rollingKpis    = @json($monthly_kpis['rolling']);
+    const ordersByStatus = @json($orders_by_status);
     const topReorders    = @json($top_reorders ?? ['labels' => [], 'data' => []]);
     const topNewDeals    = @json($top_new_deals ?? ['labels' => [], 'data' => []]);
     const topSurveys     = @json($top_surveys ?? ['labels' => [], 'data' => []]);
@@ -1069,7 +1089,7 @@
                     },
                     backgroundColor: 'rgba(56, 189, 248, 0.75)',
                     borderColor: 'rgba(56, 189, 248, 1)',
-                    data: [monthlyIncome.total_reorders, monthlyIncome.total_new_orders, monthlyIncome.total_surveys],
+                    data: [rollingKpis.reorders, rollingKpis.new_deals, rollingKpis.surveys],
                     maxBarThickness: 36
                 }
             ],
@@ -1171,7 +1191,7 @@
                         'rgba(148, 163, 184, 1)',
                         'rgba(139, 92, 246, 1)'
                     ],
-                    data: [monthlyOrders['pending'] ?? 0, monthlyOrders['confirmed'] ?? 0, monthlyOrders['shipped'] ?? 0, monthlyOrders['completed'] ?? 0, monthlyOrders['cancelled'] ?? 0, monthlyOrders['suspended'] ?? 0, monthlyOrders['returned'] ?? 0],
+                    data: [ordersByStatus['pending'] ?? 0, ordersByStatus['confirmed'] ?? 0, ordersByStatus['shipped'] ?? 0, ordersByStatus['completed'] ?? 0, ordersByStatus['cancelled'] ?? 0, ordersByStatus['suspended'] ?? 0, ordersByStatus['returned'] ?? 0],
                     maxBarThickness: 36
                 }
             ],
@@ -1305,6 +1325,11 @@
                     pointRadius: 2,
                     usePointStyle: true,
                     boxWidth: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toLocaleString() + ' EGP';
+                        }
+                    }
                 }
             },
             interaction: {
@@ -1323,7 +1348,7 @@
                     ticks: {
                         stepSize: 1000, // Increment by 1000
                         callback: function(value) {
-                            return value.toLocaleString() + ' USD'; // Format with thousand separators
+                            return value.toLocaleString() + ' EGP';
                         },
                         display: true,
                         padding: 10,

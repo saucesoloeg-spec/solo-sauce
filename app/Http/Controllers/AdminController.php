@@ -118,8 +118,9 @@ class AdminController extends Controller
         $admin               = $this->admin_service->loggedinAdmin();
         $past_monthly_income = $this->admin_service->getPastMonthlyIncome();
         $monthly_income      = $this->admin_service->getMonthlyIncome();
-        $monthly_orders      = $this->admin_service->getMonthlyOrders();
+        $orders_by_status    = $this->admin_service->getOrdersByStatusForRollingYear();
         $yearly_income       = $this->admin_service->getYearlyIncome();
+        $monthly_kpis        = $this->admin_service->getMonthlyKpis();
 
         $top_new_deals = $this->formatTopRepresentatives($this->admin_service->getTopNewDealsByRepresentative());
         $top_reorders  = $this->formatTopRepresentatives($this->admin_service->getTopReordersByRepresentative());
@@ -129,8 +130,9 @@ class AdminController extends Controller
             'admin',
             'past_monthly_income',
             'monthly_income',
-            'monthly_orders',
+            'orders_by_status',
             'yearly_income',
+            'monthly_kpis',
             'top_new_deals',
             'top_reorders',
             'top_surveys'

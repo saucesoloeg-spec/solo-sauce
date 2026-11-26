@@ -73,11 +73,17 @@ class SalesController extends Controller
     public function show($id)
     {
         request()->validate([
-            'new_deals_period' => ['nullable', 'in:today,last_week,this_month'],
-            'sold_products_period' => ['nullable', 'in:today,last_week,this_month'],
+            'new_deals_period' => ['nullable', 'in:today,last_week,this_month,custom'],
+            'sold_products_period' => ['nullable', 'in:today,last_week,this_month,custom'],
             'new_deals_status' => ['nullable', 'in:all,pending,confirmed,shipped,delivered,canceled,suspended'],
-            'reorders_period' => ['nullable', 'in:today,last_week,this_month'],
+            'new_deals_from' => ['nullable', 'required_if:new_deals_period,custom', 'date'],
+            'new_deals_to' => ['nullable', 'required_if:new_deals_period,custom', 'date', 'after_or_equal:new_deals_from'],
+            'sold_products_from' => ['nullable', 'required_if:sold_products_period,custom', 'date'],
+            'sold_products_to' => ['nullable', 'required_if:sold_products_period,custom', 'date', 'after_or_equal:sold_products_from'],
+            'reorders_period' => ['nullable', 'in:today,last_week,this_month,custom'],
             'reorders_status' => ['nullable', 'in:all,pending,confirmed,shipped,delivered,canceled,suspended'],
+            'reorders_from' => ['nullable', 'required_if:reorders_period,custom', 'date'],
+            'reorders_to' => ['nullable', 'required_if:reorders_period,custom', 'date', 'after_or_equal:reorders_from'],
             'reorders_page' => ['nullable', 'integer', 'min:1'],
         ]);
 
@@ -93,15 +99,21 @@ class SalesController extends Controller
         $newDealsStatus = request()->input('new_deals_status') ?: 'all';
         $reordersPeriod = request()->input('reorders_period') ?: 'this_month';
         $reordersStatus = request()->input('reorders_status') ?: 'all';
-        $newDealsRange = $this->salesActivityDateRange($newDealsPeriod);
+        $newDealsFrom = request()->input('new_deals_from');
+        $newDealsTo = request()->input('new_deals_to');
+        $reordersFrom = request()->input('reorders_from');
+        $reordersTo = request()->input('reorders_to');
+        $soldProductsFrom = request()->input('sold_products_from');
+        $soldProductsTo = request()->input('sold_products_to');
+        $newDealsRange = $this->salesActivityDateRange($newDealsPeriod, $newDealsFrom, $newDealsTo);
         $newDealsRange['status'] = $newDealsStatus;
-        $reordersRange = $this->salesActivityDateRange($reordersPeriod);
+        $reordersRange = $this->salesActivityDateRange($reordersPeriod, $reordersFrom, $reordersTo);
         $reordersRange['status'] = $reordersStatus;
         $activity = $this->sales_service->getSalesmanActivity(
             $sales->id,
             $newDealsRange,
             $reordersRange,
-            $this->salesActivityDateRange($soldProductsPeriod)
+            $this->salesActivityDateRange($soldProductsPeriod, $soldProductsFrom, $soldProductsTo)
         );
 
         $countries = $this->odoo_service->getCountries();
@@ -143,12 +155,25 @@ class SalesController extends Controller
             'newDealsStatus' => $newDealsStatus,
             'reordersPeriod' => $reordersPeriod,
             'reordersStatus' => $reordersStatus,
+            'newDealsFrom' => $newDealsFrom,
+            'newDealsTo' => $newDealsTo,
+            'reordersFrom' => $reordersFrom,
+            'reordersTo' => $reordersTo,
+            'soldProductsFrom' => $soldProductsFrom,
+            'soldProductsTo' => $soldProductsTo,
         ]);
     }
 
-    private function salesActivityDateRange(string $period): array
+    private function salesActivityDateRange(string $period, ?string $from = null, ?string $to = null): array
     {
         $today = now()->toDateString();
+
+        if ($period === 'custom') {
+            return [
+                'from' => $from,
+                'to' => $to,
+            ];
+        }
 
         if ($period === 'last_week') {
             return [

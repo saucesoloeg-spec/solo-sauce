@@ -44,6 +44,7 @@ class SalesService
             ->select('order_products.product_id')
             ->selectRaw('SUM(order_products.quantity) as quantity')
             ->groupBy('order_products.product_id')
+            ->orderByDesc('quantity')
             ->orderBy('order_products.product_id');
 
         if (isset($productsRange['from'], $productsRange['to'])) {

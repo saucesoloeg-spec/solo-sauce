@@ -33,9 +33,14 @@ class AdminService
         return $this->admin_repository->monthlyIncome();
     }
 
-    public function getMonthlyOrders() 
+    public function getMonthlyKpis()
     {
-        return $this->admin_repository->monthlyOrders();
+        return $this->admin_repository->monthlyKpis();
+    }
+
+    public function getOrdersByStatusForRollingYear()
+    {
+        return $this->admin_repository->ordersByStatusForRollingYear();
     }
 
     public function getYearlyIncome() 

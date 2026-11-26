@@ -103,6 +103,40 @@
     .sales-activity-card {
         margin-top: 24px;
     }
+    [data-sales-activity-results] {
+        position: relative;
+    }
+    [data-sales-activity-results][aria-busy="true"]::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: rgba(255, 255, 255, 0.7);
+    }
+    .sales-activity-loading {
+        display: none;
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        align-items: center;
+        justify-content: center;
+    }
+    [data-sales-activity-results][aria-busy="true"] .sales-activity-loading {
+        display: flex;
+    }
+    .sales-activity-spinner {
+        width: 2rem;
+        height: 2rem;
+        border: 0.25rem solid #dee2e6;
+        border-top-color: #6c757d;
+        border-radius: 50%;
+        animation: sales-activity-spin 0.75s linear infinite;
+    }
+    @keyframes sales-activity-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
     .sales-filter-form {
         display: flex;
         flex-wrap: nowrap;
@@ -111,6 +145,19 @@
     .sales-filter-form .form-select {
         flex: 0 0 160px;
         min-width: 0;
+    }
+    .sales-custom-range {
+        display: flex;
+        flex: 1 0 100%;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: 8px;
+    }
+    .sales-custom-range .form-group {
+        margin-bottom: 0;
+    }
+    .sales-custom-range .form-control {
+        min-width: 150px;
     }
     .sales-activity-card .pagination .page-link {
         padding: 0.25rem 0.5rem;
@@ -341,20 +388,24 @@
                 <p class="text-sm mb-0">{{ __('sales.sales_activity_description') }}</p>
             </div>
             <div class="card-body p-4">
-                <section class="mb-5">
+                <section id="sales-new-deals-section" class="mb-5" data-sales-activity-section data-sales-activity-page-param="new_deals_page">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                         <div>
                             <h6 class="font-weight-semibold mb-1">{{ __('sales.new_deals') }}</h6>
                             <p class="text-sm text-muted mb-0">{{ __('sales.first_orders_description') }}</p>
                         </div>
-                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}">
+                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}" data-sales-activity-filter>
                             <input type="hidden" name="sold_products_period" value="{{ $soldProductsPeriod }}">
+                            <input type="hidden" name="sold_products_from" value="{{ $soldProductsFrom }}">
+                            <input type="hidden" name="sold_products_to" value="{{ $soldProductsTo }}">
                             <input type="hidden" name="sold_products_page" value="{{ request('sold_products_page', 1) }}">
                             <input type="hidden" name="reorders_period" value="{{ $reordersPeriod }}">
+                            <input type="hidden" name="reorders_from" value="{{ $reordersFrom }}">
+                            <input type="hidden" name="reorders_to" value="{{ $reordersTo }}">
                             <input type="hidden" name="reorders_status" value="{{ $reordersStatus }}">
                             <input type="hidden" name="reorders_page" value="{{ request('reorders_page', 1) }}">
                             <label class="sr-only" for="new-deals-status">{{ __('sales.status') }}</label>
-                            <select id="new-deals-status" name="new_deals_status" class="form-select" onchange="this.form.submit()">
+                            <select id="new-deals-status" name="new_deals_status" class="form-select" onchange="this.form.requestSubmit()">
                                 <option value="all" {{ $newDealsStatus === 'all' ? 'selected' : '' }}>{{ __('orders.all') }}</option>
                                 <option value="pending" {{ $newDealsStatus === 'pending' ? 'selected' : '' }}>{{ __('orders.pending') }}</option>
                                 <option value="confirmed" {{ $newDealsStatus === 'confirmed' ? 'selected' : '' }}>{{ __('orders.confirmed') }}</option>
@@ -364,14 +415,30 @@
                                 <option value="suspended" {{ $newDealsStatus === 'suspended' ? 'selected' : '' }}>{{ __('orders.suspended') }}</option>
                             </select>
                             <label class="sr-only" for="new-deals-period">{{ __('sales.date_range') }}</label>
-                            <select id="new-deals-period" name="new_deals_period" class="form-select" onchange="this.form.submit()">
+                            <select id="new-deals-period" name="new_deals_period" class="form-select" data-sales-period>
                                 <option value="today" {{ $newDealsPeriod === 'today' ? 'selected' : '' }}>{{ __('sales.today') }}</option>
                                 <option value="last_week" {{ $newDealsPeriod === 'last_week' ? 'selected' : '' }}>{{ __('sales.last_week') }}</option>
                                 <option value="this_month" {{ $newDealsPeriod === 'this_month' ? 'selected' : '' }}>{{ __('sales.this_month') }}</option>
+                                <option value="custom" {{ $newDealsPeriod === 'custom' ? 'selected' : '' }}>{{ __('sales.custom_range') }}</option>
                             </select>
+                            <div class="sales-custom-range {{ $newDealsPeriod === 'custom' ? '' : 'd-none' }}" data-custom-range>
+                                <div class="form-group">
+                                    <label for="new-deals-from">{{ __('sales.from_date') }}</label>
+                                    <input id="new-deals-from" type="date" name="new_deals_from" class="form-control" value="{{ $newDealsFrom }}" {{ $newDealsPeriod === 'custom' ? 'required' : '' }}>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-deals-to">{{ __('sales.to_date') }}</label>
+                                    <input id="new-deals-to" type="date" name="new_deals_to" class="form-control" value="{{ $newDealsTo }}" {{ $newDealsPeriod === 'custom' ? 'required' : '' }}>
+                                </div>
+                                <button type="submit" class="btn btn-secondary mb-0">{{ __('sales.apply_date_range') }}</button>
+                            </div>
                         </form>
                     </div>
-                    <div class="table-responsive">
+                    <div data-sales-activity-results>
+                        <div class="sales-activity-loading" role="status" aria-label="{{ __('sales.loading_activity') }}">
+                            <span class="sales-activity-spinner" aria-hidden="true"></span>
+                        </div>
+                        <div class="table-responsive">
                         <table class="table align-items-center mb-0">
                             <thead class="bg-gray-100">
                                 <tr>
@@ -421,30 +488,32 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
                         <strong>{{ __('sales.total_new_deals', ['total' => $newDeals->total()]) }}</strong>
                         <span>{{ __('sales.showing_rows', ['from' => $newDeals->firstItem() ?? 0, 'to' => $newDeals->lastItem() ?? 0, 'total' => $newDeals->total()]) }}</span>
                         {{ $newDeals->withQueryString()->links() }}
                     </div>
+                    </div>
                 </section>
 
-                <section class="mb-5">
+                <section id="sales-reorders-section" class="mb-5" data-sales-activity-section data-sales-activity-page-param="reorders_page">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                         <div>
                             <h6 class="font-weight-semibold mb-1">{{ __('sales.reorders') }}</h6>
                             <p class="text-sm text-muted mb-0">{{ __('sales.reorders_description') }}</p>
                         </div>
-                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}">
+                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}" data-sales-activity-filter>
                             <input type="hidden" name="new_deals_period" value="{{ $newDealsPeriod }}">
+                            <input type="hidden" name="new_deals_from" value="{{ $newDealsFrom }}">
+                            <input type="hidden" name="new_deals_to" value="{{ $newDealsTo }}">
                             <input type="hidden" name="new_deals_status" value="{{ $newDealsStatus }}">
                             <input type="hidden" name="new_deals_page" value="{{ request('new_deals_page', 1) }}">
-                            <input type="hidden" name="reorders_period" value="{{ $reordersPeriod }}">
-                            <input type="hidden" name="reorders_status" value="{{ $reordersStatus }}">
-                            <input type="hidden" name="reorders_page" value="{{ request('reorders_page', 1) }}">
                             <input type="hidden" name="sold_products_period" value="{{ $soldProductsPeriod }}">
+                            <input type="hidden" name="sold_products_from" value="{{ $soldProductsFrom }}">
+                            <input type="hidden" name="sold_products_to" value="{{ $soldProductsTo }}">
                             <input type="hidden" name="sold_products_page" value="{{ request('sold_products_page', 1) }}">
                             <label class="sr-only" for="reorders-status">{{ __('sales.status') }}</label>
-                            <select id="reorders-status" name="reorders_status" class="form-select" onchange="this.form.submit()">
+                            <select id="reorders-status" name="reorders_status" class="form-select" onchange="this.form.requestSubmit()">
                                 <option value="all" {{ $reordersStatus === 'all' ? 'selected' : '' }}>{{ __('orders.all') }}</option>
                                 <option value="pending" {{ $reordersStatus === 'pending' ? 'selected' : '' }}>{{ __('orders.pending') }}</option>
                                 <option value="confirmed" {{ $reordersStatus === 'confirmed' ? 'selected' : '' }}>{{ __('orders.confirmed') }}</option>
@@ -454,14 +523,31 @@
                                 <option value="suspended" {{ $reordersStatus === 'suspended' ? 'selected' : '' }}>{{ __('orders.suspended') }}</option>
                             </select>
                             <label class="sr-only" for="reorders-period">{{ __('sales.date_range') }}</label>
-                            <select id="reorders-period" name="reorders_period" class="form-select" onchange="this.form.submit()">
+                            <select id="reorders-period" name="reorders_period" class="form-select" data-sales-period>
                                 <option value="today" {{ $reordersPeriod === 'today' ? 'selected' : '' }}>{{ __('sales.today') }}</option>
                                 <option value="last_week" {{ $reordersPeriod === 'last_week' ? 'selected' : '' }}>{{ __('sales.last_week') }}</option>
                                 <option value="this_month" {{ $reordersPeriod === 'this_month' ? 'selected' : '' }}>{{ __('sales.this_month') }}</option>
+                                <option value="custom" {{ $reordersPeriod === 'custom' ? 'selected' : '' }}>{{ __('sales.custom_range') }}</option>
                             </select>
+                            <div class="sales-custom-range {{ $reordersPeriod === 'custom' ? '' : 'd-none' }}" data-custom-range>
+                                <div class="form-group">
+                                    <label for="reorders-from">{{ __('sales.from_date') }}</label>
+                                    <input id="reorders-from" type="date" name="reorders_from" class="form-control" value="{{ $reordersFrom }}" {{ $reordersPeriod === 'custom' ? 'required' : '' }}>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reorders-to">{{ __('sales.to_date') }}</label>
+                                    <input id="reorders-to" type="date" name="reorders_to" class="form-control" value="{{ $reordersTo }}" {{ $reordersPeriod === 'custom' ? 'required' : '' }}>
+                                </div>
+                                <button type="submit" class="btn btn-secondary mb-0">{{ __('sales.apply_date_range') }}</button>
+                            </div>
+                            <input type="hidden" name="reorders_page" value="{{ request('reorders_page', 1) }}">
                         </form>
                     </div>
-                    <div class="table-responsive">
+                    <div data-sales-activity-results>
+                        <div class="sales-activity-loading" role="status" aria-label="{{ __('sales.loading_activity') }}">
+                            <span class="sales-activity-spinner" aria-hidden="true"></span>
+                        </div>
+                        <div class="table-responsive">
                         <table class="table align-items-center mb-0">
                             <thead class="bg-gray-100">
                                 <tr>
@@ -511,32 +597,56 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
                         <strong>{{ __('sales.total_reorders', ['total' => $reorders->total()]) }}</strong>
                         <span>{{ __('sales.showing_rows', ['from' => $reorders->firstItem() ?? 0, 'to' => $reorders->lastItem() ?? 0, 'total' => $reorders->total()]) }}</span>
                         {{ $reorders->withQueryString()->links() }}
                     </div>
+                    </div>
                 </section>
 
-                <section>
+                <section id="sales-sold-products-section" data-sales-activity-section data-sales-activity-page-param="sold_products_page">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                         <div>
                             <h6 class="font-weight-semibold mb-1">{{ __('sales.items_sold') }}</h6>
                             <p class="text-sm text-muted mb-0">{{ __('sales.sold_products_description') }}</p>
                         </div>
-                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}">
+                        <form class="sales-filter-form" method="GET" action="{{ route('sales.show', ['id' => $sales->id]) }}" data-sales-activity-filter>
                             <input type="hidden" name="new_deals_period" value="{{ $newDealsPeriod }}">
+                            <input type="hidden" name="new_deals_from" value="{{ $newDealsFrom }}">
+                            <input type="hidden" name="new_deals_to" value="{{ $newDealsTo }}">
                             <input type="hidden" name="new_deals_status" value="{{ $newDealsStatus }}">
                             <input type="hidden" name="new_deals_page" value="{{ request('new_deals_page', 1) }}">
+                            <input type="hidden" name="reorders_period" value="{{ $reordersPeriod }}">
+                            <input type="hidden" name="reorders_from" value="{{ $reordersFrom }}">
+                            <input type="hidden" name="reorders_to" value="{{ $reordersTo }}">
+                            <input type="hidden" name="reorders_status" value="{{ $reordersStatus }}">
+                            <input type="hidden" name="reorders_page" value="{{ request('reorders_page', 1) }}">
                             <label class="sr-only" for="sold-products-period">{{ __('sales.date_range') }}</label>
-                            <select id="sold-products-period" name="sold_products_period" class="form-select" onchange="this.form.submit()">
+                            <select id="sold-products-period" name="sold_products_period" class="form-select" data-sales-period>
                                 <option value="today" {{ $soldProductsPeriod === 'today' ? 'selected' : '' }}>{{ __('sales.today') }}</option>
                                 <option value="last_week" {{ $soldProductsPeriod === 'last_week' ? 'selected' : '' }}>{{ __('sales.last_week') }}</option>
                                 <option value="this_month" {{ $soldProductsPeriod === 'this_month' ? 'selected' : '' }}>{{ __('sales.this_month') }}</option>
+                                <option value="custom" {{ $soldProductsPeriod === 'custom' ? 'selected' : '' }}>{{ __('sales.custom_range') }}</option>
                             </select>
+                            <div class="sales-custom-range {{ $soldProductsPeriod === 'custom' ? '' : 'd-none' }}" data-custom-range>
+                                <div class="form-group">
+                                    <label for="sold-products-from">{{ __('sales.from_date') }}</label>
+                                    <input id="sold-products-from" type="date" name="sold_products_from" class="form-control" value="{{ $soldProductsFrom }}" {{ $soldProductsPeriod === 'custom' ? 'required' : '' }}>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sold-products-to">{{ __('sales.to_date') }}</label>
+                                    <input id="sold-products-to" type="date" name="sold_products_to" class="form-control" value="{{ $soldProductsTo }}" {{ $soldProductsPeriod === 'custom' ? 'required' : '' }}>
+                                </div>
+                                <button type="submit" class="btn btn-secondary mb-0">{{ __('sales.apply_date_range') }}</button>
+                            </div>
                         </form>
                     </div>
-                    <div class="table-responsive">
+                    <div data-sales-activity-results>
+                        <div class="sales-activity-loading" role="status" aria-label="{{ __('sales.loading_activity') }}">
+                            <span class="sales-activity-spinner" aria-hidden="true"></span>
+                        </div>
+                        <div class="table-responsive">
                         <table class="table align-items-center mb-0">
                             <thead class="bg-gray-100">
                                 <tr>
@@ -560,10 +670,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
                         <strong>{{ __('sales.total_quantity_and_price', ['quantity' => number_format($totalSoldQuantity), 'price' => number_format($totalSoldPrice, 2)]) }}</strong>
                         <span>{{ __('sales.showing_rows', ['from' => $soldProducts->firstItem() ?? 0, 'to' => $soldProducts->lastItem() ?? 0, 'total' => $soldProducts->total()]) }}</span>
                         {{ $soldProducts->withQueryString()->links() }}
+                    </div>
                     </div>
                 </section>
             </div>
@@ -586,6 +697,150 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialSelectedCityIds = JSON.parse(pageData?.dataset?.selectedCityIds || '[]').map(Number);
     const cityData = JSON.parse(pageData?.dataset?.cities || '[]');
     let selectedCities = [];
+
+    const initializeSalesPeriodControls = (root) => {
+        root.querySelectorAll('[data-sales-period]').forEach(periodSelect => {
+            const rangeFields = periodSelect.form.querySelector('[data-custom-range]');
+            const dateInputs = rangeFields.querySelectorAll('input[type="date"]');
+            const fromDate = rangeFields.querySelector('input[name$="_from"]');
+            const toDate = rangeFields.querySelector('input[name$="_to"]');
+            const updateRangeVisibility = (submitPreset) => {
+                const isCustom = periodSelect.value === 'custom';
+                rangeFields.classList.toggle('d-none', !isCustom);
+                dateInputs.forEach(input => {
+                    input.required = isCustom;
+                });
+
+                if (!isCustom && submitPreset) {
+                    periodSelect.form.requestSubmit();
+                }
+            };
+
+            const updateEndDateMinimum = () => {
+                toDate.min = fromDate.value;
+            };
+
+            updateRangeVisibility(false);
+            updateEndDateMinimum();
+            fromDate.addEventListener('change', updateEndDateMinimum);
+            periodSelect.addEventListener('change', () => updateRangeVisibility(true));
+        });
+    };
+
+    initializeSalesPeriodControls(document);
+
+    const salesActivityPageParams = ['new_deals_page', 'reorders_page', 'sold_products_page'];
+    const synchronizeSalesActivityNavigation = (url) => {
+        document.querySelectorAll('[data-sales-activity-filter] input[type="hidden"]').forEach(input => {
+            const value = url.searchParams.get(input.name);
+            if (value !== null || salesActivityPageParams.includes(input.name)) {
+                input.value = value !== null ? value : '1';
+            }
+        });
+
+        document.querySelectorAll('[data-sales-activity-section]').forEach(section => {
+            const pageParam = section.dataset.salesActivityPageParam;
+            section.querySelectorAll('.pagination a').forEach(link => {
+                const linkUrl = new URL(link.href, window.location.href);
+                const page = linkUrl.searchParams.get(pageParam);
+                url.searchParams.forEach((value, key) => {
+                    if (key !== pageParam) {
+                        linkUrl.searchParams.set(key, value);
+                    }
+                });
+                salesActivityPageParams.forEach(key => {
+                    if (key !== pageParam) {
+                        linkUrl.searchParams.set(key, url.searchParams.get(key) || '1');
+                    }
+                });
+                if (page !== null) {
+                    linkUrl.searchParams.set(pageParam, page);
+                }
+                link.href = linkUrl.href;
+            });
+        });
+    };
+
+    const activeActivityRequests = new Map();
+    const updateSalesActivitySection = async (section, url) => {
+        const previousRequest = activeActivityRequests.get(section.id);
+        if (previousRequest) {
+            previousRequest.abort();
+        }
+
+        const requestController = new AbortController();
+        const results = section.querySelector('[data-sales-activity-results]');
+        results.setAttribute('aria-busy', 'true');
+        activeActivityRequests.set(section.id, requestController);
+
+        try {
+            const response = await fetch(url.href, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                signal: requestController.signal,
+            });
+
+            if (!response.ok || response.redirected) {
+                throw new Error('Sales activity request failed.');
+            }
+
+            const pageMarkup = await response.text();
+            const parsedPage = new DOMParser().parseFromString(pageMarkup, 'text/html');
+            const updatedSection = parsedPage.getElementById(section.id);
+            if (!updatedSection) {
+                throw new Error('Sales activity response did not contain the requested table.');
+            }
+
+            if (activeActivityRequests.get(section.id) !== requestController) {
+                return;
+            }
+
+            section.replaceWith(updatedSection);
+            window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+            initializeSalesPeriodControls(updatedSection);
+            synchronizeSalesActivityNavigation(url);
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('Unable to update salesman activity in the background.', error);
+            window.location.assign(url.href);
+        } finally {
+            if (activeActivityRequests.get(section.id) === requestController) {
+                activeActivityRequests.delete(section.id);
+                results.removeAttribute('aria-busy');
+            }
+        }
+    };
+
+    document.addEventListener('submit', event => {
+        const form = event.target;
+        if (!form.matches('[data-sales-activity-filter]')) {
+            return;
+        }
+
+        event.preventDefault();
+        const section = form.closest('[data-sales-activity-section]');
+        const url = new URL(form.action, window.location.href);
+        url.search = new URLSearchParams(new FormData(form)).toString();
+        url.searchParams.set(section.dataset.salesActivityPageParam, '1');
+        updateSalesActivitySection(section, url);
+    });
+
+    document.addEventListener('click', event => {
+        const link = event.target.closest('[data-sales-activity-section] .pagination a');
+        if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return;
+        }
+
+        const url = new URL(link.href, window.location.href);
+        if (url.origin !== window.location.origin) {
+            return;
+        }
+
+        event.preventDefault();
+        updateSalesActivitySection(link.closest('[data-sales-activity-section]'), url);
+    });
 
     const resetState = () => {
         state.innerHTML = '<option value="">Select State</option>';

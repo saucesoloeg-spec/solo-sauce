@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Order;
 use App\Models\MonthlyIncome;
 use App\Models\SurveyAnswer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AdminRepository
@@ -59,11 +60,61 @@ class AdminRepository
         return $this->monthly_income_model->where('collect_date', $endDate->format('Y-m-d'))->first();   
     }
 
-    public function monthlyOrders() 
+    public function monthlyKpis()
     {
-        $lastMonth = now()->subMonthNoOverflow();
-        $start     = $lastMonth->copy()->startOfMonth();
-        $end       = $lastMonth->copy()->endOfMonth()->endOfDay();
+        $now = now();
+        $previousMonth = $now->copy()->subMonthNoOverflow();
+
+        return [
+            'rolling' => $this->getKpisForPeriod($now->copy()->subYearNoOverflow(), $now),
+            'current' => $this->getKpisForPeriod($now->copy()->startOfMonth(), $now),
+            'previous' => $this->getKpisForPeriod(
+                $previousMonth->copy()->startOfMonth(),
+                $previousMonth->copy()->endOfMonth()->endOfDay()
+            ),
+        ];
+    }
+
+    private function getKpisForPeriod($start, $end)
+    {
+        $orders = $this->order_model->whereBetween('orders.created_at', [$start, $end]);
+        $firstOrder = '(
+            SELECT o2.id
+            FROM orders o2
+            WHERE o2.customer_id = orders.customer_id
+              AND o2.deleted_at IS NULL
+            ORDER BY o2.created_at, o2.id
+            LIMIT 1
+        )';
+
+        $newDeals = (clone $orders)
+            ->whereRaw('orders.id = ' . $firstOrder)
+            ->count();
+
+        $reorders = (clone $orders)
+            ->whereRaw('orders.id <> ' . $firstOrder)
+            ->count();
+
+        $surveyPairs = $this->survey_answer_model
+            ->whereBetween('created_at', [$start, $end])
+            ->select('sales_customer_id', 'customer_id')
+            ->distinct()
+            ->toBase();
+
+        $surveys = DB::query()
+            ->fromSub($surveyPairs, 'survey_pairs')
+            ->count();
+
+        return [
+            'new_deals' => $newDeals,
+            'reorders' => $reorders,
+            'surveys' => $surveys,
+        ];
+    }
+
+    public function ordersByStatusForRollingYear()
+    {
+        [$start, $end] = $this->getRollingYearRange();
         
         return $this->order_model
                     ->whereBetween('created_at', [
@@ -75,18 +126,19 @@ class AdminRepository
                     ->pluck('total', 'state');
     }
 
-    private function getLastMonthRange()
+    private function getRollingYearRange()
     {
-        $lastMonth = now()->subMonthNoOverflow();
+        $now = now();
+
         return [
-            $lastMonth->copy()->startOfMonth(),
-            $lastMonth->copy()->endOfMonth()->endOfDay(),
+            $now->copy()->subYearNoOverflow(),
+            $now,
         ];
     }
 
     public function topNewDealsByRepresentative($limit = 5)
     {
-        [$start, $end] = $this->getLastMonthRange();
+        [$start, $end] = $this->getRollingYearRange();
 
         return $this->order_model
                     ->join('sales', 'sales.id', '=', 'orders.sales_id')
@@ -106,7 +158,7 @@ class AdminRepository
 
     public function topReordersByRepresentative($limit = 5)
     {
-        [$start, $end] = $this->getLastMonthRange();
+        [$start, $end] = $this->getRollingYearRange();
 
         return $this->order_model
                     ->join('sales', 'sales.id', '=', 'orders.sales_id')
@@ -126,14 +178,26 @@ class AdminRepository
 
     public function topSurveyAnswersByRepresentative($limit = 5)
     {
-        [$start, $end] = $this->getLastMonthRange();
+        [$start, $end] = $this->getRollingYearRange();
 
-        return $this->survey_answer_model
+        $surveyPairs = $this->survey_answer_model
                     ->join('sales', 'sales.id', '=', 'survey_answers.sales_id')
                     ->whereBetween('survey_answers.created_at', [$start, $end])
                     ->whereNotNull('survey_answers.sales_id')
-                    ->groupBy('survey_answers.sales_id', 'sales.name')
-                    ->selectRaw('survey_answers.sales_id as sales_id, sales.name as sales_name, COUNT(DISTINCT CONCAT(survey_answers.sales_customer_id, "-", survey_answers.customer_id)) as total')
+                    ->select(
+                        'survey_answers.sales_id',
+                        'sales.name as sales_name',
+                        'survey_answers.sales_customer_id',
+                        'survey_answers.customer_id'
+                    )
+                    ->distinct()
+                    ->toBase();
+
+        return DB::query()
+                    ->fromSub($surveyPairs, 'survey_pairs')
+                    ->select('sales_id', 'sales_name')
+                    ->selectRaw('COUNT(*) as total')
+                    ->groupBy('sales_id', 'sales_name')
                     ->orderByDesc('total')
                     ->limit($limit)
                     ->get();
